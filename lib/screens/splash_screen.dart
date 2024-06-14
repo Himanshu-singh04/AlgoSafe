@@ -1,0 +1,80 @@
+
+import 'package:algosafe/main.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+class splash_screen extends StatefulWidget {
+  const splash_screen({super.key});
+
+  @override
+  State<splash_screen> createState() => _splash_screenState();
+}
+
+class _splash_screenState extends State<splash_screen> { 
+  @override
+  void initState() {
+    super.initState();
+    _navigatetoHome();
+  }
+
+  _navigatetoHome() async {
+    await Future.delayed(Duration(milliseconds: 4000), (){});
+    // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyHomePage(theme: ThemeData.light(),)));
+    Navigator.of(context).pushReplacement(_createRoute());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        backgroundColor: Colors.white,
+        body: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(begin: Alignment.topRight,end: Alignment.bottomRight,colors: [Color.fromARGB(255, 167, 255, 214),Color.fromARGB(255, 231, 209, 6)])
+          ),
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+              Center(child: Image.asset("assets/images/Algofet primary subtext.png",height: size.height*0.6,width: size.width*0.8)),
+              Center(child: AnimatedTextKit(animatedTexts: [TypewriterAnimatedText("AlgoSAFE v1.0",speed: Duration(milliseconds: 250),textStyle: TextStyle(fontSize: size.width*0.1))],
+                  totalRepeatCount: 7,displayFullTextOnTap: true,
+              stopPauseOnTap: true,)),
+              CircularProgressIndicator()
+            ],),
+          ),
+        )
+      ),
+    );
+  }
+}
+
+Route _createRoute() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(theme: ThemeData.light()),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(0.0, 1.0);
+      const end = Offset.zero;
+      const curve = Curves.ease;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+
+
+
+
+
