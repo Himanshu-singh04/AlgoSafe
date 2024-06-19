@@ -1,4 +1,4 @@
-package com.example.algosafe
+package com.example.algo_safe
 
 import io.flutter.embedding.android.FlutterActivity
 

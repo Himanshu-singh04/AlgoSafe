@@ -1,4 +1,4 @@
-import 'package:algosafe/utils/bnb_custom_painter.dart';
+import 'package:algo_safe/widgets/bnb_custom_painter.dart';
 import 'package:flutter/material.dart';
 
 class bottom_nav_bar extends StatefulWidget {

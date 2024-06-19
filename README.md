@@ -1,4 +1,4 @@
-# algosafe
+# algo_safe
 
 A new Flutter project.
 

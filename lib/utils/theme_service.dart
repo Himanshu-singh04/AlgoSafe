@@ -1,6 +1,5 @@
-import 'package:algosafe/constants/theme_configuration.dart';
+import 'package:algo_safe/constants/theme_configuration.dart';
 import 'package:flutter/material.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeService{
@@ -18,17 +17,16 @@ class ThemeService{
   }
 
   final allThemes = <String, ThemeData>{
-    'Dark': darkTheme,
-    'Light':lightTheme
+    'Dark' : darkTheme,
+    'Light' : lightTheme
   };
 
-  get initial{
+  get initial {
     String? themeName = preferences.getString('theme');
     if (themeName == null){
       final isPlatformDark = WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
       themeName = isPlatformDark ? 'Dark' : 'Light';
     }
-
     return allThemes[themeName];
   }
 

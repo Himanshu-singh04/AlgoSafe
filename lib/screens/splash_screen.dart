@@ -1,8 +1,6 @@
-
-import 'package:algosafe/main.dart';
+import 'package:algo_safe/main.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class splash_screen extends StatefulWidget {
   const splash_screen({super.key});
@@ -57,7 +55,7 @@ class _splash_screenState extends State<splash_screen> {
 
 Route _createRoute() {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => MyHomePage(theme: ThemeData.light()),
+    pageBuilder: (context, animation, secondaryAnimation) => home_page(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       const begin = Offset(0.0, 1.0);
       const end = Offset.zero;
