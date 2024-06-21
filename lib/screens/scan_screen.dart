@@ -1,15 +1,17 @@
 import 'dart:async';
 
+import 'package:algo_safe/utils/colors.dart';
 import 'package:algo_safe/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 
 import 'device_screen.dart';
 import '../widgets/system_device_tile.dart';
 import '../widgets/scan_result_tile.dart';
 import '../utils/extra.dart';
 
-import 'package:algo_safe/widgets/bnb_custom_painter.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({Key? key}) : super(key: key);
@@ -57,12 +59,14 @@ class _ScanScreenState extends State<ScanScreen> {
     try {
       _systemDevices = await FlutterBluePlus.systemDevices;
     } catch (e) {
-      Snackbar.show(ABC.b, prettyException("System Devices Error:", e), success: false);
+      Snackbar.show(ABC.b, prettyException("System Devices Error:", e),
+          success: false);
     }
     try {
       await FlutterBluePlus.startScan(timeout: const Duration(seconds: 15));
     } catch (e) {
-      Snackbar.show(ABC.b, prettyException("Start Scan Error:", e), success: false);
+      Snackbar.show(ABC.b, prettyException("Start Scan Error:", e),
+          success: false);
     }
     if (mounted) {
       setState(() {});
@@ -73,16 +77,19 @@ class _ScanScreenState extends State<ScanScreen> {
     try {
       FlutterBluePlus.stopScan();
     } catch (e) {
-      Snackbar.show(ABC.b, prettyException("Stop Scan Error:", e), success: false);
+      Snackbar.show(ABC.b, prettyException("Stop Scan Error:", e),
+          success: false);
     }
   }
 
   void onConnectPressed(BluetoothDevice device) {
     device.connectAndUpdateStream().catchError((e) {
-      Snackbar.show(ABC.c, prettyException("Connect Error:", e), success: false);
+      Snackbar.show(ABC.c, prettyException("Connect Error:", e),
+          success: false);
     });
     MaterialPageRoute route = MaterialPageRoute(
-        builder: (context) => DeviceScreen(device: device), settings: RouteSettings(name: '/DeviceScreen'));
+        builder: (context) => DeviceScreen(device: device),
+        settings: RouteSettings(name: '/DeviceScreen'));
     Navigator.of(context).push(route);
   }
 
@@ -98,14 +105,16 @@ class _ScanScreenState extends State<ScanScreen> {
 
   Widget buildScanButton(BuildContext context) {
     if (FlutterBluePlus.isScanningNow) {
-      return FloatingActionButton(
-        shape: StadiumBorder(),
-        child: const Icon(Icons.stop),
+      return FloatingActionButton.extended(
+        label: const Icon(Icons.stop),
         onPressed: onStopPressed,
         backgroundColor: Colors.red,
       );
     } else {
-      return FloatingActionButton(shape: StadiumBorder(),  child: const Text("SCAN"), onPressed: onScanPressed);
+      return FloatingActionButton.extended(
+        backgroundColor: CustomColors.mainColor_3,
+          label: const Text("SCAN",style: TextStyle(color: Colors.white),),
+          onPressed: onScanPressed);
     }
   }
 
@@ -143,51 +152,68 @@ class _ScanScreenState extends State<ScanScreen> {
     return ScaffoldMessenger(
       key: Snackbar.snackBarKeyB,
       child: Scaffold(
-        appBar: AppBar(
-          title: Image.asset("assets/images/Algofet primary subtext name.png", width: size.width*0.60,),
-        ),
-        drawer: Drawer(),
-        body: RefreshIndicator(
-          onRefresh: onRefresh,
-          child: ListView(
-            children: <Widget>[
-              ..._buildSystemDeviceTiles(context),
-              ..._buildScanResultTiles(context),
-            ],
+          appBar: AppBar(
+            //systemOverlayStyle: SystemUiOverlayStyle.dark
+            //    .copyWith(statusBarColor: Colors.black),
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [Colors.white, Colors.grey.shade500],begin: Alignment.topCenter,end: Alignment.bottomCenter)
+              ),
+            ),
+            title: Image.asset(
+              "assets/images/Algofet primary subtext name.png",
+              width: size.width * 0.60,
+            ),
           ),
-        ),
-        floatingActionButton: buildScanButton(context),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        bottomNavigationBar: Container(
-            width: size.width,
-            height: 80,
-            child: Stack(
-              children: [
-                CustomPaint(
-                  size: Size(size.width, 80),
-                  painter: BNBCustomPainter(),
-                ),
-                Container(
-                  width: size.width,
-                  height: 80,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      IconButton(onPressed: (){}, icon: Icon(Icons.info)),
-                      IconButton(onPressed: (){}, icon: Icon(Icons.settings)),
-                      Container(width: size.width*0.20),
-                      IconButton(onPressed: (){}, icon: Icon(Icons.light)),
-                      IconButton(onPressed: (){}, icon: Icon(Icons.book))
-                    ],
-                  ),
-                )
+          drawer: Drawer(),
+          body: RefreshIndicator(
+            onRefresh: onRefresh,
+            child: ListView(
+              children: <Widget>[
+                ..._buildSystemDeviceTiles(context),
+                ..._buildScanResultTiles(context),
               ],
             ),
           ),
-      ),
+          floatingActionButton: buildScanButton(context),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.endFloat,
+          bottomNavigationBar: Container(
+            height: size.height*0.075,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [Colors.white, Colors.grey.shade500],begin: Alignment.topCenter,end: Alignment.bottomCenter)
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [Colors.white, Colors.grey.shade500],begin: Alignment.topCenter,end: Alignment.bottomCenter)
+            ),
+              child: const Padding(
+                padding: EdgeInsets.all(NavigationToolbar.kMiddleSpacing),
+                child: GNav(
+                  padding: EdgeInsets.all(BorderSide.strokeAlignCenter),
+                  // backgroundColor: Colors.grey,
+                  activeColor: Colors.white,
+                  tabBackgroundColor: Colors.black26,
+                  gap: 8,
+                  tabs: [
+                  GButton(
+                    icon: Icons.info,
+                    text: "Info",
+                  ),
+                  GButton(
+                    icon: Icons.settings,
+                    text: "Setting",
+                  ),
+                  GButton(
+                    icon: Icons.light,
+                    text: "Light",
+                  ),
+                  GButton(icon: Icons.book,
+                  text: "Book",)
+                ]),
+              ),
+            ),
+          )),
     );
   }
 }
-
-
-

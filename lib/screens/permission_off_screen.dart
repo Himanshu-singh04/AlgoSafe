@@ -7,6 +7,7 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+// ignore: must_be_immutable
 class BluetoothOffScreen extends StatelessWidget {
   BluetoothOffScreen({Key? key, this.adapterState}) : super(key: key);
 
@@ -19,12 +20,12 @@ class BluetoothOffScreen extends StatelessWidget {
         Icon(
           Icons.bluetooth_disabled,
           size: 200.0,
-          color: Colors.white54,
+          color: Colors.black54,
         ),
         Icon(
           Icons.location_disabled,
           size: 200.0,
-          color: Colors.white54,
+          color: Colors.black54,
         ),
       ],
     );
@@ -52,10 +53,11 @@ class BluetoothOffScreen extends StatelessWidget {
   }
 
   Widget buildTitle(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
     String? state = adapterState?.toString().split(".").last;
     return Text(
       'Bluetooth and Location is ${state != null ? state : 'not available'}',
-      style: Theme.of(context).primaryTextTheme.titleSmall?.copyWith(color: Colors.white),
+      style: Theme.of(context).primaryTextTheme.titleSmall?.copyWith(color: Colors.black,fontSize: size.height*0.025),
     );
   }
 
@@ -83,15 +85,19 @@ class BluetoothOffScreen extends StatelessWidget {
     return ScaffoldMessenger(
       key: Snackbar.snackBarKeyA,
       child: Scaffold(
-        backgroundColor: Colors.lightBlue,
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              buildBluetoothOffIcon(context),
-              buildTitle(context),
-              if (Platform.isAndroid) buildTurnOnButton(context),
-            ],
+        body: Container(
+          decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [Colors.white, Colors.grey.shade500],begin: Alignment.topCenter,end: Alignment.bottomCenter)
+            ),
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                buildBluetoothOffIcon(context),
+                buildTitle(context),
+                if (Platform.isAndroid) buildTurnOnButton(context),
+              ],
+            ),
           ),
         ),
       ),

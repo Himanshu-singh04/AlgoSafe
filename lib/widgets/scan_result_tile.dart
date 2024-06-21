@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:algo_safe/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
@@ -81,7 +82,7 @@ class _ScanResultTileState extends State<ScanResultTile> {
     return ElevatedButton(
       child: isConnected ? const Text('OPEN') : const Text('CONNECT'),
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.black,
+        backgroundColor: CustomColors.mainColor_1,
         foregroundColor: Colors.white,
       ),
       onPressed: (widget.result.advertisementData.connectable) ? widget.onTap : null,
@@ -112,19 +113,32 @@ class _ScanResultTileState extends State<ScanResultTile> {
 
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
     var adv = widget.result.advertisementData;
-    return ExpansionTile(
-      title: _buildTitle(context),
-      // leading: Text(widget.result.rssi.toString()),
-      trailing: _buildConnectButton(context),
-      children: <Widget>[
-        if (adv.advName.isNotEmpty) _buildAdvRow(context, 'Name', adv.advName),
-        if (adv.txPowerLevel != null) _buildAdvRow(context, 'Tx Power Level', '${adv.txPowerLevel}'),
-        if ((adv.appearance ?? 0) > 0) _buildAdvRow(context, 'Appearance', '0x${adv.appearance!.toRadixString(16)}'),
-        if (adv.msd.isNotEmpty) _buildAdvRow(context, 'Manufacturer Data', getNiceManufacturerData(adv.msd)),
-        if (adv.serviceUuids.isNotEmpty) _buildAdvRow(context, 'Service UUIDs', getNiceServiceUuids(adv.serviceUuids)),
-        if (adv.serviceData.isNotEmpty) _buildAdvRow(context, 'Service Data', getNiceServiceData(adv.serviceData)),
-      ],
+    return Container(
+      padding: EdgeInsets.all(size.height*0.01),
+      color: Colors.white,
+      child: Material(
+        elevation: size.height*0.1,
+        child: Container(
+          decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [Colors.grey.shade300, Colors.grey.shade300],begin: Alignment.topCenter,end: Alignment.bottomCenter)
+                ),
+          child: ExpansionTile(
+            title: _buildTitle(context),
+            // leading: Text(widget.result.rssi.toString()),
+            trailing: _buildConnectButton(context),
+            children: <Widget>[
+              if (adv.advName.isNotEmpty) _buildAdvRow(context, 'Name', adv.advName),
+              if (adv.txPowerLevel != null) _buildAdvRow(context, 'Tx Power Level', '${adv.txPowerLevel}'),
+              if ((adv.appearance ?? 0) > 0) _buildAdvRow(context, 'Appearance', '0x${adv.appearance!.toRadixString(16)}'),
+              if (adv.msd.isNotEmpty) _buildAdvRow(context, 'Manufacturer Data', getNiceManufacturerData(adv.msd)),
+              if (adv.serviceUuids.isNotEmpty) _buildAdvRow(context, 'Service UUIDs', getNiceServiceUuids(adv.serviceUuids)),
+              if (adv.serviceData.isNotEmpty) _buildAdvRow(context, 'Service Data', getNiceServiceData(adv.serviceData)),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

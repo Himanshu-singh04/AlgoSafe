@@ -1,3 +1,4 @@
+import 'package:algo_safe/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
@@ -26,7 +27,7 @@ class Snackbar {
 
   static show(ABC abc, String msg, {required bool success}) {
     final snackBar = success
-        ? SnackBar(content: Text(msg), backgroundColor: Colors.blue)
+        ? SnackBar(content: Text(msg), backgroundColor: Colors.green)
         : SnackBar(content: Text(msg), backgroundColor: Colors.red);
     getSnackbar(abc).currentState?.removeCurrentSnackBar();
     getSnackbar(abc).currentState?.showSnackBar(snackBar);

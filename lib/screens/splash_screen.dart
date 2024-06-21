@@ -1,4 +1,5 @@
 import 'package:algo_safe/main.dart';
+import 'package:algo_safe/utils/colors.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 
@@ -33,7 +34,7 @@ class _splash_screenState extends State<splash_screen> {
           width: double.infinity,
           height: double.infinity,
           decoration: BoxDecoration(
-            gradient: LinearGradient(begin: Alignment.topRight,end: Alignment.bottomRight,colors: [Color.fromARGB(255, 167, 255, 214),Color.fromARGB(255, 231, 209, 6)])
+            gradient: LinearGradient(begin: Alignment.topRight,end: Alignment.bottomRight,colors: [Color.fromRGBO(255, 255, 255, 1),Colors.grey])
           ),
           child: Center(
             child: Column(
@@ -44,7 +45,9 @@ class _splash_screenState extends State<splash_screen> {
               Center(child: AnimatedTextKit(animatedTexts: [TypewriterAnimatedText("AlgoSAFE v1.0",speed: Duration(milliseconds: 250),textStyle: TextStyle(fontSize: size.width*0.1))],
                   totalRepeatCount: 7,displayFullTextOnTap: true,
               stopPauseOnTap: true,)),
-              CircularProgressIndicator()
+              CircularProgressIndicator(
+                color: Colors.black,
+              )
             ],),
           ),
         )
