@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:algo_safe/screens/display_data_screen.dart';
+import 'package:algo_safe/constants/uuid_list.dart';
 import 'package:algo_safe/utils/colors.dart';
 import 'package:algo_safe/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 import '../widgets/service_tile.dart';
@@ -32,48 +31,20 @@ class _DeviceScreenState extends State<DeviceScreen> {
   bool _isDiscoveringServices = false;
   bool _isConnecting = false;
   bool _isDisconnecting = false;
+  var _currentBmsState; // 0: idle, 1: charging, 2:discharging
 
   late StreamSubscription<BluetoothConnectionState>
       _connectionStateSubscription;
   late StreamSubscription<bool> _isConnectingSubscription;
   late StreamSubscription<bool> _isDisconnectingSubscription;
   late StreamSubscription<int> _mtuSubscription;
-
-  Map<String, String> uuids = {
-    "BMS_state": "606d63cb-6f2c-42d0-9a1d-c3c20749c487",
-    "Battery_configuration": "53072650-6e04-40f5-89a0-5914d2324b3b",
-    "Battery_voltage": "6c1e0a36-f854-49f2-a78f-3db43f6424b1",
-    "Battery_current": "ffe56b2d-0607-428f-ba10-7a76268c4420",
-    "Battery_temperature": "ee24bdeb-7408-4cec-8186-27e01bf301d7",
-    "Battery_cycle_count": "0492a1ac-d680-4e46-a28d-0422753dd0b3",
-    "Battery_health_status": "96ff5f4c-4830-4ec1-95d8-8f92a4bba717",
-    "BMS_fault": "28fcf388-dbe0-4453-a1aa-7f41116e0e58",
-    "Package_total_capacity": "0494e147-8541-4917-be37-09540a7f3161",
-    "Package_remaining_capacity": "2e2cb9b4-02d9-4ac3-a97e-52f3c6b0c51e",
-    "cell1_voltage": "59878c02-5bfc-42c1-9c91-861b3f262ee0",
-    "cell2_voltage": "9bc4eb20-faef-48a3-a2d3-04a4977225d6",
-    "cell3_voltage": "dd5d4670-160e-4304-8a09-bbadfc7c1dec",
-    "cell4_voltage": "a3c48189-4ee2-40e1-86ee-7291fb61939d",
-    "cell5_voltage": "a1d5d1fa-691b-4f82-8c6e-98945243d711",
-    "cell6_voltage": "7d7f5064-9f05-4723-8c9a-49ca699a7535",
-    "cell7_voltage": "df8de357-450d-4373-bf3b-d3fcbb61d4a7",
-    "cell8_voltage": "6d3efe3d-e699-49ee-a01a-df60700305be",
-    "cell9_voltage": "3b9c753a-53cb-4a55-aed6-2f6609250341",
-    "cell10_voltage": "35496015-80bd-43b3-91ee-50aadb953ed8",
-    "cell11_voltage": "a69b3c58-36ef-4b22-ad0b-dbb0af5dbacd",
-    "cell12_voltage": "9452d6c5-3467-41f1-96fe-91df261efbcf",
-    "cell13_voltage": "0bc76b72-e9a7-4be7-bf53-0d0c897d8a5c",
-    "cell14_voltage": "a13f06e2-a6a8-4ecf-a130-441ab94f337d",
-    "cell15_voltage": "1d6a23ef-523d-446c-93c0-53eebad0eca9",
-    "cell16_voltage": "4c776ff8-7448-4ba0-b238-1010b4a62297",
-    "Battery_discharge": "24688ee9-9c1d-45bf-ba47-2b36cb92ace5",
-    "Battery_full_charge": "79bda1ab-8b37-421a-83b7-01c1980bdec1",
-    "Charging_Porf_cc": "16423408-9605-4312-a369-45bcacd6a880",
-    "Charging_Porf_cv": "c628e8ca-6c4e-4cda-88b1-6ca0f9320855"
-  };
+  int _selectedIndex = 0;
 
   Map<String, String> data = {};
-  final TextEditingController _writeController = TextEditingController();
+  // final TextEditingController _writeController = TextEditingController();
+  final Map<String, TextEditingController> _controllers = {
+    for (var key in uuids.keys) key: TextEditingController()
+  };
 
   @override
   void initState() {
@@ -165,6 +136,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
   Future onRefreshPressed() async {
     try {
+      _isDiscoveringServices = true;
+      setState(() {});
       _services = await widget.device.discoverServices();
       for (var service in _services) {
         for (var characteristic in service.characteristics) {
@@ -175,53 +148,14 @@ class _DeviceScreenState extends State<DeviceScreen> {
       }
       Snackbar.show(ABC.c, "Discover Services: Success", success: true);
     } catch (e) {
-      Snackbar.show(ABC.c, prettyException("Discover Services Error:", e), success: false);
+      Snackbar.show(ABC.c, prettyException("Discover Services Error:", e),
+          success: false);
     }
-  }
-
-    int parseUint16(List<int> value) {
-    final ByteData byteData = ByteData.sublistView(Uint8List.fromList(value));
-    return byteData.getUint16(0, Endian.little);
-  }
-
-  Future subscribeToCharacteristic(BluetoothCharacteristic characteristic) async {
-    await characteristic.setNotifyValue(true);
-    characteristic.value.listen((value) {
-      String characteristicKey = uuids.keys
-          .firstWhere((key) => uuids[key] == characteristic.uuid.toString());
-
-      if (value.isNotEmpty) {
-        String parsedValue = parseUint16(value).toString();
-        setState(() {
-          data[characteristicKey] = parsedValue;
-        });
-      }
-    });
-  }
-
-    Future writeCharacteristic(BluetoothCharacteristic characteristic, String value) async {
-    List<int> bytes = value.codeUnits;
-    await characteristic.write(bytes, withoutResponse: true);
-  }
-
-  Future onWritePressed() async {
-    if (_writeController.text.isEmpty) {
-      Snackbar.show(ABC.c, "Write Value: Empty", success: false);
-      return;
+    if (mounted) {
+      setState(() {
+        _isDiscoveringServices = false;
+      });
     }
-
-    for (var service in _services) {
-      for (var characteristic in service.characteristics) {
-        if (uuids.containsValue(characteristic.uuid.toString()) &&
-            (characteristic.properties.write || characteristic.properties.writeWithoutResponse)) {
-          await writeCharacteristic(characteristic, _writeController.text);
-          Snackbar.show(ABC.c, "Write: Success", success: true);
-          return;
-        }
-      }
-    }
-
-    Snackbar.show(ABC.c, "Write: Characteristic not found or not writable", success: false);
   }
 
   Future onRequestMtuPressed() async {
@@ -252,6 +186,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
       characteristic: c,
       descriptorTiles:
           c.descriptors.map((d) => DescriptorTile(descriptor: d)).toList(),
+      descriptors: [],
     );
   }
 
@@ -269,15 +204,19 @@ class _DeviceScreenState extends State<DeviceScreen> {
   }
 
   Widget buildRemoteId(BuildContext context) {
-    return Container(
-      // color: Colors.amber,
-      child: Padding(
-        padding: const EdgeInsets.all(4),
-        child: Text(
-          '${widget.device.remoteId}',
-          style: const TextStyle(fontSize: 20),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(4),
+          child: Text(
+            '${widget.device.remoteId}',
+            style: const TextStyle(fontSize: 20),
+          ),
         ),
-      ),
+        const Spacer(),
+        stateSelectorShow()
+      ],
     );
   }
 
@@ -304,7 +243,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
       _services = await widget.device.discoverServices();
       Snackbar.show(ABC.c, "Discover Services: Success", success: true);
     } catch (e) {
-      Snackbar.show(ABC.c, prettyException("Discover Services Error:", e), success: false);
+      Snackbar.show(ABC.c, prettyException("Discover Services Error:", e),
+          success: false);
     }
     if (mounted) {
       setState(() {
@@ -318,7 +258,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
       index: (_isDiscoveringServices) ? 1 : 0,
       children: <Widget>[
         TextButton(
-          onPressed: (){
+          onPressed: () {
             onDiscoverServicesPressed();
             _buildServiceTiles(context, widget.device);
           },
@@ -331,16 +271,333 @@ class _DeviceScreenState extends State<DeviceScreen> {
     );
   }
 
+  int parseUint16(List<int> value) {
+    final ByteData byteData = ByteData.sublistView(Uint8List.fromList(value));
+    return byteData.getUint16(0, Endian.little);
+  }
+
+  Future<void> subscribeToCharacteristic(
+      BluetoothCharacteristic characteristic) async {
+    await characteristic.setNotifyValue(true);
+    characteristic.value.listen((value) {
+      String characteristicKey = uuids.keys
+          .firstWhere((key) => uuids[key] == characteristic.uuid.toString());
+
+      if (value.isNotEmpty) {
+        String parsedValue;
+        if (value.length == 1) {
+          // uint8 parsing
+          parsedValue = value[0].toString();
+        } else if (value.length >= 2) {
+          // uint16 parsing
+          parsedValue = parseUint16(value).toString();
+        } else {
+          parsedValue = 'Unknown value';
+        }
+
+        setState(() {
+          data[characteristicKey] = parsedValue;
+        });
+      }
+    });
+  }
+
+  Widget stateSelected() {
+    var statevalue = data["BMS_state"];
+    if (statevalue is String) {
+      _currentBmsState = int.tryParse(statevalue) ?? 0;
+    } else if (statevalue is int) {
+      _currentBmsState = statevalue;
+    } else {
+      _currentBmsState = 0;
+    }
+
+    switch (_currentBmsState) {
+      case 0:
+        return idleWidget();
+
+      case 1:
+        return chargingWidget();
+
+      case 2:
+        return dischargingWidget();
+
+      default:
+        return idleWidget();
+    }
+  }
+
+  Future writeCharacteristic(
+      BluetoothCharacteristic characteristic, String value) async {
+    List<int> bytes = value.codeUnits;
+    await characteristic.write(bytes, withoutResponse: true);
+  }
+
+Future<void> onWritePressed(String characteristicName) async {
+  String? characteristicUuid = uuids[characteristicName];
+  String value = _controllers[characteristicName]?.text ?? '';
+
+  // Validate input values
+  if (value.isEmpty || characteristicUuid == null) {
+    Snackbar.show(
+      ABC.c,
+      "$characteristicName Write: No value provided or invalid UUID",
+      success: false,
+    );
+    return; // Skip if no value is provided or UUID is invalid
+  }
+
+  BluetoothCharacteristic? targetCharacteristic;
+
+  // Find the target characteristic by UUID
+  for (var service in _services) {
+    for (var characteristic in service.characteristics) {
+      if (characteristic.uuid.toString() == characteristicUuid) {
+        targetCharacteristic = characteristic;
+        break;
+      }
+    }
+    if (targetCharacteristic != null) break;
+  }
+
+  if (targetCharacteristic != null) {
+    try {
+      // Check if the characteristic supports write without response
+      if (targetCharacteristic.properties.writeWithoutResponse) {
+        await targetCharacteristic.write(value.codeUnits, withoutResponse: true);
+        Snackbar.show(ABC.c, "$characteristicName Write: Success", success: true);
+      } 
+      // Check if the characteristic supports write with response
+      else if (targetCharacteristic.properties.write) {
+        await targetCharacteristic.write(value.codeUnits, withoutResponse: false);
+        Snackbar.show(ABC.c, "$characteristicName Write: Success", success: true);
+      } 
+      // Characteristic is not writable
+      else {
+        Snackbar.show(
+          ABC.c,
+          "$characteristicName Write: Characteristic not writable",
+          success: false,
+        );
+      }
+    } catch (e) {
+      Snackbar.show(
+        ABC.c,
+        "$characteristicName Write: Error - $e",
+        success: false,
+      );
+    }
+  } else {
+    Snackbar.show(
+      ABC.c,
+      "$characteristicName Write: Characteristic not found",
+      success: false,
+    );
+  }
+}
+
+
+  Widget writeScreen() {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          buildTextFieldForCharacteristic("Battery_voltage"),
+          buildDropdownForCharacteristic("Battery_temperature"),
+          // Add more rows for other characteristics as needed
+        ],
+      ),
+    );
+  }
+
+  Map<String, List<String>> dropdownItems = {
+  "Battery_configuration": ["Option 1", "Option 2", "Option 3"],
+  "Battery_temperature": ["1", "2", "3"],
+};
+
+Widget buildTextFieldForCharacteristic(String key) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0),
+    child: Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: _controllers[key],
+            decoration: InputDecoration(
+              labelText: key.replaceAll('_', ' '),
+              border: OutlineInputBorder(),
+            ),
+          ),
+        ),
+        SizedBox(width: 8),
+        ElevatedButton(
+          onPressed: () => onWritePressed(key),
+          child: Text('Send'),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget buildDropdownForCharacteristic(String key) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0),
+    child: Row(
+      children: [
+        Expanded(
+          child: DropdownButtonFormField<String>(
+            value: _controllers[key]?.text.isEmpty == true ? null : _controllers[key]?.text,
+            onChanged: (newValue) {
+              setState(() {
+                _controllers[key]?.text = newValue!;
+              });
+            },
+            items: dropdownItems[key]?.map((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+            decoration: InputDecoration(
+              labelText: key.replaceAll('_', ' '),
+              border: OutlineInputBorder(),
+            ),
+          ),
+        ),
+        SizedBox(width: 8),
+        ElevatedButton(
+          onPressed: () => onWritePressed(key),
+          child: Text('Send'),
+        ),
+      ],
+    ),
+  );
+}
+
+
+
+
+  Widget stateSelectorShow() {
+    var statevalue = data["BMS_state"];
+    if (statevalue is String) {
+      _currentBmsState = int.tryParse(statevalue) ?? 0;
+    } else if (statevalue is int) {
+      _currentBmsState = statevalue;
+    } else {
+      _currentBmsState = 0;
+    }
+
+    switch (_currentBmsState) {
+      case 0: // Idle Mode
+        return Container(
+          color: Colors.yellow,
+          child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0.0, end: 1.0),
+                  duration: Duration(seconds: 2),
+                  builder: (context, value, child) {
+                    return Opacity(
+                      opacity: value,
+                      child: Row(
+                        children: [
+                          Icon(Icons.power_off),
+                          Text(
+                            "Idle Mode",
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ],
+                      ),
+                    );
+                  })),
+        );
+
+      case 1: // Charging Mode
+        return Container(
+          color: Colors.green,
+          child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0.0, end: 1.0),
+                  duration: Duration(seconds: 2),
+                  builder: (context, value, child) {
+                    return Opacity(
+                      opacity: value,
+                      child: Row(
+                        children: [
+                          Icon(Icons.battery_charging_full),
+                          Text(
+                            "Charge Mode",
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ],
+                      ),
+                    );
+                  })),
+        );
+
+      case 2: // Discharging Mode
+        return Container(
+          color: Colors.red,
+          child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0.0, end: 1.0),
+                  duration: Duration(seconds: 2),
+                  builder: (context, value, child) {
+                    return Opacity(
+                      opacity: value,
+                      child: Row(
+                        children: [
+                          Icon(Icons.battery_alert),
+                          Text(
+                            "Discharge Mode",
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ],
+                      ),
+                    );
+                  })),
+        );
+      default:
+        return Container(
+          color: Colors.yellow,
+          child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0.0, end: 1.0),
+                  duration: Duration(seconds: 2),
+                  builder: (context, value, child) {
+                    return Opacity(
+                      opacity: value,
+                      child: Row(
+                        children: [
+                          Icon(Icons.power_off),
+                          Text(
+                            "Idle Mode",
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ],
+                      ),
+                    );
+                  })),
+        );
+    }
+  }
+
   Widget buildDisplayData(BuildContext context) {
-    BluetoothDevice connectedDevice = BluetoothDevice(remoteId: widget.device.remoteId);
+    BluetoothDevice connectedDevice =
+        BluetoothDevice(remoteId: widget.device.remoteId);
     return IndexedStack(
       index: (_isDiscoveringServices) ? 1 : 0,
       children: <Widget>[
         FloatingActionButton.extended(
-          backgroundColor: CustomColors.mainColor_3,
-          onPressed: onRefreshPressed,
-          label: Icon(Icons.refresh_rounded,color: Colors.white,)
-        ),
+            backgroundColor: CustomColors.mainColor_3,
+            onPressed: onRefreshPressed,
+            label: const Icon(
+              Icons.refresh_rounded,
+              color: Colors.white,
+            )),
         const IconButton(
           icon: SizedBox(
             width: 18.0,
@@ -382,101 +639,744 @@ class _DeviceScreenState extends State<DeviceScreen> {
     ]);
   }
 
+  Widget idleWidget() {
+    return Expanded(
+      child: ListView(
+        children: [
+          ListTile(
+            title: const Text(
+              'BMS_state',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["BMS_state"] ?? "NA"),
+          ),
+          // ListTile(
+          //   title: const Text(
+          //     'Battery_configuration',
+          //     style: TextStyle(fontWeight: FontWeight.bold),
+          //   ),
+          //   trailing: Text(data["Battery_configuration"] ?? "NA"),
+          // ),
+          ListTile(
+            title: const Text(
+              'Battery_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Battery_current',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_current"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Battery_temperature',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_temperature"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Battery_cycle_count',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_cycle_count"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Battery_health_status',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_health_status"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'BMS_fault',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["BMS_fault"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Package_total_capacity',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Package_total_capacity"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Package_remaining_capacity',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Package_remaining_capacity"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell1_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell1_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell2_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell2_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell3_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell3_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell4_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell4_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell5_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell5_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell6_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell6_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell7_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell7_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell8_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell8_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell9_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell9_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell10_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell10_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell11_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell11_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell12_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell12_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell13_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell13_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell14_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell14_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell15_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell15_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell16_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell16_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Battery_discharge',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_discharge"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Battery_full_charge',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_full_charge"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Charging_Porf_cc',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Charging_Porf_cc"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Charging_Porf_cv',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Charging_Porf_cv"] ?? "NA"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget chargingWidget() {
+    return Expanded(
+      child: ListView(
+        children: [
+          ListTile(
+            title: const Text(
+              'BMS_state',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["BMS_state"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Battery_configuration',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_configuration"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Battery_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Battery_current',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_current"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Battery_temperature',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_temperature"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Battery_cycle_count',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_cycle_count"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Battery_health_status',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_health_status"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'BMS_fault',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["BMS_fault"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Package_total_capacity',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Package_total_capacity"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Package_remaining_capacity',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Package_remaining_capacity"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell1_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell1_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell2_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell2_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell3_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell3_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell4_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell4_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell5_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell5_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell6_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell6_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell7_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell7_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell8_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell8_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell9_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell9_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell10_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell10_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell11_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell11_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell12_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell12_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell13_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell13_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell14_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell14_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell15_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell15_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell16_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell16_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Battery_discharge',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_discharge"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Battery_full_charge',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_full_charge"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Charging_Porf_cc',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Charging_Porf_cc"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Charging_Porf_cv',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Charging_Porf_cv"] ?? "NA"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget dischargingWidget() {
+    return Expanded(
+      child: ListView(
+        children: [
+          ListTile(
+            title: const Text(
+              'BMS_state',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["BMS_state"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Battery_configuration',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_configuration"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Battery_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Battery_current',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_current"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Battery_temperature',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_temperature"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Battery_cycle_count',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_cycle_count"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Battery_health_status',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_health_status"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'BMS_fault',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["BMS_fault"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Package_total_capacity',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Package_total_capacity"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Package_remaining_capacity',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Package_remaining_capacity"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell1_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell1_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell2_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell2_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell3_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell3_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell4_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell4_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell5_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell5_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell6_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell6_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell7_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell7_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell8_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell8_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell9_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell9_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell10_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell10_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell11_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell11_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell12_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell12_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell13_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell13_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell14_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell14_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell15_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell15_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'cell16_voltage',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["cell16_voltage"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Battery_discharge',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_discharge"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Battery_full_charge',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Battery_full_charge"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Charging_Porf_cc',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Charging_Porf_cc"] ?? "NA"),
+          ),
+          ListTile(
+            title: const Text(
+              'Charging_Porf_cv',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            trailing: Text(data["Charging_Porf_cv"] ?? "NA"),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
+    final List<Widget> read_write_screens = [stateSelected(), writeScreen()];
+
     return ScaffoldMessenger(
       key: Snackbar.snackBarKeyC,
       child: Scaffold(
-          appBar: AppBar(
-            flexibleSpace: Container(
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: [Colors.white, Colors.grey.shade500],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter)),
-            ),
-            title: Text(widget.device.platformName),
-            actions: [buildConnectButton(context)],
+        appBar: AppBar(
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    colors: [Colors.white, Colors.grey.shade500],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter)),
           ),
-          body: Padding(
-        padding: EdgeInsets.all(size.height*0.01),
-        child: Column(
-          children: [
-            buildRemoteId(context),
-            SizedBox(height: size.height*0.01),
-            Container(
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: [Colors.white, Colors.grey.shade500],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter)),
-              child: ListTile(
-                leading: buildRssiTile(context),
-                title: Text(
-                         'Device ${_connectionState.toString().split('.')[1]}.'),
-                         trailing: buildGetServices(context),
+          title: Text(widget.device.platformName),
+          actions: [buildConnectButton(context)],
+        ),
+        body: Padding(
+          padding: EdgeInsets.all(size.height * 0.01),
+          child: Column(
+            children: [
+              buildRemoteId(context),
+              SizedBox(height: size.height * 0.01),
+              Container(
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        colors: [Colors.white, Colors.grey.shade500],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter)),
+                child: ListTile(
+                  leading: buildRssiTile(context),
+                  title: Text(
+                      'Device ${_connectionState.toString().split('.')[1]}.'),
+                  trailing: buildGetServices(context),
+                ),
               ),
-            ),
-            SizedBox(height: size.height*0.01),
-            Container(child: buildMtuTile(context),decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: [Colors.white, Colors.grey.shade500],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter)),),
-                      // ..._buildServiceTiles(context, widget.device),
-            // ElevatedButton(
-            //   onPressed: onDiscoverServicesPressed,
-            //   child: const Text("Discover Services"),
-            // ),
-            // _isDiscoveringServices
-            //F     ? const CircularProgressIndicator()
-            //     : const SizedBox.shrink(),
-            // TextField(
-            //   controller: _writeController,
-            //   decoration: const InputDecoration(
-            //     labelText: "Write Value",
-            //     border: OutlineInputBorder(),
-            //   ),
-            // ),
-            // ElevatedButton(
-            //   onPressed: onWritePressed,
-            //   child: const Text("Write"),
-            // ),
-            SizedBox(
-              height: size.height*0.01,
-            ),
-            Expanded(
-              child: ListView(
-                children: data.entries
-                    .map((entry) => ListTile(
-                      
-                          title: Text(entry.key,style: TextStyle(fontWeight: FontWeight.bold),),
-                          trailing: Text(entry.value, style: TextStyle(fontSize: size.height*0.02),),
-                        ),
-                        )
-                    .toList(),
+              SizedBox(height: size.height * 0.01),
+              Container(
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        colors: [Colors.white, Colors.grey.shade500],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter)),
+                child: buildMtuTile(context),
               ),
-            ),
-          ],
+              SizedBox(
+                height: size.height * 0.01,
+              ),
+              read_write_screens[_selectedIndex]
+            ],
+          ),
+        ),
+        floatingActionButton: buildDisplayData(context),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+              gradient: LinearGradient(
+                  colors: [Colors.white, Colors.grey.shade500],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter)),
+          child: NavigationBar(
+            indicatorColor: Colors.black12,
+            surfaceTintColor: Colors.transparent,
+            backgroundColor: Colors.transparent,
+            height: size.height * 0.075,
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: (int index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
+            destinations: <NavigationDestination>[
+              NavigationDestination(
+                  icon: Icon(Icons.mark_chat_read_outlined), label: "Read"),
+              NavigationDestination(icon: Icon(Icons.edit), label: "Write")
+            ],
+          ),
         ),
       ),
-          // body: SingleChildScrollView(
-          //   child: Column(
-          //     children: <Widget>[
-          //       buildRemoteId(context),
-          //       ListTile(
-          //         leading: buildRssiTile(context),
-          //         title: Text(
-          //             'Device is ${_connectionState.toString().split('.')[1]}.'),
-          //         trailing: buildGetServices(context),
-          //       ),
-          //       buildMtuTile(context),
-          //       ..._buildServiceTiles(context, widget.device),
-          //     ],
-          //   ),
-          // ),
-          floatingActionButton: buildDisplayData(context),floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,),
     );
   }
 }

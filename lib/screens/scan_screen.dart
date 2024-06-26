@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:algo_safe/utils/colors.dart';
 import 'package:algo_safe/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
@@ -12,9 +11,8 @@ import '../widgets/system_device_tile.dart';
 import '../widgets/scan_result_tile.dart';
 import '../utils/extra.dart';
 
-
 class ScanScreen extends StatefulWidget {
-  const ScanScreen({Key? key}) : super(key: key);
+  const ScanScreen({super.key});
 
   @override
   State<ScanScreen> createState() => _ScanScreenState();
@@ -26,6 +24,7 @@ class _ScanScreenState extends State<ScanScreen> {
   bool _isScanning = false;
   late StreamSubscription<List<ScanResult>> _scanResultsSubscription;
   late StreamSubscription<bool> _isScanningSubscription;
+  int mainScreen = 0;
 
   @override
   void initState() {
@@ -69,7 +68,9 @@ class _ScanScreenState extends State<ScanScreen> {
           success: false);
     }
     if (mounted) {
-      setState(() {});
+      setState(() {
+        mainScreen = 1;
+      });
     }
   }
 
@@ -83,13 +84,16 @@ class _ScanScreenState extends State<ScanScreen> {
   }
 
   void onConnectPressed(BluetoothDevice device) {
+    setState(() {
+      onStopPressed();
+    });
     device.connectAndUpdateStream().catchError((e) {
       Snackbar.show(ABC.c, prettyException("Connect Error:", e),
           success: false);
     });
     MaterialPageRoute route = MaterialPageRoute(
         builder: (context) => DeviceScreen(device: device),
-        settings: RouteSettings(name: '/DeviceScreen'));
+        settings: const RouteSettings(name: '/DeviceScreen'));
     Navigator.of(context).push(route);
   }
 
@@ -100,7 +104,7 @@ class _ScanScreenState extends State<ScanScreen> {
     if (mounted) {
       setState(() {});
     }
-    return Future.delayed(Duration(milliseconds: 500));
+    return Future.delayed(const Duration(milliseconds: 500));
   }
 
   Widget buildScanButton(BuildContext context) {
@@ -112,8 +116,11 @@ class _ScanScreenState extends State<ScanScreen> {
       );
     } else {
       return FloatingActionButton.extended(
-        backgroundColor: CustomColors.mainColor_3,
-          label: const Text("SCAN",style: TextStyle(color: Colors.white),),
+          backgroundColor: CustomColors.mainColor_3,
+          label: const Text(
+            "SCAN",
+            style: TextStyle(color: Colors.white),
+          ),
           onPressed: onScanPressed);
     }
   }
@@ -126,7 +133,7 @@ class _ScanScreenState extends State<ScanScreen> {
             onOpen: () => Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => DeviceScreen(device: d),
-                settings: RouteSettings(name: '/DeviceScreen'),
+                settings: const RouteSettings(name: '/DeviceScreen'),
               ),
             ),
             onConnect: () => onConnectPressed(d),
@@ -146,6 +153,24 @@ class _ScanScreenState extends State<ScanScreen> {
         .toList();
   }
 
+//------------------------------------------------------------------------------------------------------------------------//
+  Widget mainScreenDisplay() {
+    return Container();
+  }
+//------------------------------------------------------------------------------------------------------------------------//
+
+  Widget scanScreenDisplay() {
+    return RefreshIndicator(
+      onRefresh: onRefresh,
+      child: ListView(
+        children: <Widget>[
+          ..._buildSystemDeviceTiles(context),
+          ..._buildScanResultTiles(context),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -157,60 +182,166 @@ class _ScanScreenState extends State<ScanScreen> {
             //    .copyWith(statusBarColor: Colors.black),
             flexibleSpace: Container(
               decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [Colors.white, Colors.grey.shade500],begin: Alignment.topCenter,end: Alignment.bottomCenter)
-              ),
+                  gradient: LinearGradient(
+                      colors: [Colors.white, Colors.grey.shade500],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter)),
             ),
             title: Image.asset(
               "assets/images/Algofet primary subtext name.png",
               width: size.width * 0.60,
             ),
+            actions: [
+              IconButton(
+                  onPressed: () {
+                    setState(() {
+                      mainScreen = 0;
+                      onStopPressed();
+                    });
+                  },
+                  icon: const Icon(Icons.arrow_back)),
+              SizedBox(
+                width: size.width * 0.02,
+              )
+            ],
           ),
-          drawer: Drawer(),
-          body: RefreshIndicator(
-            onRefresh: onRefresh,
+          drawer: Drawer(
             child: ListView(
-              children: <Widget>[
-                ..._buildSystemDeviceTiles(context),
-                ..._buildScanResultTiles(context),
+              children: [
+                DrawerHeader(
+                  child: Image.asset(
+                      "assets/images/Algofet secondary subtext.png"),
+                  padding: EdgeInsets.all(size.width * 0.075),
+                ),
+                const ListTile(
+                  leading: Icon(Icons.home),
+                  title: Text("Home"),
+                ),
+                const Divider(),
+                const ExpansionTile(
+                  leading: Icon(Icons.shopping_bag_rounded),
+                  title: Text("Products"),
+                  children: [
+                    ListTile(
+                      // leading: Icon(Icons.home),
+                      title: Text("AlgoDOCK"),
+                    ),
+                    ListTile(
+                      // leading: Icon(Icons.home),
+                      title: Text("AlgoBMS"),
+                    ),
+                    ListTile(
+                      // leading: Icon(Icons.home),
+                      title: Text("AlgoX"),
+                    ),
+                    ListTile(
+                      // leading: Icon(Icons.home),
+                      title: Text("AlgoPACK"),
+                    ),
+                    ListTile(
+                      // leading: Icon(Icons.home),
+                      title: Text("AlgoSAFE"),
+                    ),
+                    ListTile(
+                      // leading: Icon(Icons.home),
+                      title: Text("AlgoCOM"),
+                    ),
+                  ],
+                ),
+                const Divider(),
+                const ListTile(
+                      leading: Icon(Icons.person_3),
+                      title: Text("Application"),
+                    ),
+                    const Divider(),
+                const ListTile(
+                      leading: Icon(Icons.call),
+                      title: Text("Contact Us"),
+                    ),const Divider(),
+                const ListTile(
+                      leading: Icon(Icons.work),
+                      title: Text("Company"),
+                    ),const Divider(),
+                const ExpansionTile(
+                      leading: Icon(Icons.more),
+                      title: Text("More"),
+                      children: [
+                ListTile(
+                      // leading: Icon(Icons.home),
+                      title: Text("NEWS"),
+                    ),
+                    ListTile(
+                      // leading: Icon(Icons.home),
+                      title: Text("Partners"),),
+                      ListTile(
+                      // leading: Icon(Icons.home),
+                      title: Text("FAQs"),)
+                      ],
+                    ),
+                    const Divider()
               ],
             ),
+            // child: Column(
+
+            // children: [
+            // SizedBox(height: size.height*0.05,),
+            // Container(child: Image.asset("assets/images/Algofet secondary subtext.png"),padding: EdgeInsets.all(size.width*0.075),)
+            // ],
+            // ),
           ),
+          body: (mainScreen != 1) ? mainScreenDisplay() : scanScreenDisplay(),
+          // body: RefreshIndicator(
+          //   onRefresh: onRefresh,
+          //   child: ListView(
+          //     children: <Widget>[
+          //       ..._buildSystemDeviceTiles(context),
+          //       ..._buildScanResultTiles(context),
+          //     ],
+          //   ),
+          // ),
           floatingActionButton: buildScanButton(context),
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.endFloat,
+          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
           bottomNavigationBar: Container(
-            height: size.height*0.075,
+            height: size.height * 0.075,
             decoration: BoxDecoration(
-              gradient: LinearGradient(colors: [Colors.white, Colors.grey.shade500],begin: Alignment.topCenter,end: Alignment.bottomCenter)
-            ),
+                gradient: LinearGradient(
+                    colors: [Colors.white, Colors.grey.shade500],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter)),
             child: Container(
               decoration: BoxDecoration(
-              gradient: LinearGradient(colors: [Colors.white, Colors.grey.shade500],begin: Alignment.topCenter,end: Alignment.bottomCenter)
-            ),
-              child: const Padding(
+                  gradient: LinearGradient(
+                      colors: [Colors.white, Colors.grey.shade500],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter)),
+              child: Padding(
                 padding: EdgeInsets.all(NavigationToolbar.kMiddleSpacing),
                 child: GNav(
-                  padding: EdgeInsets.all(BorderSide.strokeAlignCenter),
-                  // backgroundColor: Colors.grey,
-                  activeColor: Colors.white,
-                  tabBackgroundColor: Colors.black26,
-                  gap: 8,
-                  tabs: [
-                  GButton(
-                    icon: Icons.info,
-                    text: "Info",
-                  ),
-                  GButton(
-                    icon: Icons.settings,
-                    text: "Setting",
-                  ),
-                  GButton(
-                    icon: Icons.light,
-                    text: "Light",
-                  ),
-                  GButton(icon: Icons.book,
-                  text: "Book",)
-                ]),
+                    padding: EdgeInsets.all(BorderSide.strokeAlignCenter),
+                    // backgroundColor: Colors.grey,
+                    activeColor: Colors.white,
+                    tabBackgroundColor: Colors.black38,
+                    gap: 8,
+                
+                    tabs: [
+                      GButton(
+                        icon: Icons.search,
+                        text: "Scan",
+                        // onPressed: (){}
+                      ),
+                      GButton(
+                        icon: Icons.settings,
+                        text: "Setting",
+                      ),
+                      GButton(
+                        icon: Icons.light,
+                        text: "Light",
+                      ),
+                      GButton(
+                        icon: Icons.book,
+                        text: "Book",
+                      )
+                    ]),
               ),
             ),
           )),

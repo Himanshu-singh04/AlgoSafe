@@ -1,6 +1,7 @@
+// --------------------------------------------------Not Required-----------------------------------------------------------------------//
+
 import 'dart:async';
 import 'dart:typed_data';
-import 'package:algo_safe/utils/colors.dart';
 import 'package:algo_safe/utils/extra.dart';
 import 'package:algo_safe/utils/snack_bar.dart';
 import 'package:flutter/material.dart';

@@ -10,7 +10,7 @@ class CharacteristicTile extends StatefulWidget {
   final BluetoothCharacteristic characteristic;
   final List<DescriptorTile> descriptorTiles;
 
-  const CharacteristicTile({Key? key, required this.characteristic, required this.descriptorTiles}) : super(key: key);
+  const CharacteristicTile({Key? key, required this.characteristic, required this.descriptorTiles, required List<DescriptorTile> descriptors}) : super(key: key);
 
   @override
   State<CharacteristicTile> createState() => _CharacteristicTileState();

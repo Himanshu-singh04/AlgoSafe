@@ -5,7 +5,6 @@ import 'package:algo_safe/screens/scan_screen.dart';
 import 'package:algo_safe/screens/splash_screen.dart';
 import 'package:algo_safe/utils/theme_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
@@ -17,10 +16,11 @@ void main() async {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     theme: initTheme,
-    home: splash_screen(),
+    home: const splash_screen(),
   ));
 }
 
+// ignore: camel_case_types
 class home_page extends StatefulWidget {
   const home_page({super.key});
 
@@ -28,6 +28,7 @@ class home_page extends StatefulWidget {
   State<home_page> createState() => _home_pageState();
 }
 
+// ignore: camel_case_types
 class _home_pageState extends State<home_page> {
   BluetoothAdapterState _adapterState = BluetoothAdapterState.unknown;
 
