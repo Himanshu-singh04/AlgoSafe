@@ -24,6 +24,7 @@ class ThemeService{
   get initial {
     String? themeName = preferences.getString('theme');
     if (themeName == null){
+      // ignore: deprecated_member_use
       final isPlatformDark = WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
       themeName = isPlatformDark ? 'Dark' : 'Light';
     }

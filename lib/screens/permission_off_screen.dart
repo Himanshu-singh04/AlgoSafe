@@ -9,7 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 // ignore: must_be_immutable
 class BluetoothOffScreen extends StatelessWidget {
-  BluetoothOffScreen({Key? key, this.adapterState}) : super(key: key);
+  BluetoothOffScreen({super.key, this.adapterState});
 
   final BluetoothAdapterState? adapterState;
   
@@ -23,7 +23,7 @@ class BluetoothOffScreen extends StatelessWidget {
           color: Colors.black54,
         ),
         Icon(
-          Icons.location_disabled,
+          Icons.location_off_sharp,
           size: 200.0,
           color: Colors.black54,
         ),
@@ -56,7 +56,8 @@ class BluetoothOffScreen extends StatelessWidget {
     final Size size = MediaQuery.of(context).size;
     String? state = adapterState?.toString().split(".").last;
     return Text(
-      'Bluetooth and Location is ${state != null ? state : 'not available'}',
+      //
+      'Bluetooth and Location is ${state ?? 'not available'}',
       style: Theme.of(context).primaryTextTheme.titleSmall?.copyWith(color: Colors.black,fontSize: size.height*0.025),
     );
   }

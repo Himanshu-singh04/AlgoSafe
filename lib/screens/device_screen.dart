@@ -31,7 +31,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
   bool _isDiscoveringServices = false;
   bool _isConnecting = false;
   bool _isDisconnecting = false;
-  var _currentBmsState; // 0: idle, 1: charging, 2:discharging
+  var _currentBmsState = 0; // 0: idle, 1: charging, 2:discharging
 
   late StreamSubscription<BluetoothConnectionState>
       _connectionStateSubscription;
@@ -307,7 +307,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
     if (statevalue is String) {
       _currentBmsState = int.tryParse(statevalue) ?? 0;
     } else if (statevalue is int) {
-      _currentBmsState = statevalue;
+      // ignore: cast_from_null_always_fails
+      _currentBmsState = statevalue as int;
     } else {
       _currentBmsState = 0;
     }
@@ -333,156 +334,369 @@ class _DeviceScreenState extends State<DeviceScreen> {
     await characteristic.write(bytes, withoutResponse: true);
   }
 
-Future<void> onWritePressed(String characteristicName) async {
-  String? characteristicUuid = uuids[characteristicName];
-  String value = _controllers[characteristicName]?.text ?? '';
+  Future<void> onWritePressed(String characteristicName) async {
+    String? characteristicUuid = uuids[characteristicName];
+    String value = _controllers[characteristicName]?.text ?? '';
 
-  // Validate input values
-  if (value.isEmpty || characteristicUuid == null) {
-    Snackbar.show(
-      ABC.c,
-      "$characteristicName Write: No value provided or invalid UUID",
-      success: false,
-    );
-    return; // Skip if no value is provided or UUID is invalid
-  }
-
-  BluetoothCharacteristic? targetCharacteristic;
-
-  // Find the target characteristic by UUID
-  for (var service in _services) {
-    for (var characteristic in service.characteristics) {
-      if (characteristic.uuid.toString() == characteristicUuid) {
-        targetCharacteristic = characteristic;
-        break;
-      }
+    // Validate input values
+    if (value.isEmpty || characteristicUuid == null) {
+      Snackbar.show(
+        ABC.c,
+        "$characteristicName Write: No value provided or invalid UUID",
+        success: false,
+      );
+      return; // Skip if no value is provided or UUID is invalid
     }
-    if (targetCharacteristic != null) break;
-  }
 
-  if (targetCharacteristic != null) {
-    try {
-      // Check if the characteristic supports write without response
-      if (targetCharacteristic.properties.writeWithoutResponse) {
-        await targetCharacteristic.write(value.codeUnits, withoutResponse: true);
-        Snackbar.show(ABC.c, "$characteristicName Write: Success", success: true);
-      } 
-      // Check if the characteristic supports write with response
-      else if (targetCharacteristic.properties.write) {
-        await targetCharacteristic.write(value.codeUnits, withoutResponse: false);
-        Snackbar.show(ABC.c, "$characteristicName Write: Success", success: true);
-      } 
-      // Characteristic is not writable
-      else {
+    BluetoothCharacteristic? targetCharacteristic;
+
+    // Find the target characteristic by UUID
+    for (var service in _services) {
+      for (var characteristic in service.characteristics) {
+        if (characteristic.uuid.toString() == characteristicUuid) {
+          targetCharacteristic = characteristic;
+          break;
+        }
+      }
+      if (targetCharacteristic != null) break;
+    }
+
+    if (targetCharacteristic != null) {
+      try {
+        // Check if the characteristic supports write without response
+        if (targetCharacteristic.properties.writeWithoutResponse) {
+          await targetCharacteristic.write(value.codeUnits,
+              withoutResponse: true);
+          Snackbar.show(ABC.c, "$characteristicName Write: Success",
+              success: true);
+        }
+        // Check if the characteristic supports write with response
+        else if (targetCharacteristic.properties.write) {
+          await targetCharacteristic.write(value.codeUnits,
+              withoutResponse: false);
+          Snackbar.show(ABC.c, "$characteristicName Write: Success",
+              success: true);
+        }
+        // Characteristic is not writable
+        else {
+          Snackbar.show(
+            ABC.c,
+            "$characteristicName Write: Characteristic not writable",
+            success: false,
+          );
+        }
+      } catch (e) {
         Snackbar.show(
           ABC.c,
-          "$characteristicName Write: Characteristic not writable",
+          "$characteristicName Write: Error - $e",
           success: false,
         );
       }
-    } catch (e) {
+    } else {
       Snackbar.show(
         ABC.c,
-        "$characteristicName Write: Error - $e",
+        "$characteristicName Write: Characteristic not found",
         success: false,
       );
     }
-  } else {
-    Snackbar.show(
-      ABC.c,
-      "$characteristicName Write: Characteristic not found",
-      success: false,
-    );
   }
-}
-
 
   Widget writeScreen() {
+    final Size size = MediaQuery.of(context).size;
     return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: ListView(
         children: [
-          buildTextFieldForCharacteristic("Battery_voltage"),
-          buildDropdownForCharacteristic("Battery_temperature"),
-          // Add more rows for other characteristics as needed
+          buildDropdownForCharacteristic("Battery_configuration"),
+          SizedBox(
+            height: size.height * 0.01,
+          ),
+          buildSliderForCharacteristic("Battery_constant_current"),
+          SizedBox(
+            height: size.height * 0.01,
+          ),
+          buildSliderForCharacteristic("Battery_peak_current"),
+          SizedBox(
+            height: size.height * 0.01,
+          ),
+          buildSliderForCharacteristic("Battery_max_voltage"),
+          SizedBox(
+            height: size.height * 0.01,
+          ),
+          buildSliderForCharacteristic("Battery_min_voltage"),
+          SizedBox(
+            height: size.height * 0.01,
+          ),
+          buildSliderForCharacteristic("Battery_operating_temperature"),
+          SizedBox(
+            height: size.height * 0.01,
+          ),
+          buildTextFieldForCharacteristic("Battery_id"),
+          SizedBox(
+            height: size.height * 0.01,
+          ),
+          buildTextFieldForCharacteristic("BMS_id"),
+          SizedBox(
+            height: size.height * 0.01,
+          ),
+          buildToggleForCharacteristic("Battery_DSG_C"),
+          SizedBox(
+            height: size.height * 0.01,
+          ),
+          buildToggleForCharacteristic("Battery_CHG_C"),
         ],
       ),
     );
   }
 
   Map<String, List<String>> dropdownItems = {
-  "Battery_configuration": ["Option 1", "Option 2", "Option 3"],
-  "Battery_temperature": ["1", "2", "3"],
-};
+    "Battery_configuration": ["2", "4", "6", "8", "10", "12", "14", "16"],
+  };
 
-Widget buildTextFieldForCharacteristic(String key) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8.0),
-    child: Row(
-      children: [
-        Expanded(
-          child: TextField(
-            controller: _controllers[key],
-            decoration: InputDecoration(
-              labelText: key.replaceAll('_', ' '),
-              border: OutlineInputBorder(),
+  Widget buildTextFieldForCharacteristic(String key) {
+    final Size size = MediaQuery.of(context).size;
+
+    return Container(
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(size.height * 0.01),
+          color: CustomColors.mainColor_3),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                style: TextStyle(color: Colors.white),
+                controller: _controllers[key],
+                decoration: InputDecoration(
+                  labelText: key.replaceAll('_', ' '),
+                  labelStyle: TextStyle(color: Colors.white),
+                  border: InputBorder.none,
+                ),
+              ),
             ),
-          ),
-        ),
-        SizedBox(width: 8),
-        ElevatedButton(
-          onPressed: () => onWritePressed(key),
-          child: Text('Send'),
-        ),
-      ],
-    ),
-  );
-}
-
-Widget buildDropdownForCharacteristic(String key) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8.0),
-    child: Row(
-      children: [
-        Expanded(
-          child: DropdownButtonFormField<String>(
-            value: _controllers[key]?.text.isEmpty == true ? null : _controllers[key]?.text,
-            onChanged: (newValue) {
-              setState(() {
-                _controllers[key]?.text = newValue!;
-              });
-            },
-            items: dropdownItems[key]?.map((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
-            decoration: InputDecoration(
-              labelText: key.replaceAll('_', ' '),
-              border: OutlineInputBorder(),
+            SizedBox(width: 8),
+            IconButton(
+              color: Colors.white,
+              onPressed: () => onWritePressed(key),
+              icon: Icon(Icons.send),
             ),
-          ),
+          ],
         ),
-        SizedBox(width: 8),
-        ElevatedButton(
-          onPressed: () => onWritePressed(key),
-          child: Text('Send'),
+      ),
+    );
+  }
+
+  Widget buildDropdownForCharacteristic(String key) {
+    final Size size = MediaQuery.of(context).size;
+
+    return Container(
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(size.height * 0.01),
+          color: CustomColors.mainColor_3),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: DropdownButtonFormField<String>(
+                value: _controllers[key]?.text.isEmpty == true
+                    ? null
+                    : _controllers[key]?.text,
+                onChanged: (newValue) {
+                  setState(() {
+                    _controllers[key]?.text = newValue!;
+                  });
+                },
+                items: dropdownItems[key]?.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(
+                      value,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
+                }).toList(),
+                decoration: InputDecoration(
+                  labelText: key.replaceAll('_', ' '),
+                  labelStyle: TextStyle(color: Colors.white),
+                  border: InputBorder.none,
+                ),
+                iconEnabledColor: Colors.white,
+                dropdownColor: CustomColors.mainColor_3,
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            SizedBox(width: 8),
+            IconButton(
+              color: Colors.white,
+              onPressed: () => onWritePressed(key),
+              icon: Icon(Icons.send),
+            ),
+          ],
         ),
-      ],
-    ),
-  );
-}
+      ),
+    );
+  }
 
+  final Map<String, double> _sliderValues = {
+    "Battery_constant_current": 0.0,
+    "Battery_peak_current": 0.0,
+    "Battery_max_voltage": 0.0,
+    "Battery_min_voltage": 0.0,
+    "Battery_operating_temperature": 0.0,
+  };
 
+  Map<String, List<double>> sliderMinMax = {
+    "Battery_constant_current": [0.0, 100.0],
+    "Battery_peak_current": [0.0, 100.0],
+    "Battery_max_voltage": [0.0, 100.0],
+    "Battery_min_voltage": [0.0, 100.0],
+    "Battery_operating_temperature": [0.0, 100.0],
+  };
 
+  Map<String, int> sliderDivisions = {
+    "Battery_constant_current": 50,
+    "Battery_peak_current": 50,
+    "Battery_max_voltage": 50,
+    "Battery_min_voltage": 50,
+    "Battery_operating_temperature": 50,
+  };
+
+  Widget buildSliderForCharacteristic(String key) {
+    final Size size = MediaQuery.of(context).size;
+
+    return Container(
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(size.height * 0.01),
+          color: CustomColors.mainColor_3),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('${key}: ${_sliderValues[key]?.toStringAsFixed(1)}',style: TextStyle(color: Colors.white),),
+                  Row(
+                    children: [
+                      IconButton(
+                        color: Colors.white,
+                        icon: Icon(Icons.remove),
+                        onPressed: () {
+                          setState(() {
+                            double newValue = _sliderValues[key]! - 1;
+                            if (newValue >= sliderMinMax[key]![0]) {
+                              _sliderValues[key] = newValue;
+                              _controllers[key]?.text =
+                                  newValue.toStringAsFixed(1);
+                            }
+                          });
+                        },
+                      ),
+                      Slider(
+                        activeColor: Colors.blueAccent,
+                        value: _sliderValues[key] ?? 0.0,
+                        min: sliderMinMax[key]?.first ?? 0.0,
+                        max: sliderMinMax[key]?.last ?? 100.0,
+                        divisions: sliderDivisions[key] ?? 10,
+                        label:
+                            (_sliderValues[key]?.toStringAsFixed(1) ?? '0.0'),
+                        onChanged: (newValue) {
+                          setState(() {
+                            _sliderValues[key] = newValue;
+                            _controllers[key]?.text =
+                                newValue.toStringAsFixed(1);
+                          });
+                        },
+                      ),
+                      IconButton(
+                        color: Colors.white,
+                        icon: Icon(Icons.add),
+                        onPressed: () {
+                          setState(() {
+                            double newValue = _sliderValues[key]! + 1;
+                            if (newValue <= sliderMinMax[key]![1]) {
+                              _sliderValues[key] = newValue;
+                              _controllers[key]?.text =
+                                  newValue.toStringAsFixed(1);
+                            }
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(width: 8),
+            IconButton(
+              color: Colors.white,
+              onPressed: () => onWritePressed(key),
+              icon: Icon(Icons.send),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Map<String, bool> _toggleValues = {
+    "Battery_DSG_C": false,
+    "Battery_CHG_C": false,
+  };
+
+  Widget buildToggleForCharacteristic(String key) {
+    final Size size = MediaQuery.of(context).size;
+
+    return Container(
+      decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  Text(
+                    key.replaceAll('_', ' '),
+                    style: TextStyle(fontSize: 16,color: Colors.white),
+                  ),
+                  SizedBox(width: 8),
+                  Switch(
+                    activeColor: Colors.grey,
+                    value: _toggleValues[key] ?? false,
+                    onChanged: (bool newValue) {
+                      setState(() {
+                        _toggleValues[key] = newValue;
+                        _controllers[key]?.text = newValue ? '1' : '0';
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(width: 8),
+            IconButton(
+              color: Colors.white,
+              onPressed: () => onWritePressed(key),
+              icon: Icon(Icons.send),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget stateSelectorShow() {
     var statevalue = data["BMS_state"];
     if (statevalue is String) {
       _currentBmsState = int.tryParse(statevalue) ?? 0;
     } else if (statevalue is int) {
-      _currentBmsState = statevalue;
+      // ignore: cast_from_null_always_fails
+      _currentBmsState = statevalue as int;
     } else {
       _currentBmsState = 0;
     }
@@ -640,658 +854,967 @@ Widget buildDropdownForCharacteristic(String key) {
   }
 
   Widget idleWidget() {
+    final Size size = MediaQuery.of(context).size;
+
+    Future<void> refreshData() async {
+      setState(() {
+        onRefreshPressed();
+      });
+    }
+
     return Expanded(
-      child: ListView(
-        children: [
-          ListTile(
-            title: const Text(
-              'BMS_state',
-              style: TextStyle(fontWeight: FontWeight.bold),
+      child: RefreshIndicator(
+        onRefresh: refreshData,
+        child: ListView(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'Battery_voltage',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                  data["Battery_voltage"] != null
+                      ? "${data["Battery_voltage"]} V"
+                      : "NA",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: size.height * 0.018),
+                ),
+              ),
             ),
-            trailing: Text(data["BMS_state"] ?? "NA"),
-          ),
-          // ListTile(
-          //   title: const Text(
-          //     'Battery_configuration',
-          //     style: TextStyle(fontWeight: FontWeight.bold),
-          //   ),
-          //   trailing: Text(data["Battery_configuration"] ?? "NA"),
-          // ),
-          ListTile(
-            title: const Text(
-              'Battery_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["Battery_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Battery_current',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'Battery_temperature',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["Battery_temperature"] != null
+                        ? "${data["Battery_temperature"]} °C"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["Battery_current"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Battery_temperature',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["Battery_temperature"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Battery_cycle_count',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'Battery_health_status',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["Battery_health_status"] != null
+                        ? "${data["Battery_health_status"]} %"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["Battery_cycle_count"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Battery_health_status',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["Battery_health_status"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'BMS_fault',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'Package_total_capacity',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["Package_total_capacity"] != null
+                        ? "${data["Package_total_capacity"]} Ah"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["BMS_fault"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Package_total_capacity',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["Package_total_capacity"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Package_remaining_capacity',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'Battery_cycle_count',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["Battery_cycle_count"] != null
+                        ? "${data["Battery_cycle_count"]}"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["Package_remaining_capacity"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell1_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["cell1_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell2_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'BMS_fault',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["BMS_fault"] != null ? "${data["BMS_fault"]}" : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["cell2_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell3_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell3_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell4_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell4_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell5_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell5_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell6_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell6_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell7_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell7_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell8_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell8_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell9_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell9_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell10_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell10_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell11_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell11_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell12_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell12_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell13_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell13_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell14_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell14_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell15_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell15_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell16_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell16_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Battery_discharge',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["Battery_discharge"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Battery_full_charge',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["Battery_full_charge"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Charging_Porf_cc',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["Charging_Porf_cc"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Charging_Porf_cv',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["Charging_Porf_cv"] ?? "NA"),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget chargingWidget() {
+    final Size size = MediaQuery.of(context).size;
+
+    Future<void> refreshData() async {
+      setState(() {
+        onRefreshPressed();
+      });
+    }
+
     return Expanded(
-      child: ListView(
-        children: [
-          ListTile(
-            title: const Text(
-              'BMS_state',
-              style: TextStyle(fontWeight: FontWeight.bold),
+      child: RefreshIndicator(
+        onRefresh: refreshData,
+        child: ListView(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'Battery_voltage',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["Battery_voltage"] != null
+                        ? "${data["Battery_voltage"]} V"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["BMS_state"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Battery_configuration',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["Battery_configuration"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Battery_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'Battery_current',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["Battery_current"] != null
+                        ? "${data["Battery_current"]} A"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["Battery_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Battery_current',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["Battery_current"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Battery_temperature',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'Battery_temperature',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["Battery_temperature"] != null
+                        ? "${data["Battery_temperature"]} °C"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["Battery_temperature"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Battery_cycle_count',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["Battery_cycle_count"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Battery_health_status',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'Battery_health_status',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["Battery_health_status"] != null
+                        ? "${data["Battery_health_status"]} %"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["Battery_health_status"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'BMS_fault',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["BMS_fault"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Package_total_capacity',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'Package_total_capacity',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["Package_total_capacity"] != null
+                        ? "${data["Package_total_capacity"]} Ah"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["Package_total_capacity"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Package_remaining_capacity',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["Package_remaining_capacity"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell1_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'Package_remaining_capacity',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["Package_remaining_capacity"] != null
+                        ? "${data["Package_remaining_capacity"]} Ah"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["cell1_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell2_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["cell2_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell3_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'Battery_full_charge',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["Battery_full_charge"] != null
+                        ? "${data["Battery_full_charge"]} mins"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["cell3_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell4_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["cell4_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell5_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'Charging_Porfile_cv',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["Charging_Porfile_cv"] != null
+                        ? "${data["Charging_Porfile_cv"]} V"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["cell5_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell6_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["cell6_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell7_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'Charging_Porfile_cc',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["Charging_Porfile_cc"] != null
+                        ? "${data["Charging_Porfile_cc"]} A"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["cell7_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell8_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["cell8_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell9_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'cell1_voltage',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["cell1_voltage"] != null
+                        ? "${data["cell1_voltage"]} V"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["cell9_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell10_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["cell10_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell11_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'cell2_voltage',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["cell2_voltage"] != null
+                        ? "${data["cell2_voltage"]} V"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["cell11_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell12_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["cell12_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell13_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'cell3_voltage',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["cell3_voltage"] != null
+                        ? "${data["cell3_voltage"]} V"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["cell13_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell14_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["cell14_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell15_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'cell4_voltage',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["cell4_voltage"] != null
+                        ? "${data["cell4_voltage"]} V"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["cell15_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell16_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["cell16_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Battery_discharge',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'cell5_voltage',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["cell5_voltage"] != null
+                        ? "${data["cell5_voltage"]} V"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["Battery_discharge"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Battery_full_charge',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["Battery_full_charge"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Charging_Porf_cc',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'cell6_voltage',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["cell6_voltage"] != null
+                        ? "${data["cell6_voltage"]} V"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["Charging_Porf_cc"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Charging_Porf_cv',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["Charging_Porf_cv"] ?? "NA"),
-          ),
-        ],
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'cell7_voltage',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["cell7_voltage"] != null
+                        ? "${data["cell7_voltage"]} V"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
+            ),
+            SizedBox(
+              height: size.height * 0.01,
+            ),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'cell8_voltage',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["cell8_voltage"] != null
+                        ? "${data["cell8_voltage"]} V"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
+            ),
+            SizedBox(
+              height: size.height * 0.01,
+            ),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'cell9_voltage',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["cell9_voltage"] != null
+                        ? "${data["cell9_voltage"]} V"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
+            ),
+            SizedBox(
+              height: size.height * 0.01,
+            ),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'cell10_voltage',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["cell10_voltage"] != null
+                        ? "${data["cell10_voltage"]} V"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
+            ),
+            SizedBox(
+              height: size.height * 0.01,
+            ),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'cell11_voltage',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["cell11_voltage"] != null
+                        ? "${data["cell11_voltage"]} V"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
+            ),
+            SizedBox(
+              height: size.height * 0.01,
+            ),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'cell12_voltage',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["cell12_voltage"] != null
+                        ? "${data["cell12_voltage"]} V"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
+            ),
+            SizedBox(
+              height: size.height * 0.01,
+            ),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'cell13_voltage',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["cell13_voltage"] != null
+                        ? "${data["cell13_voltage"]} V"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
+            ),
+            SizedBox(
+              height: size.height * 0.01,
+            ),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'cell14_voltage',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["cell14_voltage"] != null
+                        ? "${data["cell14_voltage"]} V"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
+            ),
+            SizedBox(
+              height: size.height * 0.01,
+            ),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'cell15_voltage',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["cell15_voltage"] != null
+                        ? "${data["cell15_voltage"]} V"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
+            ),
+            SizedBox(
+              height: size.height * 0.01,
+            ),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'cell16_voltage',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["cell16_voltage"] != null
+                        ? "${data["cell16_voltage"]} V"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
+            ),
+            SizedBox(
+              height: size.height * 0.01,
+            ),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'BMS_fault',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["BMS_fault"] != null ? "${data["BMS_fault"]}" : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget dischargingWidget() {
+    final Size size = MediaQuery.of(context).size;
+
+    Future<void> refreshData() async {
+      setState(() {
+        onRefreshPressed();
+      });
+    }
+
     return Expanded(
-      child: ListView(
-        children: [
-          ListTile(
-            title: const Text(
-              'BMS_state',
-              style: TextStyle(fontWeight: FontWeight.bold),
+      child: RefreshIndicator(
+        onRefresh: refreshData,
+        child: ListView(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'Battery_voltage',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["Battery_voltage"] != null
+                        ? "${data["Battery_voltage"]} V"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["BMS_state"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Battery_configuration',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["Battery_configuration"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Battery_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'Battery_current',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["Battery_current"] != null
+                        ? "${data["Battery_current"]} A"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["Battery_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Battery_current',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["Battery_current"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Battery_temperature',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'Battery_temperature',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["Battery_temperature"] != null
+                        ? "${data["Battery_temperature"]} °C"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["Battery_temperature"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Battery_cycle_count',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["Battery_cycle_count"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Battery_health_status',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'Battery_health_status',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["Battery_health_status"] != null
+                        ? "${data["Battery_health_status"]} %"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["Battery_health_status"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'BMS_fault',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["BMS_fault"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Package_total_capacity',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'Package_total_capacity',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["Package_total_capacity"] != null
+                        ? "${data["Package_total_capacity"]} Ah"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["Package_total_capacity"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Package_remaining_capacity',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["Package_remaining_capacity"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell1_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'Package_remaining_capacity',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["Package_remaining_capacity"] != null
+                        ? "${data["Package_remaining_capacity"]} Ah"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["cell1_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell2_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["cell2_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell3_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'Battery_discharge',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["Battery_discharge"] != null
+                        ? "${data["Battery_discharge"]} mins"
+                        : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["cell3_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell4_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            SizedBox(
+              height: size.height * 0.01,
             ),
-            trailing: Text(data["cell4_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell5_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'BMS_fault',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text(
+                    data["BMS_fault"] != null ? "${data["BMS_fault"]}" : "NA",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
             ),
-            trailing: Text(data["cell5_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell6_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell6_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell7_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell7_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell8_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell8_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell9_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell9_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell10_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell10_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell11_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell11_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell12_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell12_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell13_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell13_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell14_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell14_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell15_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell15_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'cell16_voltage',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["cell16_voltage"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Battery_discharge',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["Battery_discharge"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Battery_full_charge',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["Battery_full_charge"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Charging_Porf_cc',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["Charging_Porf_cc"] ?? "NA"),
-          ),
-          ListTile(
-            title: const Text(
-              'Charging_Porf_cv',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            trailing: Text(data["Charging_Porf_cv"] ?? "NA"),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -1350,8 +1873,8 @@ Widget buildDropdownForCharacteristic(String key) {
             ],
           ),
         ),
-        floatingActionButton: buildDisplayData(context),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        // floatingActionButton: buildDisplayData(context),
+        // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
               gradient: LinearGradient(
