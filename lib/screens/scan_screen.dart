@@ -1,16 +1,20 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:algo_safe/utils/colors.dart';
 import 'package:algo_safe/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:location/location.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'device_screen.dart';
 import '../widgets/system_device_tile.dart';
 import '../widgets/scan_result_tile.dart';
 import '../utils/extra.dart';
 
+// ignore: must_be_immutable
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
 
@@ -25,6 +29,48 @@ class _ScanScreenState extends State<ScanScreen> {
   late StreamSubscription<List<ScanResult>> _scanResultsSubscription;
   late StreamSubscription<bool> _isScanningSubscription;
   int mainScreen = 0;
+
+  late final BluetoothAdapterState? adapterState;
+  Location location = Location();
+
+  Future<void> _toggleLocation() async {
+    bool serviceEnabled = await location.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await location.requestService();
+      if (!serviceEnabled) {
+        return;
+      }
+    }
+
+    var permissionGranted = await location.serviceEnabled();
+
+    if (permissionGranted == Permission.location.status.isDenied) {
+      permissionGranted = (await location.requestPermission()) as bool;
+      if (permissionGranted != Permission.location.status.isGranted) {
+        return;
+      }
+    }
+  }
+
+  Widget buildTurnOnButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: ElevatedButton(
+        child: const Text('TURN ON'),
+        onPressed: () async {
+          try {
+            if (Platform.isAndroid) {
+              await FlutterBluePlus.turnOn();
+              _toggleLocation();
+            }
+          } catch (e) {
+            Snackbar.show(ABC.a, prettyException("Error Turning On:", e),
+                success: false);
+          }
+        },
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -189,9 +235,45 @@ class _ScanScreenState extends State<ScanScreen> {
             ),
             title: Image.asset(
               "assets/images/Algofet primary subtext name.png",
-              width: size.width * 0.60,
+              width: size.width * 0.40,
             ),
             actions: [
+              IconButton(
+                  onPressed: () async {
+                    bool serviceEnabled = await location.serviceEnabled();
+                    if (!serviceEnabled) {
+                      serviceEnabled = await location.requestService();
+                      if (!serviceEnabled) {
+                        return;
+                      }
+                    }
+
+                    var permissionGranted = await location.serviceEnabled();
+                    if (permissionGranted ==
+                        Permission.location.status.isDenied) {
+                      permissionGranted =
+                          (await location.requestPermission()) as bool;
+                      if (permissionGranted !=
+                          Permission.location.status.isGranted) {
+                        return;
+                      }
+                    }
+                  },
+                  icon: const Icon(Icons.location_on)),
+              IconButton(
+                  onPressed: () async {
+                    try {
+                      if (Platform.isAndroid) {
+                        await FlutterBluePlus.turnOn();
+                        _toggleLocation();
+                      }
+                    } catch (e) {
+                      Snackbar.show(
+                          ABC.a, prettyException("Error Turning On:", e),
+                          success: false);
+                    }
+                  },
+                  icon: const Icon(Icons.bluetooth)),
               IconButton(
                   onPressed: () {
                     setState(() {
@@ -250,35 +332,39 @@ class _ScanScreenState extends State<ScanScreen> {
                 ),
                 const Divider(),
                 const ListTile(
-                      leading: Icon(Icons.person_3),
-                      title: Text("Application"),
-                    ),
-                    const Divider(),
+                  leading: Icon(Icons.person_3),
+                  title: Text("Application"),
+                ),
+                const Divider(),
                 const ListTile(
-                      leading: Icon(Icons.call),
-                      title: Text("Contact Us"),
-                    ),const Divider(),
+                  leading: Icon(Icons.call),
+                  title: Text("Contact Us"),
+                ),
+                const Divider(),
                 const ListTile(
-                      leading: Icon(Icons.work),
-                      title: Text("Company"),
-                    ),const Divider(),
+                  leading: Icon(Icons.work),
+                  title: Text("Company"),
+                ),
+                const Divider(),
                 const ExpansionTile(
-                      leading: Icon(Icons.more),
-                      title: Text("More"),
-                      children: [
-                ListTile(
+                  leading: Icon(Icons.more),
+                  title: Text("More"),
+                  children: [
+                    ListTile(
                       // leading: Icon(Icons.home),
                       title: Text("NEWS"),
                     ),
                     ListTile(
                       // leading: Icon(Icons.home),
-                      title: Text("Partners"),),
-                      ListTile(
-                      // leading: Icon(Icons.home),
-                      title: Text("FAQs"),)
-                      ],
+                      title: Text("Partners"),
                     ),
-                    const Divider()
+                    ListTile(
+                      // leading: Icon(Icons.home),
+                      title: Text("FAQs"),
+                    )
+                  ],
+                ),
+                const Divider()
               ],
             ),
             // child: Column(
@@ -322,7 +408,6 @@ class _ScanScreenState extends State<ScanScreen> {
                     activeColor: Colors.white,
                     tabBackgroundColor: Colors.black38,
                     gap: 8,
-                
                     tabs: [
                       GButton(
                         icon: Icons.search,

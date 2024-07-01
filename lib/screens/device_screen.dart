@@ -33,6 +33,10 @@ class _DeviceScreenState extends State<DeviceScreen> {
   bool _isDisconnecting = false;
   var _currentBmsState = 0; // 0: idle, 1: charging, 2:discharging
 
+  BluetoothDevice? targetDevice;
+  BluetoothCharacteristic? otaCharacteristic;
+  bool is_Connected = false;
+
   late StreamSubscription<BluetoothConnectionState>
       _connectionStateSubscription;
   late StreamSubscription<bool> _isConnectingSubscription;
@@ -49,6 +53,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
   @override
   void initState() {
     super.initState();
+    onRefreshPressed();
 
     _connectionStateSubscription =
         widget.device.connectionState.listen((state) async {
@@ -443,6 +448,9 @@ class _DeviceScreenState extends State<DeviceScreen> {
             height: size.height * 0.01,
           ),
           buildToggleForCharacteristic("Battery_CHG_C"),
+          SizedBox(
+            height: size.height * 0.01,
+          ),
         ],
       ),
     );
@@ -577,7 +585,10 @@ class _DeviceScreenState extends State<DeviceScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('${key}: ${_sliderValues[key]?.toStringAsFixed(1)}',style: TextStyle(color: Colors.white),),
+                  Text(
+                    '${key}: ${_sliderValues[key]?.toStringAsFixed(1)}',
+                    style: TextStyle(color: Colors.white),
+                  ),
                   Row(
                     children: [
                       IconButton(
@@ -651,8 +662,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
     return Container(
       decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
+          borderRadius: BorderRadius.circular(size.height * 0.01),
+          color: CustomColors.mainColor_3),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
@@ -662,7 +673,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 children: [
                   Text(
                     key.replaceAll('_', ' '),
-                    style: TextStyle(fontSize: 16,color: Colors.white),
+                    style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                   SizedBox(width: 8),
                   Switch(

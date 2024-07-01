@@ -12,4 +12,13 @@ class CustomColors {
   // ignore: constant_identifier_names
   static const Color artpark_orange = Color(0xfff27c38);
 
+  // colors combos
+  static const Color baige = Color(0xFFF5E1);
+  static const Color light_red = Color(0xFF6969);
+  static const Color dark_red = Color(0xC80036);
+  static const Color dark_blue = Color(0x0C1844);
+
+  static const Color gold = Color(0xFFD700);
+  static const Color teal = Color(0x008080);
+
 }

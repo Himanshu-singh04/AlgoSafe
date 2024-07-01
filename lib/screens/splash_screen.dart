@@ -1,5 +1,5 @@
 import 'package:algo_safe/main.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:algo_safe/utils/colors.dart';
 import 'package:flutter/material.dart';
 
 // ignore: camel_case_types
@@ -20,7 +20,6 @@ class _splash_screenState extends State<splash_screen> {
 
   _navigatetoHome() async {
     await Future.delayed(const Duration(milliseconds: 4000), (){});
-    // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyHomePage(theme: ThemeData.light(),)));
     // ignore: use_build_context_synchronously
     Navigator.of(context).pushReplacement(_createRoute());
   }
@@ -28,6 +27,7 @@ class _splash_screenState extends State<splash_screen> {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
+    
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -36,7 +36,7 @@ class _splash_screenState extends State<splash_screen> {
           width: double.infinity,
           height: double.infinity,
           decoration: const BoxDecoration(
-            gradient: LinearGradient(begin: Alignment.topRight,end: Alignment.bottomRight,colors: [Color.fromRGBO(255, 255, 255, 1),Colors.grey])
+            gradient: LinearGradient(begin: Alignment.topRight,end: Alignment.bottomRight,colors: [CustomColors.teal,CustomColors.gold,CustomColors.mainColor_3])
           ),
           child: Center(
             child: Column(
@@ -44,9 +44,7 @@ class _splash_screenState extends State<splash_screen> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
               Center(child: Image.asset("assets/images/Algofet primary subtext.png",height: size.height*0.6,width: size.width*0.8)),
-              Center(child: AnimatedTextKit(animatedTexts: [TypewriterAnimatedText("AlgoSAFE v1.0",speed: const Duration(milliseconds: 250),textStyle: TextStyle(fontSize: size.width*0.1))],
-                  totalRepeatCount: 7,displayFullTextOnTap: true,
-              stopPauseOnTap: true,)),
+              Center(child: Text("AlgoSAFE",style: TextStyle(fontSize: size.height*0.05),)),
               const CircularProgressIndicator(
                 color: Colors.black,
               )
