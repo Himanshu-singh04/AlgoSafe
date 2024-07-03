@@ -16,7 +16,7 @@ void main() async {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     theme: initTheme,
-    home: const splash_screen(),
+    home: splash_screen(),
   ));
 }
 
@@ -53,10 +53,7 @@ class _home_pageState extends State<home_page> {
 
   @override
   Widget build(BuildContext context) {
-    // Widget screen = _adapterState == BluetoothAdapterState.on
-    //     ? ScanScreen()
-    //     : BluetoothOffScreen(adapterState: _adapterState);
-    Widget screen = ScanScreen();
+    Widget screen = const ScanScreen();
 
     return MaterialApp(
       color: Colors.lightBlue,

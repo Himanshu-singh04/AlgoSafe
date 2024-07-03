@@ -33,9 +33,6 @@ class _DeviceScreenState extends State<DeviceScreen> {
   bool _isDisconnecting = false;
   var _currentBmsState = 0; // 0: idle, 1: charging, 2:discharging
 
-  BluetoothDevice? targetDevice;
-  BluetoothCharacteristic? otaCharacteristic;
-  bool is_Connected = false;
 
   late StreamSubscription<BluetoothConnectionState>
       _connectionStateSubscription;
@@ -50,10 +47,18 @@ class _DeviceScreenState extends State<DeviceScreen> {
     for (var key in uuids.keys) key: TextEditingController()
   };
 
+  void _delayedRefreshFunction() {
+    Future.delayed(Duration(seconds: 2), () {
+      setState(() {
+        onRefreshPressed();
+      });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    onRefreshPressed();
+    _delayedRefreshFunction();
 
     _connectionStateSubscription =
         widget.device.connectionState.listen((state) async {
@@ -486,7 +491,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
             IconButton(
               color: Colors.white,
               onPressed: () => onWritePressed(key),
-              icon: Icon(Icons.send),
+              icon: Icon(Icons.save),
             ),
           ],
         ),
@@ -538,7 +543,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
             IconButton(
               color: Colors.white,
               onPressed: () => onWritePressed(key),
-              icon: Icon(Icons.send),
+              icon: Icon(Icons.save),
             ),
           ],
         ),
@@ -644,7 +649,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
             IconButton(
               color: Colors.white,
               onPressed: () => onWritePressed(key),
-              icon: Icon(Icons.send),
+              icon: Icon(Icons.save),
             ),
           ],
         ),
@@ -693,7 +698,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
             IconButton(
               color: Colors.white,
               onPressed: () => onWritePressed(key),
-              icon: Icon(Icons.send),
+              icon: Icon(Icons.save),
             ),
           ],
         ),
@@ -702,6 +707,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
   }
 
   Widget stateSelectorShow() {
+    final Size size = MediaQuery.of(context).size;
     var statevalue = data["BMS_state"];
     if (statevalue is String) {
       _currentBmsState = int.tryParse(statevalue) ?? 0;
@@ -715,7 +721,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
     switch (_currentBmsState) {
       case 0: // Idle Mode
         return Container(
-          color: Colors.yellow,
+          height: size.height * 0.05,
+          color: Colors.blue,
           child: Padding(
               padding: const EdgeInsets.all(4),
               child: TweenAnimationBuilder<double>(
@@ -725,10 +732,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
                     return Opacity(
                       opacity: value,
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.power_off),
                           Text(
-                            "Idle Mode",
+                            "IDLE MODE",
                             style: TextStyle(fontSize: 20),
                           ),
                         ],
@@ -739,6 +747,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
       case 1: // Charging Mode
         return Container(
+          height: size.height * 0.05,
           color: Colors.green,
           child: Padding(
               padding: const EdgeInsets.all(4),
@@ -749,10 +758,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
                     return Opacity(
                       opacity: value,
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.battery_charging_full),
                           Text(
-                            "Charge Mode",
+                            "CHARGE MODE",
                             style: TextStyle(fontSize: 20),
                           ),
                         ],
@@ -763,6 +773,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
       case 2: // Discharging Mode
         return Container(
+          height: size.height * 0.05,
           color: Colors.red,
           child: Padding(
               padding: const EdgeInsets.all(4),
@@ -773,10 +784,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
                     return Opacity(
                       opacity: value,
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.battery_alert),
+                          Icon(Icons.battery_alert_sharp),
                           Text(
-                            "Discharge Mode",
+                            "DISCHARGE MODE",
                             style: TextStyle(fontSize: 20),
                           ),
                         ],
@@ -786,7 +798,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
         );
       default:
         return Container(
-          color: Colors.yellow,
+          height: size.height * 0.05,
+          color: Colors.blue,
           child: Padding(
               padding: const EdgeInsets.all(4),
               child: TweenAnimationBuilder<double>(
@@ -796,10 +809,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
                     return Opacity(
                       opacity: value,
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.power_off),
                           Text(
-                            "Idle Mode",
+                            "IDLE MODE",
                             style: TextStyle(fontSize: 20),
                           ),
                         ],
@@ -1853,30 +1867,16 @@ class _DeviceScreenState extends State<DeviceScreen> {
           padding: EdgeInsets.all(size.height * 0.01),
           child: Column(
             children: [
-              buildRemoteId(context),
               SizedBox(height: size.height * 0.01),
+              stateSelectorShow(),
               Container(
                 decoration: BoxDecoration(
                     gradient: LinearGradient(
                         colors: [Colors.white, Colors.grey.shade500],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter)),
-                child: ListTile(
-                  leading: buildRssiTile(context),
-                  title: Text(
-                      'Device ${_connectionState.toString().split('.')[1]}.'),
-                  trailing: buildGetServices(context),
-                ),
               ),
               SizedBox(height: size.height * 0.01),
-              Container(
-                decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        colors: [Colors.white, Colors.grey.shade500],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter)),
-                child: buildMtuTile(context),
-              ),
               SizedBox(
                 height: size.height * 0.01,
               ),
@@ -1905,8 +1905,9 @@ class _DeviceScreenState extends State<DeviceScreen> {
             },
             destinations: <NavigationDestination>[
               NavigationDestination(
-                  icon: Icon(Icons.mark_chat_read_outlined), label: "Read"),
-              NavigationDestination(icon: Icon(Icons.edit), label: "Write")
+                  icon: Icon(Icons.my_library_books), label: "Data Monitoring"),
+              NavigationDestination(
+                  icon: Icon(Icons.edit), label: "Data Configuration")
             ],
           ),
         ),
