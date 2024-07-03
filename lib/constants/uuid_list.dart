@@ -104,7 +104,7 @@ Map<String, String> uuid_algoBMS_discharge_read = {
 
 // ignore: non_constant_identifier_names
 Map<String, String> uuid_algoBMS_write = {
-  "Battery_configuration " : "6bd6c397-e8dc-4d41-991d-8f2e887b7061", // compulsory
+  // "Battery_configuration " : "6bd6c397-e8dc-4d41-991d-8f2e887b7061", // compulsory
   // "Battery_capacity" : "", // compulsory
   "Battery_constant_current" : "fd049ff1-670c-40fe-98b8-00504699f8c1", // default
   "Battery_peak_current" : "08b3b2fe-8fce-4393-b554-a31429b35d45", // default
@@ -112,7 +112,7 @@ Map<String, String> uuid_algoBMS_write = {
   "Battery_min_voltage" : "751eafc6-1a1d-4a5e-8df1-4e6ee1f479d1", // default
   "Battery_operating_temperature" : "73e469a2-b1c2-4119-8be7-f325f75b8374", // default
   "Battery_id" : "2277ad1c-a8fd-48c3-9c1c-bddafa72922f", // compulsory
-  "BMS_id" : "d7e138fa-a4c2-482d-a8ee-f62429d4bdf4", // compulsory
+  // "BMS_id" : "d7e138fa-a4c2-482d-a8ee-f62429d4bdf4", // compulsory
   "Battery_CHG_C" : "6fc9cfaf-cbf9-4c28-866d-6ef4e4e5440a", // default
   "Battery_DSG_C" : "435ddd69-c9c1-498c-9889-a63d97dea0ed" // default
 };

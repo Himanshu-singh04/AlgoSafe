@@ -5,6 +5,7 @@ import 'package:algo_safe/utils/colors.dart';
 import 'package:algo_safe/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import '../widgets/service_tile.dart';
 import '../widgets/characteristic_tile.dart';
@@ -42,6 +43,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
   // final TextEditingController _writeController = TextEditingController();
   final Map<String, TextEditingController> _controllers = {
     for (var key in uuids.keys) key: TextEditingController()
+  };
+
+    final Map<String, TextEditingController> _ccontrollers = {
+    "Battery_constant_current": TextEditingController(),
+    "Battery_peak_current": TextEditingController(),
+    "Battery_max_voltage": TextEditingController(),
+    "Battery_min_voltage": TextEditingController(),
+    "Battery_operating_temperature": TextEditingController(),
+    "Battery_id": TextEditingController(),
+    "Battery_DSG_C": TextEditingController(),
+    "Battery_CHG_C": TextEditingController(),
   };
 
   void _delayedRefreshFunction() {
@@ -408,145 +420,145 @@ class _DeviceScreenState extends State<DeviceScreen> {
     }
   }
 
-  Widget writeScreen() {
-    final Size size = MediaQuery.of(context).size;
-    return Expanded(
-      child: ListView(
-        children: [
-          buildDropdownForCharacteristic("Battery_configuration"),
-          SizedBox(
-            height: size.height * 0.01,
-          ),
-          buildSliderForCharacteristic("Battery_constant_current"),
-          SizedBox(
-            height: size.height * 0.01,
-          ),
-          buildSliderForCharacteristic("Battery_peak_current"),
-          SizedBox(
-            height: size.height * 0.01,
-          ),
-          buildSliderForCharacteristic("Battery_max_voltage"),
-          SizedBox(
-            height: size.height * 0.01,
-          ),
-          buildSliderForCharacteristic("Battery_min_voltage"),
-          SizedBox(
-            height: size.height * 0.01,
-          ),
-          buildSliderForCharacteristic("Battery_operating_temperature"),
-          SizedBox(
-            height: size.height * 0.01,
-          ),
-          buildTextFieldForCharacteristic("Battery_id"),
-          SizedBox(
-            height: size.height * 0.01,
-          ),
-          buildTextFieldForCharacteristic("BMS_id"),
-          SizedBox(
-            height: size.height * 0.01,
-          ),
-          buildToggleForCharacteristic("Battery_DSG_C"),
-          SizedBox(
-            height: size.height * 0.01,
-          ),
-          buildToggleForCharacteristic("Battery_CHG_C"),
-          SizedBox(
-            height: size.height * 0.01,
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget writeScreen() {
+  //   final Size size = MediaQuery.of(context).size;
+  //   return Expanded(
+  //     child: ListView(
+  //       children: [
+  //         buildDropdownForCharacteristic("Battery_configuration"),
+  //         SizedBox(
+  //           height: size.height * 0.01,
+  //         ),
+  //         buildSliderForCharacteristic("Battery_constant_current"),
+  //         SizedBox(
+  //           height: size.height * 0.01,
+  //         ),
+  //         buildSliderForCharacteristic("Battery_peak_current"),
+  //         SizedBox(
+  //           height: size.height * 0.01,
+  //         ),
+  //         buildSliderForCharacteristic("Battery_max_voltage"),
+  //         SizedBox(
+  //           height: size.height * 0.01,
+  //         ),
+  //         buildSliderForCharacteristic("Battery_min_voltage"),
+  //         SizedBox(
+  //           height: size.height * 0.01,
+  //         ),
+  //         buildSliderForCharacteristic("Battery_operating_temperature"),
+  //         SizedBox(
+  //           height: size.height * 0.01,
+  //         ),
+  //         buildTextFieldForCharacteristic("Battery_id"),
+  //         SizedBox(
+  //           height: size.height * 0.01,
+  //         ),
+  //         buildTextFieldForCharacteristic("BMS_id"),
+  //         SizedBox(
+  //           height: size.height * 0.01,
+  //         ),
+  //         buildToggleForCharacteristic("Battery_DSG_C"),
+  //         SizedBox(
+  //           height: size.height * 0.01,
+  //         ),
+  //         buildToggleForCharacteristic("Battery_CHG_C"),
+  //         SizedBox(
+  //           height: size.height * 0.01,
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Map<String, List<String>> dropdownItems = {
     "Battery_configuration": ["2", "4", "6", "8", "10", "12", "14", "16"],
   };
 
-  Widget buildTextFieldForCharacteristic(String key) {
-    final Size size = MediaQuery.of(context).size;
+  // Widget buildTextFieldForCharacteristic(String key) {
+  //   final Size size = MediaQuery.of(context).size;
 
-    return Container(
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(size.height * 0.01),
-          color: CustomColors.mainColor_3),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            Expanded(
-              child: TextField(
-                style: TextStyle(color: Colors.white),
-                controller: _controllers[key],
-                decoration: InputDecoration(
-                  labelText: key.replaceAll('_', ' '),
-                  labelStyle: TextStyle(color: Colors.white),
-                  border: InputBorder.none,
-                ),
-              ),
-            ),
-            SizedBox(width: 8),
-            IconButton(
-              color: Colors.white,
-              onPressed: () => onWritePressed(key),
-              icon: Icon(Icons.save),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  //   return Container(
+  //     decoration: BoxDecoration(
+  //         borderRadius: BorderRadius.circular(size.height * 0.01),
+  //         color: CustomColors.mainColor_3),
+  //     child: Padding(
+  //       padding: const EdgeInsets.all(8.0),
+  //       child: Row(
+  //         children: [
+  //           Expanded(
+  //             child: TextField(
+  //               style: TextStyle(color: Colors.white),
+  //               controller: _controllers[key],
+  //               decoration: InputDecoration(
+  //                 labelText: key.replaceAll('_', ' '),
+  //                 labelStyle: TextStyle(color: Colors.white),
+  //                 border: InputBorder.none,
+  //               ),
+  //             ),
+  //           ),
+  //           SizedBox(width: 8),
+  //           IconButton(
+  //             color: Colors.white,
+  //             onPressed: () => onWritePressed(key),
+  //             icon: Icon(Icons.save),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  Widget buildDropdownForCharacteristic(String key) {
-    final Size size = MediaQuery.of(context).size;
+  // Widget buildDropdownForCharacteristic(String key) {
+  //   final Size size = MediaQuery.of(context).size;
 
-    return Container(
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(size.height * 0.01),
-          color: CustomColors.mainColor_3),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            Expanded(
-              child: DropdownButtonFormField<String>(
-                value: _controllers[key]?.text.isEmpty == true
-                    ? null
-                    : _controllers[key]?.text,
-                onChanged: (newValue) {
-                  setState(() {
-                    _controllers[key]?.text = newValue!;
-                  });
-                },
-                items: dropdownItems[key]?.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(
-                      value,
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  );
-                }).toList(),
-                decoration: InputDecoration(
-                  labelText: key.replaceAll('_', ' '),
-                  labelStyle: TextStyle(color: Colors.white),
-                  border: InputBorder.none,
-                ),
-                iconEnabledColor: Colors.white,
-                dropdownColor: CustomColors.mainColor_3,
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-            SizedBox(width: 8),
-            IconButton(
-              color: Colors.white,
-              onPressed: () => onWritePressed(key),
-              icon: Icon(Icons.save),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  //   return Container(
+  //     decoration: BoxDecoration(
+  //         borderRadius: BorderRadius.circular(size.height * 0.01),
+  //         color: CustomColors.mainColor_3),
+  //     child: Padding(
+  //       padding: const EdgeInsets.all(8.0),
+  //       child: Row(
+  //         children: [
+  //           Expanded(
+  //             child: DropdownButtonFormField<String>(
+  //               value: _controllers[key]?.text.isEmpty == true
+  //                   ? null
+  //                   : _controllers[key]?.text,
+  //               onChanged: (newValue) {
+  //                 setState(() {
+  //                   _controllers[key]?.text = newValue!;
+  //                 });
+  //               },
+  //               items: dropdownItems[key]?.map((String value) {
+  //                 return DropdownMenuItem<String>(
+  //                   value: value,
+  //                   child: Text(
+  //                     value,
+  //                     style: TextStyle(color: Colors.white),
+  //                   ),
+  //                 );
+  //               }).toList(),
+  //               decoration: InputDecoration(
+  //                 labelText: key.replaceAll('_', ' '),
+  //                 labelStyle: TextStyle(color: Colors.white),
+  //                 border: InputBorder.none,
+  //               ),
+  //               iconEnabledColor: Colors.white,
+  //               dropdownColor: CustomColors.mainColor_3,
+  //               style: TextStyle(color: Colors.white),
+  //             ),
+  //           ),
+  //           SizedBox(width: 8),
+  //           IconButton(
+  //             color: Colors.white,
+  //             onPressed: () => onWritePressed(key),
+  //             icon: Icon(Icons.save),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   final Map<String, double> _sliderValues = {
     "Battery_constant_current": 0.0,
@@ -572,136 +584,460 @@ class _DeviceScreenState extends State<DeviceScreen> {
     "Battery_operating_temperature": 50,
   };
 
-  Widget buildSliderForCharacteristic(String key) {
-    final Size size = MediaQuery.of(context).size;
+  // Widget buildSliderForCharacteristic(String key) {
+  //   final Size size = MediaQuery.of(context).size;
 
-    return Container(
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(size.height * 0.01),
-          color: CustomColors.mainColor_3),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${key}: ${_sliderValues[key]?.toStringAsFixed(1)}',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  Row(
-                    children: [
-                      IconButton(
-                        color: Colors.white,
-                        icon: Icon(Icons.remove),
-                        onPressed: () {
-                          setState(() {
-                            double newValue = _sliderValues[key]! - 1;
-                            if (newValue >= sliderMinMax[key]![0]) {
-                              _sliderValues[key] = newValue;
-                              _controllers[key]?.text =
-                                  newValue.toStringAsFixed(1);
-                            }
-                          });
-                        },
-                      ),
-                      Slider(
-                        activeColor: Colors.blueAccent,
-                        value: _sliderValues[key] ?? 0.0,
-                        min: sliderMinMax[key]?.first ?? 0.0,
-                        max: sliderMinMax[key]?.last ?? 100.0,
-                        divisions: sliderDivisions[key] ?? 10,
-                        label:
-                            (_sliderValues[key]?.toStringAsFixed(1) ?? '0.0'),
-                        onChanged: (newValue) {
-                          setState(() {
-                            _sliderValues[key] = newValue;
-                            _controllers[key]?.text =
-                                newValue.toStringAsFixed(1);
-                          });
-                        },
-                      ),
-                      IconButton(
-                        color: Colors.white,
-                        icon: Icon(Icons.add),
-                        onPressed: () {
-                          setState(() {
-                            double newValue = _sliderValues[key]! + 1;
-                            if (newValue <= sliderMinMax[key]![1]) {
-                              _sliderValues[key] = newValue;
-                              _controllers[key]?.text =
-                                  newValue.toStringAsFixed(1);
-                            }
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(width: 8),
-            IconButton(
-              color: Colors.white,
-              onPressed: () => onWritePressed(key),
-              icon: Icon(Icons.save),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  //   return Container(
+  //     decoration: BoxDecoration(
+  //         borderRadius: BorderRadius.circular(size.height * 0.01),
+  //         color: CustomColors.mainColor_3),
+  //     child: Padding(
+  //       padding: const EdgeInsets.all(8.0),
+  //       child: Row(
+  //         children: [
+  //           Expanded(
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Text(
+  //                   '${key}: ${_sliderValues[key]?.toStringAsFixed(1)}',
+  //                   style: TextStyle(color: Colors.white),
+  //                 ),
+  //                 Row(
+  //                   children: [
+  //                     IconButton(
+  //                       color: Colors.white,
+  //                       icon: Icon(Icons.remove),
+  //                       onPressed: () {
+  //                         setState(() {
+  //                           double newValue = _sliderValues[key]! - 1;
+  //                           if (newValue >= sliderMinMax[key]![0]) {
+  //                             _sliderValues[key] = newValue;
+  //                             _controllers[key]?.text =
+  //                                 newValue.toStringAsFixed(1);
+  //                           }
+  //                         });
+  //                       },
+  //                     ),
+  //                     Slider(
+  //                       activeColor: Colors.blueAccent,
+  //                       value: _sliderValues[key] ?? 0.0,
+  //                       min: sliderMinMax[key]?.first ?? 0.0,
+  //                       max: sliderMinMax[key]?.last ?? 100.0,
+  //                       divisions: sliderDivisions[key] ?? 10,
+  //                       label:
+  //                           (_sliderValues[key]?.toStringAsFixed(1) ?? '0.0'),
+  //                       onChanged: (newValue) {
+  //                         setState(() {
+  //                           _sliderValues[key] = newValue;
+  //                           _controllers[key]?.text =
+  //                               newValue.toStringAsFixed(1);
+  //                         });
+  //                       },
+  //                     ),
+  //                     IconButton(
+  //                       color: Colors.white,
+  //                       icon: Icon(Icons.add),
+  //                       onPressed: () {
+  //                         setState(() {
+  //                           double newValue = _sliderValues[key]! + 1;
+  //                           if (newValue <= sliderMinMax[key]![1]) {
+  //                             _sliderValues[key] = newValue;
+  //                             _controllers[key]?.text =
+  //                                 newValue.toStringAsFixed(1);
+  //                           }
+  //                         });
+  //                       },
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //           SizedBox(width: 8),
+  //           IconButton(
+  //             color: Colors.white,
+  //             onPressed: () => onWritePressed(key),
+  //             icon: Icon(Icons.save),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Map<String, bool> _toggleValues = {
     "Battery_DSG_C": false,
     "Battery_CHG_C": false,
   };
 
-  Widget buildToggleForCharacteristic(String key) {
-    final Size size = MediaQuery.of(context).size;
+  // Widget buildToggleForCharacteristic(String key) {
+  //   final Size size = MediaQuery.of(context).size;
 
-    return Container(
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(size.height * 0.01),
-          color: CustomColors.mainColor_3),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            Expanded(
-              child: Row(
-                children: [
-                  Text(
-                    key.replaceAll('_', ' '),
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                  SizedBox(width: 8),
-                  Switch(
-                    activeColor: Colors.grey,
-                    value: _toggleValues[key] ?? false,
-                    onChanged: (bool newValue) {
-                      setState(() {
-                        _toggleValues[key] = newValue;
-                        _controllers[key]?.text = newValue ? '1' : '0';
-                      });
-                    },
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(width: 8),
-            IconButton(
-              color: Colors.white,
-              onPressed: () => onWritePressed(key),
-              icon: Icon(Icons.save),
-            ),
-          ],
-        ),
+  //   return Container(
+  //     decoration: BoxDecoration(
+  //         borderRadius: BorderRadius.circular(size.height * 0.01),
+  //         color: CustomColors.mainColor_3),
+  //     child: Padding(
+  //       padding: const EdgeInsets.all(8.0),
+  //       child: Row(
+  //         children: [
+  //           Expanded(
+  //             child: Row(
+  //               children: [
+  //                 Text(
+  //                   key.replaceAll('_', ' '),
+  //                   style: TextStyle(fontSize: 16, color: Colors.white),
+  //                 ),
+  //                 SizedBox(width: 8),
+  //                 Switch(
+  //                   activeColor: Colors.grey,
+  //                   value: _toggleValues[key] ?? false,
+  //                   onChanged: (bool newValue) {
+  //                     setState(() {
+  //                       _toggleValues[key] = newValue;
+  //                       _controllers[key]?.text = newValue ? '1' : '0';
+  //                     });
+  //                   },
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //           SizedBox(width: 8),
+  //           IconButton(
+  //             color: Colors.white,
+  //             onPressed: () => onWritePressed(key),
+  //             icon: Icon(Icons.save),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  final _formKey = GlobalKey<FormState>();
+
+Widget writeScreen() {
+  final Size size = MediaQuery.of(context).size;
+  return Expanded(
+    child: Form(
+      key: _formKey,
+      child: ListView(
+        children: [
+          // buildDropdownForCharacteristic("Battery_configuration"),
+          // SizedBox(height: size.height * 0.01),
+          buildSliderForCharacteristic("Battery_constant_current"),
+          SizedBox(height: size.height * 0.01),
+          buildSliderForCharacteristic("Battery_peak_current"),
+          SizedBox(height: size.height * 0.01),
+          buildSliderForCharacteristic("Battery_max_voltage"),
+          SizedBox(height: size.height * 0.01),
+          buildSliderForCharacteristic("Battery_min_voltage"),
+          SizedBox(height: size.height * 0.01),
+          buildSliderForCharacteristic("Battery_operating_temperature"),
+          SizedBox(height: size.height * 0.01),
+          buildTextFieldForCharacteristic("Battery_id", isRequired: true),
+          // SizedBox(height: size.height * 0.01),
+          // buildTextFieldForCharacteristic("BMS_id", isRequired: true),
+          SizedBox(height: size.height * 0.01),
+          buildToggleForCharacteristic("Battery_DSG_C"),
+          SizedBox(height: size.height * 0.01),
+          buildToggleForCharacteristic("Battery_CHG_C"),
+          SizedBox(height: size.height * 0.02),
+          ElevatedButton(
+            onPressed: () {
+              if (_formKey.currentState!.validate()) {
+                onSendAllPressed();
+              }
+            },
+            child: Text('Send'),
+          ),
+        ],
       ),
-    );
+    ),
+  );
+}
+
+Widget buildTextFieldForCharacteristic(String key, {bool isRequired = false}) {
+  final Size size = MediaQuery.of(context).size;
+
+  return Container(
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(size.height * 0.01),
+      color: CustomColors.mainColor_3,
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextFormField(
+              style: TextStyle(color: Colors.white),
+              controller: _controllers[key],
+              decoration: InputDecoration(
+                labelText: key.replaceAll('_', ' '),
+                labelStyle: TextStyle(color: Colors.white),
+                border: InputBorder.none,
+              ),
+              validator: isRequired
+                  ? (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter $key';
+                      }
+                      return null;
+                    }
+                  : null,
+            ),
+          ),
+          SizedBox(width: 8),
+          IconButton(
+            color: Colors.white,
+            onPressed: () => onWritePressed(key),
+            icon: Icon(Icons.save),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget buildDropdownForCharacteristic(String key) {
+  final Size size = MediaQuery.of(context).size;
+
+  return Container(
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(size.height * 0.01),
+      color: CustomColors.mainColor_3,
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: DropdownButtonFormField<String>(
+              value: _controllers[key]?.text.isEmpty == true
+                  ? null
+                  : _controllers[key]?.text,
+              onChanged: (newValue) {
+                setState(() {
+                  _controllers[key]?.text = newValue!;
+                });
+              },
+              items: dropdownItems[key]?.map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(
+                    value,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                );
+              }).toList(),
+              decoration: InputDecoration(
+                labelText: key.replaceAll('_', ' '),
+                labelStyle: TextStyle(color: Colors.white),
+                border: InputBorder.none,
+              ),
+              iconEnabledColor: Colors.white,
+              dropdownColor: CustomColors.mainColor_3,
+              style: TextStyle(color: Colors.white),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select $key';
+                }
+                return null;
+              },
+            ),
+          ),
+          SizedBox(width: 8),
+          IconButton(
+            color: Colors.white,
+            onPressed: () => onWritePressed(key),
+            icon: Icon(Icons.save),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget buildSliderForCharacteristic(String key) {
+  final Size size = MediaQuery.of(context).size;
+
+  return Container(
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(size.height * 0.01),
+      color: CustomColors.mainColor_3,
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${key}: ${_sliderValues[key]?.toStringAsFixed(1)}',
+                  style: TextStyle(color: Colors.white),
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      color: Colors.white,
+                      icon: Icon(Icons.remove),
+                      onPressed: () {
+                        setState(() {
+                          double newValue = _sliderValues[key]! - 1;
+                          if (newValue >= sliderMinMax[key]![0]) {
+                            _sliderValues[key] = newValue;
+                            _controllers[key]?.text =
+                                newValue.toStringAsFixed(1);
+                          }
+                        });
+                      },
+                    ),
+                    Slider(
+                      activeColor: Colors.blueAccent,
+                      value: _sliderValues[key] ?? 0.0,
+                      min: sliderMinMax[key]?.first ?? 0.0,
+                      max: sliderMinMax[key]?.last ?? 100.0,
+                      divisions: sliderDivisions[key] ?? 10,
+                      label: (_sliderValues[key]?.toStringAsFixed(1) ?? '0.0'),
+                      onChanged: (newValue) {
+                        setState(() {
+                          _sliderValues[key] = newValue;
+                          _controllers[key]?.text =
+                              newValue.toStringAsFixed(1);
+                        });
+                      },
+                    ),
+                    IconButton(
+                      color: Colors.white,
+                      icon: Icon(Icons.add),
+                      onPressed: () {
+                        setState(() {
+                          double newValue = _sliderValues[key]! + 1;
+                          if (newValue <= sliderMinMax[key]![1]) {
+                            _sliderValues[key] = newValue;
+                            _controllers[key]?.text =
+                                newValue.toStringAsFixed(1);
+                          }
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: 8),
+          IconButton(
+            color: Colors.white,
+            onPressed: () => onWritePressed(key),
+            icon: Icon(Icons.save),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget buildToggleForCharacteristic(String key) {
+  final Size size = MediaQuery.of(context).size;
+
+  return Container(
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(size.height * 0.01),
+      color: CustomColors.mainColor_3,
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                Text(
+                  key.replaceAll('_', ' '),
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+                SizedBox(width: 8),
+                Switch(
+                  activeColor: Colors.grey,
+                  value: _toggleValues[key] ?? false,
+                  onChanged: (bool newValue) {
+                    setState(() {
+                      _toggleValues[key] = newValue;
+                      _controllers[key]?.text = newValue ? '1' : '0';
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: 8),
+          IconButton(
+            color: Colors.white,
+            onPressed: () => onWritePressed(key),
+            icon: Icon(Icons.save),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+ Future<void> onSendAllPressed() async {
+    bool allSuccess = true;
+    String summaryMessage = '';
+
+    for (String characteristicName in uuid_algoBMS_write.keys) {
+      String? characteristicUuid = uuid_algoBMS_write[characteristicName];
+      String value = _controllers[characteristicName]?.text ?? '';
+
+      if (value.isEmpty || characteristicUuid == null) {
+        summaryMessage += '$characteristicName Write: No value provided or invalid UUID\n';
+        allSuccess = false;
+        continue;
+      }
+
+      BluetoothCharacteristic? targetCharacteristic;
+
+      for (var service in _services) {
+        for (var characteristic in service.characteristics) {
+          if (characteristic.uuid.toString() == characteristicUuid) {
+            targetCharacteristic = characteristic;
+            break;
+          }
+        }
+        if (targetCharacteristic != null) break;
+      }
+
+      if (targetCharacteristic != null) {
+        try {
+          if (targetCharacteristic.properties.writeWithoutResponse) {
+            await targetCharacteristic.write(value.codeUnits, withoutResponse: true);
+            summaryMessage += '$characteristicName Write: Success\n';
+          } else if (targetCharacteristic.properties.write) {
+            await targetCharacteristic.write(value.codeUnits, withoutResponse: false);
+            summaryMessage += '$characteristicName Write: Success\n';
+          } else {
+            summaryMessage += '$characteristicName Write: Characteristic not writable\n';
+            allSuccess = false;
+          }
+        } catch (e) {
+          summaryMessage += '$characteristicName Write: Error - $e\n';
+          allSuccess = false;
+        }
+      } else {
+        summaryMessage += '$characteristicName Write: Characteristic not found\n';
+        allSuccess = false;
+      }
+    }
+
+    Snackbar.show(ABC.c, summaryMessage, success: allSuccess);
   }
+
 
   Widget stateSelectorShow() {
     final Size size = MediaQuery.of(context).size;
@@ -835,31 +1171,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
     switch (_currentBmsState) {
       case 0:
-        return Container(
-          decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  colors: [Colors.white, Colors.grey.shade500],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter)),
-          child: NavigationBar(
-            indicatorColor: Colors.black12,
-            surfaceTintColor: Colors.transparent,
-            backgroundColor: Colors.transparent,
-            height: size.height * 0.075,
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: (int index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-            destinations: <NavigationDestination>[
-              NavigationDestination(
-                  icon: Icon(Icons.my_library_books), label: "Data Monitoring"),
-              NavigationDestination(
-                  icon: Icon(Icons.edit), label: "Data Configuration")
-            ],
-          ),
-        );
+        return bottomNavigationBar();
 
       case 1:
         return SizedBox.shrink();
@@ -868,7 +1180,13 @@ class _DeviceScreenState extends State<DeviceScreen> {
         return SizedBox.shrink();
 
       default:
-        return Container(
+        return bottomNavigationBar();
+    }
+  }
+
+  Widget bottomNavigationBar (){
+    final Size size = MediaQuery.of(context).size;
+    return Container(
           decoration: BoxDecoration(
               gradient: LinearGradient(
                   colors: [Colors.white, Colors.grey.shade500],
@@ -893,7 +1211,6 @@ class _DeviceScreenState extends State<DeviceScreen> {
             ],
           ),
         );
-    }
   }
 
   Widget buildDisplayData(BuildContext context) {
