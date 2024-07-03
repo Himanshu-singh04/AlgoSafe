@@ -31,26 +31,26 @@ class BluetoothOffScreen extends StatelessWidget {
     );
   }
 
-  Location location = Location();
+  // Location location = Location();
 
-  Future<void> _toggleLocation() async {
-    bool serviceEnabled = await location.serviceEnabled();
-    if (!serviceEnabled){
-      serviceEnabled = await location.requestService();
-      if (!serviceEnabled){
-        return;
-      }
-    }
+  // Future<void> _toggleLocation() async {
+  //   bool serviceEnabled = await location.serviceEnabled();
+  //   if (!serviceEnabled){
+  //     serviceEnabled = await location.requestService();
+  //     if (!serviceEnabled){
+  //       return;
+  //     }
+  //   }
 
-    var permissionGranted = await location.serviceEnabled();
+  //   var permissionGranted = await location.serviceEnabled();
 
-    if (permissionGranted == Permission.location.status.isDenied){
-      permissionGranted = (await location.requestPermission()) as bool;
-      if (permissionGranted != Permission.location.status.isGranted){
-        return;
-      }
-    }
-  }
+  //   if (permissionGranted == Permission.location.status.isDenied){
+  //     permissionGranted = (await location.requestPermission()) as bool;
+  //     if (permissionGranted != Permission.location.status.isGranted){
+  //       return;
+  //     }
+  //   }
+  // }
 
   Widget buildTitle(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -62,24 +62,24 @@ class BluetoothOffScreen extends StatelessWidget {
     );
   }
 
-  Widget buildTurnOnButton(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: ElevatedButton(
-        child: const Text('TURN ON'),
-        onPressed: () async {
-          try {
-            if (Platform.isAndroid) {
-              await FlutterBluePlus.turnOn();
-              _toggleLocation();
-            }
-          } catch (e) {
-            Snackbar.show(ABC.a, prettyException("Error Turning On:", e), success: false);
-          }
-        },
-      ),
-    );
-  }
+  // Widget buildTurnOnButton(BuildContext context) {
+  //   return Padding(
+  //     padding: const EdgeInsets.all(20.0),
+  //     child: ElevatedButton(
+  //       child: const Text('TURN ON'),
+  //       onPressed: () async {
+  //         try {
+  //           if (Platform.isAndroid) {
+  //             await FlutterBluePlus.turnOn();
+  //             _toggleLocation();
+  //           }
+  //         } catch (e) {
+  //           Snackbar.show(ABC.a, prettyException("Error Turning On:", e), success: false);
+  //         }
+  //       },
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +96,7 @@ class BluetoothOffScreen extends StatelessWidget {
               children: <Widget>[
                 buildBluetoothOffIcon(context),
                 buildTitle(context),
-                if (Platform.isAndroid) buildTurnOnButton(context),
+                // if (Platform.isAndroid) buildTurnOnButton(context),
               ],
             ),
           ),

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
@@ -26,11 +27,19 @@ class _splash_screenState extends State<splash_screen> {
 
   bool isShowSignInDialog = false;
   late final BluetoothAdapterState? adapterState;
+  late StreamSubscription<BluetoothAdapterState> adapterStateStateSubscription;
 
   @override
   void initState() {
-    _buttonAnimationController = OneShotAnimation("active", autoplay: false);
     super.initState();
+    _buttonAnimationController = OneShotAnimation("active", autoplay: false);
+    adapterStateStateSubscription =
+        FlutterBluePlus.adapterState.listen((state) {
+      adapterState = state;
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   @override
@@ -78,21 +87,15 @@ class _splash_screenState extends State<splash_screen> {
                   press: () async {
                     _buttonAnimationController.isActive = true;
 
-                    bool canProceed = false;
-
-                    if (!canProceed) {
-                      Future.delayed(Duration(seconds: 1), () {
-                        setState(() {
-                          isShowSignInDialog = true;
-                        });
-                        showCustomDialog(
-                          context,
-                          onValue: (_) {},
-                        );
+                    Future.delayed(Duration(seconds: 1), () {
+                      setState(() {
+                        isShowSignInDialog = true;
                       });
-                    } else{
-                      Navigator.of(context).pushReplacement(_createRoute());
-                    }
+                      showCustomDialog(
+                        context,
+                        onValue: (_) {},
+                      );
+                    });
                   },
                 ),
                 SizedBox(
@@ -106,36 +109,6 @@ class _splash_screenState extends State<splash_screen> {
     );
   }
 }
-
-// Future<bool> checkLocationAndBluetooth() async {
-//   Location location = Location();
-//   bool serviceEnabled;
-//   PermissionStatus permissionGranted;
-
-//   // Check location service
-//   serviceEnabled = await location.serviceEnabled();
-//   if (!serviceEnabled) {
-//     serviceEnabled = await location.requestService();
-//     if (!serviceEnabled) {
-//       return false;
-//     }
-//   }
-
-//   // Check location permission
-//   permissionGranted = await location.hasPermission();
-//   if (permissionGranted == PermissionStatus.denied) {
-//     permissionGranted = await location.requestPermission();
-//     if (permissionGranted != PermissionStatus.granted) {
-//       return false;
-//     }
-//   }
-
-//   // Check Bluetooth status
-//     FlutterBluePlus flutterBluePlus = FlutterBluePlus();
-//   bool isBluetoothOn = await FlutterBluePlus.isOn;
-
-//   return serviceEnabled && permissionGranted == PermissionStatus.granted && isBluetoothOn;
-// }
 
 Route _createRoute() {
   return PageRouteBuilder(

@@ -30,47 +30,47 @@ class _ScanScreenState extends State<ScanScreen> {
   late StreamSubscription<bool> _isScanningSubscription;
   int mainScreen = 0;
 
-  late final BluetoothAdapterState? adapterState;
-  Location location = Location();
+  // late final BluetoothAdapterState? adapterState;
+  // Location location = Location();
 
-  Future<void> _toggleLocation() async {
-    bool serviceEnabled = await location.serviceEnabled();
-    if (!serviceEnabled) {
-      serviceEnabled = await location.requestService();
-      if (!serviceEnabled) {
-        return;
-      }
-    }
+  // Future<void> _toggleLocation() async {
+  //   bool serviceEnabled = await location.serviceEnabled();
+  //   if (!serviceEnabled) {
+  //     serviceEnabled = await location.requestService();
+  //     if (!serviceEnabled) {
+  //       return;
+  //     }
+  //   }
 
-    var permissionGranted = await location.serviceEnabled();
+  //   var permissionGranted = await location.serviceEnabled();
 
-    if (permissionGranted == Permission.location.status.isDenied) {
-      permissionGranted = (await location.requestPermission()) as bool;
-      if (permissionGranted != Permission.location.status.isGranted) {
-        return;
-      }
-    }
-  }
+  //   if (permissionGranted == Permission.location.status.isDenied) {
+  //     permissionGranted = (await location.requestPermission()) as bool;
+  //     if (permissionGranted != Permission.location.status.isGranted) {
+  //       return;
+  //     }
+  //   }
+  // }
 
-  Widget buildTurnOnButton(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: ElevatedButton(
-        child: const Text('TURN ON'),
-        onPressed: () async {
-          try {
-            if (Platform.isAndroid) {
-              await FlutterBluePlus.turnOn();
-              _toggleLocation();
-            }
-          } catch (e) {
-            Snackbar.show(ABC.a, prettyException("Error Turning On:", e),
-                success: false);
-          }
-        },
-      ),
-    );
-  }
+  // Widget buildTurnOnButton(BuildContext context) {
+  //   return Padding(
+  //     padding: const EdgeInsets.all(20.0),
+  //     child: ElevatedButton(
+  //       child: const Text('TURN ON'),
+  //       onPressed: () async {
+  //         try {
+  //           if (Platform.isAndroid) {
+  //             await FlutterBluePlus.turnOn();
+  //             _toggleLocation();
+  //           }
+  //         } catch (e) {
+  //           Snackbar.show(ABC.a, prettyException("Error Turning On:", e),
+  //               success: false);
+  //         }
+  //       },
+  //     ),
+  //   );
+  // }
 
   @override
   void initState() {
@@ -162,7 +162,7 @@ class _ScanScreenState extends State<ScanScreen> {
       );
     } else {
       return FloatingActionButton.extended(
-          backgroundColor: CustomColors.mainColor_3,
+          backgroundColor: CustomColors.mainColor_1,
           label: const Text(
             "SCAN",
             style: TextStyle(color: Colors.white),
@@ -224,13 +224,12 @@ class _ScanScreenState extends State<ScanScreen> {
     return ScaffoldMessenger(
       key: Snackbar.snackBarKeyB,
       child: Scaffold(
+        backgroundColor: Colors.white,
           appBar: AppBar(
-            //systemOverlayStyle: SystemUiOverlayStyle.dark
-            //    .copyWith(statusBarColor: Colors.black),
             flexibleSpace: Container(
               decoration: BoxDecoration(
                   gradient: LinearGradient(
-                      colors: [Colors.white, Colors.grey.shade500],
+                      colors: [ Colors.grey.shade500,Colors.white],
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter)),
             ),
@@ -239,41 +238,6 @@ class _ScanScreenState extends State<ScanScreen> {
               width: size.width * 0.40,
             ),
             actions: [
-              // IconButton(
-              //     onPressed: () async {
-              //       bool serviceEnabled = await location.serviceEnabled();
-              //       if (!serviceEnabled) {
-              //         serviceEnabled = await location.requestService();
-              //         if (!serviceEnabled) {
-              //           return;
-              //         }
-              //       }
-
-              //       var permissionGranted = await location.serviceEnabled();
-              //       if (permissionGranted ==
-              //           Permission.location.status.isDenied) {
-              //         permissionGranted =
-              //             (await location.requestPermission()) as bool;
-              //         if (permissionGranted !=
-              //             Permission.location.status.isGranted) {
-              //           return;
-              //         }
-              //       }
-              //     },
-              //     icon: const Icon(Icons.location_on)),
-              // IconButton(
-              //     onPressed: () async {
-              //       try {
-              //         if (Platform.isAndroid) {
-              //           await FlutterBluePlus.turnOn();
-              //         }
-              //       } catch (e) {
-              //         Snackbar.show(
-              //             ABC.a, prettyException("Error Turning On:", e),
-              //             success: false);
-              //       }
-              //     },
-              //     icon: const Icon(Icons.bluetooth)),
               IconButton(
                   onPressed: () {
                     setState(() {

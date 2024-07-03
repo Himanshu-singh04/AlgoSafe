@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:algo_safe/controllers/location_and_ble_controller.dart';
 import 'package:algo_safe/main.dart';
+import 'package:algo_safe/utils/colors.dart';
 import 'package:algo_safe/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
@@ -9,7 +11,6 @@ import 'package:permission_handler/permission_handler.dart';
 
 void showCustomDialog(BuildContext context, {required ValueChanged onValue}) {
   final Size size = MediaQuery.of(context).size;
-  bool checkBox = false;
 
   showGeneralDialog(
     context: context,
@@ -20,8 +21,8 @@ void showCustomDialog(BuildContext context, {required ValueChanged onValue}) {
     pageBuilder: (_, __, ___) {
       return Center(
         child: Container(
-          width: size.width ,
-          height: size.height * 0.25,
+          width: size.width,
+          height: size.height * 0.275,
           margin: const EdgeInsets.symmetric(horizontal: 16),
           padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
           decoration: BoxDecoration(
@@ -67,52 +68,31 @@ void showCustomDialog(BuildContext context, {required ValueChanged onValue}) {
                         SizedBox(
                           height: 16,
                         ),
-                        ElevatedButton(
+                        Text(
+                          "Enable Permissions and Proceed",
+                          style: TextStyle(
+                              color: Colors.black, fontWeight: FontWeight.w500),
+                        ),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        SizedBox(
+                          width: size.width * 0.5,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: CustomColors.mainColor_1),
                             onPressed: () async {
-                              try {
-                                if (Platform.isAndroid) {
-                                  await FlutterBluePlus.turnOn();
-                                }
-                              } catch (e) {
-                                Snackbar.show(ABC.a,
-                                    prettyException("Error Turning On:", e),
-                                    success: false);
-                              }
-
-                              Location location = Location();
-                              bool serviceEnabled =
-                                  await location.serviceEnabled();
-                              if (!serviceEnabled) {
-                                serviceEnabled =
-                                    await location.requestService();
-                                if (!serviceEnabled) {
-                                  return;
-                                }
-                              }
-
-                              var permissionGranted =
-                                  await location.serviceEnabled();
-
-                              if (permissionGranted ==
-                                  Permission.location.status.isDenied) {
-                                permissionGranted = (await location
-                                    .requestPermission()) as bool;
-                                if (permissionGranted !=
-                                    Permission.location.status.isGranted) {
-                                  return;
-                                }
-                              }
+                              toggleLocation();
+                              toggleBLE();
                               Navigator.of(context)
                                   .pushReplacement(_createRoute());
                             },
-                            child: Row(
-                              children: [
-                                Checkbox(value: checkBox, onChanged: (bool? value){checkBox = value!;}),
-                                Text("Enable Permissions and Proceed"),
-                              ],
-                            )),
-
-                            
+                            child: Text(
+                              "Proceed",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
 
                         // CheckboxListTile(
                         //   title: Text("title text"),
@@ -157,6 +137,7 @@ void showCustomDialog(BuildContext context, {required ValueChanged onValue}) {
 
 Route _createRoute() {
   return PageRouteBuilder(
+    transitionDuration: Duration(seconds: 1),
     pageBuilder: (context, animation, secondaryAnimation) => const home_page(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       const begin = Offset(0.0, 1.0);
