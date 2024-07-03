@@ -5,7 +5,6 @@ import 'package:algo_safe/utils/colors.dart';
 import 'package:algo_safe/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import '../widgets/service_tile.dart';
 import '../widgets/characteristic_tile.dart';
@@ -971,7 +970,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'Battery_voltage',
+                  'Battery Voltage',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -995,7 +994,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'Battery_temperature',
+                  'Battery Temperature',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1018,7 +1017,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'Battery_health_status',
+                  'Battery Health Status',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1041,7 +1040,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'Package_total_capacity',
+                  'Package Total Capacity',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1064,7 +1063,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'Battery_cycle_count',
+                  'Battery Cycle Count',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1087,7 +1086,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'BMS_fault',
+                  'BMS Fault',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1125,7 +1124,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'Battery_voltage',
+                  'Battery Voltage',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1148,7 +1147,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'Battery_current',
+                  'Battery Current',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1171,7 +1170,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'Battery_temperature',
+                  'Battery Temperature',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1194,7 +1193,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'Battery_health_status',
+                  'Battery Health Status',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1217,7 +1216,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'Package_total_capacity',
+                  'Package Total Capacity',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1240,7 +1239,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'Package_remaining_capacity',
+                  'Package Remaining Capacity',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1263,7 +1262,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'Battery_full_charge',
+                  'Battery Full Charge',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1286,7 +1285,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'Charging_Porfile_cv',
+                  'Charging Porfile CV',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1309,7 +1308,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'Charging_Porfile_cc',
+                  'Charging Porfile CC',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1332,7 +1331,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'cell1_voltage',
+                  'Cell1 Voltage',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1355,7 +1354,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'cell2_voltage',
+                  'Cell2 Voltage',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1378,7 +1377,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'cell3_voltage',
+                  'Cell3 Voltage',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1401,7 +1400,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'cell4_voltage',
+                  'Cell4 Voltage',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1424,7 +1423,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'cell5_voltage',
+                  'Cell5 Voltage',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1447,7 +1446,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'cell6_voltage',
+                  'Cell6 Voltage',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1470,7 +1469,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'cell7_voltage',
+                  'Cell7 Voltage',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1493,7 +1492,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'cell8_voltage',
+                  'Cell8 Voltage',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1516,7 +1515,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'cell9_voltage',
+                  'Cell9 Voltage',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1539,7 +1538,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'cell10_voltage',
+                  'Cell10 Voltage',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1562,7 +1561,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'cell11_voltage',
+                  'Cell11 Voltage',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1585,7 +1584,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'cell12_voltage',
+                  'Cell12 Voltage',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1608,7 +1607,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'cell13_voltage',
+                  'Cell13 Voltage',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1631,7 +1630,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'cell14_voltage',
+                  'Cell14 Voltage',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1654,7 +1653,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'cell15_voltage',
+                  'Cell15 Voltage',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1677,7 +1676,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'cell16_voltage',
+                  'Cell16 Voltage',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1700,7 +1699,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'BMS_fault',
+                  'BMS Fault',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1738,7 +1737,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'Battery_voltage',
+                  'Battery Voltage',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1761,7 +1760,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'Battery_current',
+                  'Battery Current',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1784,7 +1783,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'Battery_temperature',
+                  'Battery Temperature',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1807,7 +1806,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'Battery_health_status',
+                  'Battery Health Status',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1830,7 +1829,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'Package_total_capacity',
+                  'Package Total Capacity',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1853,7 +1852,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'Package_remaining_capacity',
+                  'Package Remaining Capacity',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1876,7 +1875,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'Battery_discharge',
+                  'Battery Discharge',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -1899,7 +1898,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   color: CustomColors.mainColor_3),
               child: ListTile(
                 title: const Text(
-                  'BMS_fault',
+                  'BMS Fault',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),

@@ -16,7 +16,7 @@ void main() {
     // Build our app and trigger a frame.
     await tester.pumpWidget(MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: const splash_screen(),
+    home: splash_screen(),
   ));
 
     // Verify that our counter starts at 0.
