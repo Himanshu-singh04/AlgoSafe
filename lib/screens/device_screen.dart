@@ -1,13 +1,12 @@
 import 'dart:async';
 import 'dart:typed_data';
-
 import 'package:algo_safe/constants/uuid_list.dart';
 import 'package:algo_safe/utils/colors.dart';
 import 'package:algo_safe/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-
 import '../widgets/service_tile.dart';
 import '../widgets/characteristic_tile.dart';
 import '../widgets/descriptor_tile.dart';
@@ -32,7 +31,6 @@ class _DeviceScreenState extends State<DeviceScreen> {
   bool _isConnecting = false;
   bool _isDisconnecting = false;
   var _currentBmsState = 0; // 0: idle, 1: charging, 2:discharging
-
 
   late StreamSubscription<BluetoothConnectionState>
       _connectionStateSubscription;
@@ -820,6 +818,81 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       ),
                     );
                   })),
+        );
+    }
+  }
+
+  Widget navShow() {
+    final Size size = MediaQuery.of(context).size;
+    var navValue = data["BMS_state"];
+    if (navValue is String) {
+      _currentBmsState = int.tryParse(navValue) ?? 0;
+    } else if (navValue is int) {
+      // ignore: cast_from_null_always_fails
+      _currentBmsState = navValue as int;
+    } else {
+      _currentBmsState = 0;
+    }
+
+    switch (_currentBmsState) {
+      case 0:
+        return Container(
+          decoration: BoxDecoration(
+              gradient: LinearGradient(
+                  colors: [Colors.white, Colors.grey.shade500],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter)),
+          child: NavigationBar(
+            indicatorColor: Colors.black12,
+            surfaceTintColor: Colors.transparent,
+            backgroundColor: Colors.transparent,
+            height: size.height * 0.075,
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: (int index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
+            destinations: <NavigationDestination>[
+              NavigationDestination(
+                  icon: Icon(Icons.my_library_books), label: "Data Monitoring"),
+              NavigationDestination(
+                  icon: Icon(Icons.edit), label: "Data Configuration")
+            ],
+          ),
+        );
+
+      case 1:
+        return SizedBox.shrink();
+
+      case 2:
+        return SizedBox.shrink();
+
+      default:
+        return Container(
+          decoration: BoxDecoration(
+              gradient: LinearGradient(
+                  colors: [Colors.white, Colors.grey.shade500],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter)),
+          child: NavigationBar(
+            indicatorColor: Colors.black12,
+            surfaceTintColor: Colors.transparent,
+            backgroundColor: Colors.transparent,
+            height: size.height * 0.075,
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: (int index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
+            destinations: <NavigationDestination>[
+              NavigationDestination(
+                  icon: Icon(Icons.my_library_books), label: "Data Monitoring"),
+              NavigationDestination(
+                  icon: Icon(Icons.edit), label: "Data Configuration")
+            ],
+          ),
         );
     }
   }
@@ -1852,66 +1925,41 @@ class _DeviceScreenState extends State<DeviceScreen> {
     return ScaffoldMessenger(
       key: Snackbar.snackBarKeyC,
       child: Scaffold(
-        appBar: AppBar(
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    colors: [Colors.white, Colors.grey.shade500],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter)),
+          appBar: AppBar(
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      colors: [Colors.white, Colors.grey.shade500],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter)),
+            ),
+            title: Text(widget.device.platformName),
+            actions: [buildConnectButton(context)],
           ),
-          title: Text(widget.device.platformName),
-          actions: [buildConnectButton(context)],
-        ),
-        body: Padding(
-          padding: EdgeInsets.all(size.height * 0.01),
-          child: Column(
-            children: [
-              SizedBox(height: size.height * 0.01),
-              stateSelectorShow(),
-              Container(
-                decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        colors: [Colors.white, Colors.grey.shade500],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter)),
-              ),
-              SizedBox(height: size.height * 0.01),
-              SizedBox(
-                height: size.height * 0.01,
-              ),
-              read_write_screens[_selectedIndex]
-            ],
+          body: Padding(
+            padding: EdgeInsets.all(size.height * 0.01),
+            child: Column(
+              children: [
+                SizedBox(height: size.height * 0.01),
+                stateSelectorShow(),
+                Container(
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          colors: [Colors.white, Colors.grey.shade500],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter)),
+                ),
+                SizedBox(height: size.height * 0.01),
+                SizedBox(
+                  height: size.height * 0.01,
+                ),
+                read_write_screens[_selectedIndex]
+              ],
+            ),
           ),
-        ),
-        // floatingActionButton: buildDisplayData(context),
-        // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  colors: [Colors.white, Colors.grey.shade500],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter)),
-          child: NavigationBar(
-            indicatorColor: Colors.black12,
-            surfaceTintColor: Colors.transparent,
-            backgroundColor: Colors.transparent,
-            height: size.height * 0.075,
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: (int index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-            destinations: <NavigationDestination>[
-              NavigationDestination(
-                  icon: Icon(Icons.my_library_books), label: "Data Monitoring"),
-              NavigationDestination(
-                  icon: Icon(Icons.edit), label: "Data Configuration")
-            ],
-          ),
-        ),
-      ),
+          // floatingActionButton: buildDisplayData(context),
+          // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          bottomNavigationBar: navShow()),
     );
   }
 }

@@ -1,14 +1,9 @@
 import 'dart:async';
-import 'dart:io';
-
 import 'package:algo_safe/utils/colors.dart';
 import 'package:algo_safe/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:location/location.dart';
-import 'package:permission_handler/permission_handler.dart';
-
 import 'device_screen.dart';
 import '../widgets/system_device_tile.dart';
 import '../widgets/scan_result_tile.dart';

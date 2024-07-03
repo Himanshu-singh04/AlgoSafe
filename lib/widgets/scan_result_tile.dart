@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:algo_safe/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';

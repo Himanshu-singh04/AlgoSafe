@@ -1,16 +1,10 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:ui';
-
 import 'package:algo_safe/main.dart';
-import 'package:algo_safe/utils/snack_bar.dart';
-
 import 'package:algo_safe/widgets/animated_button.dart';
 import 'package:algo_safe/widgets/custom_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:location/location.dart';
-import 'package:location_platform_interface/location_platform_interface.dart';
 import 'package:rive/rive.dart';
 
 // ignore: camel_case_types

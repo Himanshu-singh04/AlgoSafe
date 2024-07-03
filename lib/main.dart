@@ -1,6 +1,4 @@
 import 'dart:async';
-
-import 'package:algo_safe/screens/permission_off_screen.dart';
 import 'package:algo_safe/screens/scan_screen.dart';
 import 'package:algo_safe/screens/splash_screen.dart';
 import 'package:algo_safe/utils/theme_service.dart';
@@ -30,7 +28,7 @@ class home_page extends StatefulWidget {
 
 // ignore: camel_case_types
 class _home_pageState extends State<home_page> {
-  BluetoothAdapterState _adapterState = BluetoothAdapterState.unknown;
+  BluetoothAdapterState adapterState = BluetoothAdapterState.unknown;
 
   late StreamSubscription<BluetoothAdapterState> _adapterStateStateSubscription;
 
@@ -38,7 +36,7 @@ class _home_pageState extends State<home_page> {
   void initState() {
     super.initState();
     _adapterStateStateSubscription = FlutterBluePlus.adapterState.listen((state) {
-      _adapterState = state;
+      adapterState = state;
       if (mounted) {
         setState(() {});
       }

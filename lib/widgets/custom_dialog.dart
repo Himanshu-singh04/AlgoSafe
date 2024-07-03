@@ -1,13 +1,7 @@
-import 'dart:io';
-
 import 'package:algo_safe/controllers/location_and_ble_controller.dart';
 import 'package:algo_safe/main.dart';
 import 'package:algo_safe/utils/colors.dart';
-import 'package:algo_safe/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:location/location.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 void showCustomDialog(BuildContext context, {required ValueChanged onValue}) {
   final Size size = MediaQuery.of(context).size;
@@ -92,15 +86,7 @@ void showCustomDialog(BuildContext context, {required ValueChanged onValue}) {
                               style: TextStyle(color: Colors.white),
                             ),
                           ),
-                        ),
-
-                        // CheckboxListTile(
-                        //   title: Text("title text"),
-                        //   value: checkedValue,
-                        //   onChanged: (newValue) {},
-                        //   controlAffinity: ListTileControlAffinity
-                        //       .leading, //  <-- leading Checkbox
-                        // )
+                        )
                       ],
                     ),
                   ),
@@ -113,22 +99,12 @@ void showCustomDialog(BuildContext context, {required ValueChanged onValue}) {
     },
     transitionBuilder: (_, anim, __, child) {
       Tween<Offset> tween;
-      // if (anim.status == AnimationStatus.reverse) {
-      //   tween = Tween(begin: const Offset(0, 1), end: Offset.zero);
-      // } else {
-      //   tween = Tween(begin: const Offset(0, -1), end: Offset.zero);
-      // }
-
       tween = Tween(begin: const Offset(0, -1), end: Offset.zero);
 
       return SlideTransition(
         position: tween.animate(
           CurvedAnimation(parent: anim, curve: Curves.easeInOut),
         ),
-        // child: FadeTransition(
-        //   opacity: anim,
-        //   child: child,
-        // ),
         child: child,
       );
     },
