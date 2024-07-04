@@ -82,5 +82,26 @@ class BluetoothAdapterStateObserver extends NavigatorObserver {
     _adapterStateSubscription?.cancel();
     _adapterStateSubscription = null;
   }
+
+    @override
+  void didRemove(Route route, Route? previousRoute) {
+    super.didRemove(route, previousRoute);
+    if (route.settings.name == '/DeviceScreen') {
+      _adapterStateSubscription?.cancel();
+      _adapterStateSubscription = null;
+    }
+  }
+
+  @override
+  void didReplace({Route? newRoute, Route? oldRoute}) {
+    super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
+    if (oldRoute?.settings.name == '/DeviceScreen') {
+      _adapterStateSubscription?.cancel();
+      _adapterStateSubscription = null;
+    }
+  }
 }
+
+
+
 

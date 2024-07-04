@@ -124,19 +124,58 @@ class _ScanScreenState extends State<ScanScreen> {
     }
   }
 
-  void onConnectPressed(BluetoothDevice device) {
-    setState(() {
-      onStopPressed();
-    });
-    device.connectAndUpdateStream().catchError((e) {
-      Snackbar.show(ABC.c, prettyException("Connect Error:", e),
-          success: false);
-    });
-    MaterialPageRoute route = MaterialPageRoute(
-        builder: (context) => DeviceScreen(device: device),
-        settings: const RouteSettings(name: '/DeviceScreen'));
-    Navigator.of(context).push(route);
-  }
+  // void onConnectPressed(BluetoothDevice device) {
+  //   setState(() {
+  //     onStopPressed();
+  //   });
+  //   device.connectAndUpdateStream().catchError((e) {
+  //     Snackbar.show(ABC.c, prettyException("Connect Error:", e),
+  //         success: false);
+  //   });
+  //   MaterialPageRoute route = MaterialPageRoute(
+  //       builder: (context) => DeviceScreen(device: device),
+  //       settings: const RouteSettings(name: '/DeviceScreen'));
+  //   Navigator.of(context).push(route);
+  // }
+
+//   void onConnectPressed(BluetoothDevice device) {
+//   setState(() {
+//     onStopPressed();
+//   });
+//   device.connectAndUpdateStream().catchError((e) {
+//     Snackbar.show(ABC.c, prettyException("Connect Error:", e),
+//         success: false);
+//   });
+//   Navigator.of(context).pop();
+  
+//   MaterialPageRoute route = MaterialPageRoute(
+//     builder: (context) => DeviceScreen(device: device),
+//     settings: const RouteSettings(name: '/DeviceScreen'),
+//   );
+
+//   Navigator.of(context).pushAndRemoveUntil(route, (route) {
+//     // Define your scan screen's route name (e.g., '/ScanScreen')
+//     return route.settings.name == '/ScanScreen';
+//   });
+// }
+
+void onConnectPressed(BluetoothDevice device) {
+  setState(() {
+    onStopPressed();
+  });
+  device.connectAndUpdateStream().catchError((e) {
+    Snackbar.show(ABC.c, prettyException("Connect Error:", e),
+        success: false);
+  });
+  Navigator.of(context).pop();
+
+  MaterialPageRoute route = MaterialPageRoute(
+    builder: (context) => DeviceScreen(device: device),
+    settings: const RouteSettings(name: '/DeviceScreen'),
+  );
+
+  Navigator.of(context).push(route);
+}
 
   Future onRefresh() {
     if (_isScanning == false) {
@@ -166,22 +205,22 @@ class _ScanScreenState extends State<ScanScreen> {
     }
   }
 
-  List<Widget> _buildSystemDeviceTiles(BuildContext context) {
-    return _systemDevices
-        .map(
-          (d) => SystemDeviceTile(
-            device: d,
-            onOpen: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => DeviceScreen(device: d),
-                settings: const RouteSettings(name: '/DeviceScreen'),
-              ),
+List<Widget> _buildSystemDeviceTiles(BuildContext context) {
+  return _systemDevices
+      .map(
+        (d) => SystemDeviceTile(
+          device: d,
+          onOpen: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => DeviceScreen(device: d),
+              settings: const RouteSettings(name: '/DeviceScreen'),
             ),
-            onConnect: () => onConnectPressed(d),
           ),
-        )
-        .toList();
-  }
+          onConnect: () => onConnectPressed(d),
+        ),
+      )
+      .toList();
+}
 
   List<Widget> _buildScanResultTiles(BuildContext context) {
     return _scanResults

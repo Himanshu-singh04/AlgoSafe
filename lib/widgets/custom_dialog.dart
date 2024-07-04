@@ -113,7 +113,7 @@ void showCustomDialog(BuildContext context, {required ValueChanged onValue}) {
 
 Route _createRoute() {
   return PageRouteBuilder(
-    transitionDuration: Duration(seconds: 1),
+    // transitionDuration: Duration(seconds: 1),
     pageBuilder: (context, animation, secondaryAnimation) => const home_page(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       const begin = Offset(0.0, 1.0);

@@ -30,7 +30,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
   bool _isDiscoveringServices = false;
   bool _isConnecting = false;
   bool _isDisconnecting = false;
-  var _currentBmsState = 0; // 0: idle, 1: charging, 2:discharging
+  var _currentBmsState = 0; // 125: idle, 4: charging, 3:discharging
 
   late StreamSubscription<BluetoothConnectionState>
       _connectionStateSubscription;
@@ -45,7 +45,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
     for (var key in uuids.keys) key: TextEditingController()
   };
 
-    final Map<String, TextEditingController> _ccontrollers = {
+  final Map<String, TextEditingController> _ccontrollers = {
     "Battery_constant_current": TextEditingController(),
     "Battery_peak_current": TextEditingController(),
     "Battery_max_voltage": TextEditingController(),
@@ -322,29 +322,40 @@ class _DeviceScreenState extends State<DeviceScreen> {
   }
 
   Widget stateSelected() {
+    Widget abc = idleWidget();
     var statevalue = data["BMS_state"];
     if (statevalue is String) {
       _currentBmsState = int.tryParse(statevalue) ?? 0;
+      print("${_currentBmsState} BMSstate");
     } else if (statevalue is int) {
       // ignore: cast_from_null_always_fails
       _currentBmsState = statevalue as int;
+      print("${_currentBmsState} BMSstate");
     } else {
       _currentBmsState = 0;
+      print("${_currentBmsState} BMSstate");
     }
 
     switch (_currentBmsState) {
-      case 0:
-        return idleWidget();
-
       case 1:
-        return chargingWidget();
-
       case 2:
-        return dischargingWidget();
+      case 5:
+        abc = idleWidget();
+        break;
+
+      case 4:
+        abc = chargingWidget();
+        break;
+
+      case 3:
+        abc = dischargingWidget();
+        break;
 
       default:
-        return idleWidget();
+        abc = idleWidget();
+        break;
     }
+    return abc;
   }
 
   Future writeCharacteristic(
@@ -420,145 +431,9 @@ class _DeviceScreenState extends State<DeviceScreen> {
     }
   }
 
-  // Widget writeScreen() {
-  //   final Size size = MediaQuery.of(context).size;
-  //   return Expanded(
-  //     child: ListView(
-  //       children: [
-  //         buildDropdownForCharacteristic("Battery_configuration"),
-  //         SizedBox(
-  //           height: size.height * 0.01,
-  //         ),
-  //         buildSliderForCharacteristic("Battery_constant_current"),
-  //         SizedBox(
-  //           height: size.height * 0.01,
-  //         ),
-  //         buildSliderForCharacteristic("Battery_peak_current"),
-  //         SizedBox(
-  //           height: size.height * 0.01,
-  //         ),
-  //         buildSliderForCharacteristic("Battery_max_voltage"),
-  //         SizedBox(
-  //           height: size.height * 0.01,
-  //         ),
-  //         buildSliderForCharacteristic("Battery_min_voltage"),
-  //         SizedBox(
-  //           height: size.height * 0.01,
-  //         ),
-  //         buildSliderForCharacteristic("Battery_operating_temperature"),
-  //         SizedBox(
-  //           height: size.height * 0.01,
-  //         ),
-  //         buildTextFieldForCharacteristic("Battery_id"),
-  //         SizedBox(
-  //           height: size.height * 0.01,
-  //         ),
-  //         buildTextFieldForCharacteristic("BMS_id"),
-  //         SizedBox(
-  //           height: size.height * 0.01,
-  //         ),
-  //         buildToggleForCharacteristic("Battery_DSG_C"),
-  //         SizedBox(
-  //           height: size.height * 0.01,
-  //         ),
-  //         buildToggleForCharacteristic("Battery_CHG_C"),
-  //         SizedBox(
-  //           height: size.height * 0.01,
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
   Map<String, List<String>> dropdownItems = {
     "Battery_configuration": ["2", "4", "6", "8", "10", "12", "14", "16"],
   };
-
-  // Widget buildTextFieldForCharacteristic(String key) {
-  //   final Size size = MediaQuery.of(context).size;
-
-  //   return Container(
-  //     decoration: BoxDecoration(
-  //         borderRadius: BorderRadius.circular(size.height * 0.01),
-  //         color: CustomColors.mainColor_3),
-  //     child: Padding(
-  //       padding: const EdgeInsets.all(8.0),
-  //       child: Row(
-  //         children: [
-  //           Expanded(
-  //             child: TextField(
-  //               style: TextStyle(color: Colors.white),
-  //               controller: _controllers[key],
-  //               decoration: InputDecoration(
-  //                 labelText: key.replaceAll('_', ' '),
-  //                 labelStyle: TextStyle(color: Colors.white),
-  //                 border: InputBorder.none,
-  //               ),
-  //             ),
-  //           ),
-  //           SizedBox(width: 8),
-  //           IconButton(
-  //             color: Colors.white,
-  //             onPressed: () => onWritePressed(key),
-  //             icon: Icon(Icons.save),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  // Widget buildDropdownForCharacteristic(String key) {
-  //   final Size size = MediaQuery.of(context).size;
-
-  //   return Container(
-  //     decoration: BoxDecoration(
-  //         borderRadius: BorderRadius.circular(size.height * 0.01),
-  //         color: CustomColors.mainColor_3),
-  //     child: Padding(
-  //       padding: const EdgeInsets.all(8.0),
-  //       child: Row(
-  //         children: [
-  //           Expanded(
-  //             child: DropdownButtonFormField<String>(
-  //               value: _controllers[key]?.text.isEmpty == true
-  //                   ? null
-  //                   : _controllers[key]?.text,
-  //               onChanged: (newValue) {
-  //                 setState(() {
-  //                   _controllers[key]?.text = newValue!;
-  //                 });
-  //               },
-  //               items: dropdownItems[key]?.map((String value) {
-  //                 return DropdownMenuItem<String>(
-  //                   value: value,
-  //                   child: Text(
-  //                     value,
-  //                     style: TextStyle(color: Colors.white),
-  //                   ),
-  //                 );
-  //               }).toList(),
-  //               decoration: InputDecoration(
-  //                 labelText: key.replaceAll('_', ' '),
-  //                 labelStyle: TextStyle(color: Colors.white),
-  //                 border: InputBorder.none,
-  //               ),
-  //               iconEnabledColor: Colors.white,
-  //               dropdownColor: CustomColors.mainColor_3,
-  //               style: TextStyle(color: Colors.white),
-  //             ),
-  //           ),
-  //           SizedBox(width: 8),
-  //           IconButton(
-  //             color: Colors.white,
-  //             onPressed: () => onWritePressed(key),
-  //             icon: Icon(Icons.save),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 
   final Map<String, double> _sliderValues = {
     "Battery_constant_current": 0.0,
@@ -569,145 +444,62 @@ class _DeviceScreenState extends State<DeviceScreen> {
   };
 
   Map<String, List<double>> sliderMinMax = {
-    "Battery_constant_current": [0.0, 100.0],
-    "Battery_peak_current": [0.0, 100.0],
-    "Battery_max_voltage": [0.0, 100.0],
-    "Battery_min_voltage": [0.0, 100.0],
-    "Battery_operating_temperature": [0.0, 100.0],
+    "Battery_constant_current": [0.0, 180.0],
+    "Battery_peak_current": [0.0, 180.0],
+    "Battery_max_voltage": [0.0, 4350.0],
+    "Battery_min_voltage": [0.0, 2500.0],
+    "Battery_operating_temperature": [0.0, 80.0],
   };
 
   Map<String, int> sliderDivisions = {
-    "Battery_constant_current": 50,
-    "Battery_peak_current": 50,
-    "Battery_max_voltage": 50,
+    "Battery_constant_current": 90,
+    "Battery_peak_current": 90,
+    "Battery_max_voltage": 87,
     "Battery_min_voltage": 50,
-    "Battery_operating_temperature": 50,
+    "Battery_operating_temperature": 80,
   };
 
-  // Widget buildSliderForCharacteristic(String key) {
-  //   final Size size = MediaQuery.of(context).size;
-
-  //   return Container(
-  //     decoration: BoxDecoration(
-  //         borderRadius: BorderRadius.circular(size.height * 0.01),
-  //         color: CustomColors.mainColor_3),
-  //     child: Padding(
-  //       padding: const EdgeInsets.all(8.0),
-  //       child: Row(
-  //         children: [
-  //           Expanded(
-  //             child: Column(
-  //               crossAxisAlignment: CrossAxisAlignment.start,
-  //               children: [
-  //                 Text(
-  //                   '${key}: ${_sliderValues[key]?.toStringAsFixed(1)}',
-  //                   style: TextStyle(color: Colors.white),
-  //                 ),
-  //                 Row(
-  //                   children: [
-  //                     IconButton(
-  //                       color: Colors.white,
-  //                       icon: Icon(Icons.remove),
-  //                       onPressed: () {
-  //                         setState(() {
-  //                           double newValue = _sliderValues[key]! - 1;
-  //                           if (newValue >= sliderMinMax[key]![0]) {
-  //                             _sliderValues[key] = newValue;
-  //                             _controllers[key]?.text =
-  //                                 newValue.toStringAsFixed(1);
-  //                           }
-  //                         });
-  //                       },
-  //                     ),
-  //                     Slider(
-  //                       activeColor: Colors.blueAccent,
-  //                       value: _sliderValues[key] ?? 0.0,
-  //                       min: sliderMinMax[key]?.first ?? 0.0,
-  //                       max: sliderMinMax[key]?.last ?? 100.0,
-  //                       divisions: sliderDivisions[key] ?? 10,
-  //                       label:
-  //                           (_sliderValues[key]?.toStringAsFixed(1) ?? '0.0'),
-  //                       onChanged: (newValue) {
-  //                         setState(() {
-  //                           _sliderValues[key] = newValue;
-  //                           _controllers[key]?.text =
-  //                               newValue.toStringAsFixed(1);
-  //                         });
-  //                       },
-  //                     ),
-  //                     IconButton(
-  //                       color: Colors.white,
-  //                       icon: Icon(Icons.add),
-  //                       onPressed: () {
-  //                         setState(() {
-  //                           double newValue = _sliderValues[key]! + 1;
-  //                           if (newValue <= sliderMinMax[key]![1]) {
-  //                             _sliderValues[key] = newValue;
-  //                             _controllers[key]?.text =
-  //                                 newValue.toStringAsFixed(1);
-  //                           }
-  //                         });
-  //                       },
-  //                     ),
-  //                   ],
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //           SizedBox(width: 8),
-  //           IconButton(
-  //             color: Colors.white,
-  //             onPressed: () => onWritePressed(key),
-  //             icon: Icon(Icons.save),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  Map<String, bool> _toggleValues = {
+  Map<String, bool> toggleValues = {
     "Battery_DSG_C": false,
     "Battery_CHG_C": false,
   };
 
-  // Widget buildToggleForCharacteristic(String key) {
-  //   final Size size = MediaQuery.of(context).size;
+  final _formKey = GlobalKey<FormState>();
 
-  //   return Container(
-  //     decoration: BoxDecoration(
-  //         borderRadius: BorderRadius.circular(size.height * 0.01),
-  //         color: CustomColors.mainColor_3),
-  //     child: Padding(
-  //       padding: const EdgeInsets.all(8.0),
-  //       child: Row(
+  // Widget writeScreen() {
+  //   final Size size = MediaQuery.of(context).size;
+  //   return Expanded(
+  //     child: Form(
+  //       key: _formKey,
+  //       child: ListView(
   //         children: [
-  //           Expanded(
-  //             child: Row(
-  //               children: [
-  //                 Text(
-  //                   key.replaceAll('_', ' '),
-  //                   style: TextStyle(fontSize: 16, color: Colors.white),
-  //                 ),
-  //                 SizedBox(width: 8),
-  //                 Switch(
-  //                   activeColor: Colors.grey,
-  //                   value: _toggleValues[key] ?? false,
-  //                   onChanged: (bool newValue) {
-  //                     setState(() {
-  //                       _toggleValues[key] = newValue;
-  //                       _controllers[key]?.text = newValue ? '1' : '0';
-  //                     });
-  //                   },
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //           SizedBox(width: 8),
-  //           IconButton(
-  //             color: Colors.white,
-  //             onPressed: () => onWritePressed(key),
-  //             icon: Icon(Icons.save),
+  //           // buildDropdownForCharacteristic("Battery_configuration"),
+  //           // SizedBox(height: size.height * 0.01),
+  //           buildSliderForCharacteristic("Battery_constant_current"),
+  //           SizedBox(height: size.height * 0.01),
+  //           buildSliderForCharacteristic("Battery_peak_current"),
+  //           SizedBox(height: size.height * 0.01),
+  //           buildSliderForCharacteristic("Battery_max_voltage"),
+  //           SizedBox(height: size.height * 0.01),
+  //           buildSliderForCharacteristic("Battery_min_voltage"),
+  //           SizedBox(height: size.height * 0.01),
+  //           buildSliderForCharacteristic("Battery_operating_temperature"),
+  //           SizedBox(height: size.height * 0.01),
+  //           buildTextFieldForCharacteristic("Battery_id", isRequired: true),
+  //           // SizedBox(height: size.height * 0.01),
+  //           // buildTextFieldForCharacteristic("BMS_id", isRequired: true),
+  //           SizedBox(height: size.height * 0.01),
+  //           buildToggleForCharacteristic("Battery_DSG_C"),
+  //           SizedBox(height: size.height * 0.01),
+  //           buildToggleForCharacteristic("Battery_CHG_C"),
+  //           SizedBox(height: size.height * 0.02),
+  //           ElevatedButton(
+  //             onPressed: () {
+  //               if (_formKey.currentState!.validate()) {
+  //                 onSendAllPressed();
+  //               }
+  //             },
+  //             child: Text('Send'),
   //           ),
   //         ],
   //       ),
@@ -715,289 +507,408 @@ class _DeviceScreenState extends State<DeviceScreen> {
   //   );
   // }
 
-  final _formKey = GlobalKey<FormState>();
-
-Widget writeScreen() {
-  final Size size = MediaQuery.of(context).size;
-  return Expanded(
-    child: Form(
-      key: _formKey,
-      child: ListView(
-        children: [
-          // buildDropdownForCharacteristic("Battery_configuration"),
-          // SizedBox(height: size.height * 0.01),
-          buildSliderForCharacteristic("Battery_constant_current"),
-          SizedBox(height: size.height * 0.01),
-          buildSliderForCharacteristic("Battery_peak_current"),
-          SizedBox(height: size.height * 0.01),
-          buildSliderForCharacteristic("Battery_max_voltage"),
-          SizedBox(height: size.height * 0.01),
-          buildSliderForCharacteristic("Battery_min_voltage"),
-          SizedBox(height: size.height * 0.01),
-          buildSliderForCharacteristic("Battery_operating_temperature"),
-          SizedBox(height: size.height * 0.01),
-          buildTextFieldForCharacteristic("Battery_id", isRequired: true),
-          // SizedBox(height: size.height * 0.01),
-          // buildTextFieldForCharacteristic("BMS_id", isRequired: true),
-          SizedBox(height: size.height * 0.01),
-          buildToggleForCharacteristic("Battery_DSG_C"),
-          SizedBox(height: size.height * 0.01),
-          buildToggleForCharacteristic("Battery_CHG_C"),
-          SizedBox(height: size.height * 0.02),
-          ElevatedButton(
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                onSendAllPressed();
-              }
-            },
-            child: Text('Send'),
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-Widget buildTextFieldForCharacteristic(String key, {bool isRequired = false}) {
-  final Size size = MediaQuery.of(context).size;
-
-  return Container(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(size.height * 0.01),
-      color: CustomColors.mainColor_3,
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextFormField(
-              style: TextStyle(color: Colors.white),
-              controller: _controllers[key],
-              decoration: InputDecoration(
-                labelText: key.replaceAll('_', ' '),
-                labelStyle: TextStyle(color: Colors.white),
-                border: InputBorder.none,
-              ),
-              validator: isRequired
-                  ? (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter $key';
-                      }
-                      return null;
-                    }
-                  : null,
+  Widget writeScreen() {
+    final Size size = MediaQuery.of(context).size;
+    return Expanded(
+      child: Form(
+        key: _formKey,
+        child: ListView(
+          children: [
+            ExpansionTile(
+              title: Text('Compulsory Fields'),
+              initiallyExpanded: true,
+              children: [
+                // buildDropdownForCharacteristic("Battery_configuration"),
+                // SizedBox(height: size.height * 0.01),
+                buildTextFieldForCharacteristic("Battery_id", isRequired: true),
+                SizedBox(height: size.height * 0.01),
+                // buildTextFieldForCharacteristic("BMS_id", isRequired: true),
+                // SizedBox(height: size.height * 0.01),
+              ],
             ),
-          ),
-          SizedBox(width: 8),
-          IconButton(
-            color: Colors.white,
-            onPressed: () => onWritePressed(key),
-            icon: Icon(Icons.save),
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-Widget buildDropdownForCharacteristic(String key) {
-  final Size size = MediaQuery.of(context).size;
-
-  return Container(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(size.height * 0.01),
-      color: CustomColors.mainColor_3,
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: DropdownButtonFormField<String>(
-              value: _controllers[key]?.text.isEmpty == true
-                  ? null
-                  : _controllers[key]?.text,
-              onChanged: (newValue) {
-                setState(() {
-                  _controllers[key]?.text = newValue!;
-                });
+            SizedBox(height: size.height * 0.02),
+            ExpansionTile(
+              title: Text('Default Values'),
+              initiallyExpanded: true,
+              children: [
+                buildSliderForCharacteristic("Battery_constant_current"),
+                SizedBox(height: size.height * 0.01),
+                buildSliderForCharacteristic("Battery_peak_current"),
+                SizedBox(height: size.height * 0.01),
+                buildSliderForCharacteristic("Battery_max_voltage"),
+                SizedBox(height: size.height * 0.01),
+                buildSliderForCharacteristic("Battery_min_voltage"),
+                SizedBox(height: size.height * 0.01),
+                buildSliderForCharacteristic("Battery_operating_temperature"),
+                SizedBox(height: size.height * 0.01),
+                buildToggleForCharacteristic("Battery_DSG_C"),
+                SizedBox(height: size.height * 0.01),
+                buildToggleForCharacteristic("Battery_CHG_C"),
+              ],
+            ),
+            SizedBox(height: size.height * 0.02),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: CustomColors.mainColor_1),
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  onSendAllPressed();
+                }
               },
-              items: dropdownItems[key]?.map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(
-                    value,
+              child: Text("Save Configuration", style: TextStyle(
+                color: Colors.white
+              ),),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildTextFieldForCharacteristic(String key,
+      {bool isRequired = false}) {
+    final Size size = MediaQuery.of(context).size;
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(size.height * 0.01),
+        color: CustomColors.mainColor_3,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                style: TextStyle(color: Colors.white),
+                controller: _controllers[key],
+                decoration: InputDecoration(
+                  labelText: key.replaceAll('_', ' '),
+                  labelStyle: TextStyle(color: Colors.white),
+                  border: InputBorder.none,
+                ),
+                validator: isRequired
+                    ? (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter $key';
+                        }
+                        return null;
+                      }
+                    : null,
+              ),
+            ),
+            // SizedBox(width: 8),
+            // IconButton(
+            //   color: Colors.white,
+            //   onPressed: () => onWritePressed(key),
+            //   icon: Icon(Icons.save),
+            // ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildDropdownForCharacteristic(String key) {
+    final Size size = MediaQuery.of(context).size;
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(size.height * 0.01),
+        color: CustomColors.mainColor_3,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: DropdownButtonFormField<String>(
+                value: _controllers[key]?.text.isEmpty == true
+                    ? null
+                    : _controllers[key]?.text,
+                onChanged: (newValue) {
+                  setState(() {
+                    _controllers[key]?.text = newValue!;
+                  });
+                },
+                items: dropdownItems[key]?.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(
+                      value,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
+                }).toList(),
+                decoration: InputDecoration(
+                  labelText: key.replaceAll('_', ' '),
+                  labelStyle: TextStyle(color: Colors.white),
+                  border: InputBorder.none,
+                ),
+                iconEnabledColor: Colors.white,
+                dropdownColor: CustomColors.mainColor_3,
+                style: TextStyle(color: Colors.white),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select $key';
+                  }
+                  return null;
+                },
+              ),
+            ),
+            // SizedBox(width: 8),
+            // IconButton(
+            //   color: Colors.white,
+            //   onPressed: () => onWritePressed(key),
+            //   icon: Icon(Icons.save),
+            // ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildSliderForCharacteristic(String key) {
+    final Size size = MediaQuery.of(context).size;
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(size.height * 0.01),
+        color: CustomColors.mainColor_3,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${key}: ${_sliderValues[key]?.toStringAsFixed(1)}',
                     style: TextStyle(color: Colors.white),
                   ),
-                );
-              }).toList(),
-              decoration: InputDecoration(
-                labelText: key.replaceAll('_', ' '),
-                labelStyle: TextStyle(color: Colors.white),
-                border: InputBorder.none,
+                  Row(
+                    children: [
+                      IconButton(
+                        color: Colors.white,
+                        icon: Icon(Icons.remove),
+                        onPressed: () {
+                          setState(() {
+                            double newValue = _sliderValues[key]! - 1;
+                            if (newValue >= sliderMinMax[key]![0]) {
+                              _sliderValues[key] = newValue;
+                              _controllers[key]?.text =
+                                  newValue.toStringAsFixed(1);
+                            }
+                          });
+                        },
+                      ),
+                      Spacer(),
+                      Container(
+                        width: size.width * 0.65,
+                        child: Slider(
+                          activeColor: Colors.blueAccent,
+                          value: _sliderValues[key] ?? 0.0,
+                          min: sliderMinMax[key]?.first ?? 0.0,
+                          max: sliderMinMax[key]?.last ?? 100.0,
+                          divisions: sliderDivisions[key] ?? 10,
+                          label:
+                              (_sliderValues[key]?.toStringAsFixed(1) ?? '0.0'),
+                          onChanged: (newValue) {
+                            setState(() {
+                              _sliderValues[key] = newValue;
+                              _controllers[key]?.text =
+                                  newValue.toStringAsFixed(1);
+                            });
+                          },
+                        ),
+                      ),
+                      Spacer(),
+                      IconButton(
+                        color: Colors.white,
+                        icon: Icon(Icons.add),
+                        onPressed: () {
+                          setState(() {
+                            double newValue = _sliderValues[key]! + 1;
+                            if (newValue <= sliderMinMax[key]![1]) {
+                              _sliderValues[key] = newValue;
+                              _controllers[key]?.text =
+                                  newValue.toStringAsFixed(1);
+                            }
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              iconEnabledColor: Colors.white,
-              dropdownColor: CustomColors.mainColor_3,
-              style: TextStyle(color: Colors.white),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please select $key';
-                }
-                return null;
-              },
             ),
-          ),
-          SizedBox(width: 8),
-          IconButton(
-            color: Colors.white,
-            onPressed: () => onWritePressed(key),
-            icon: Icon(Icons.save),
-          ),
-        ],
+            // SizedBox(width: 8),
+            // IconButton(
+            //   color: Colors.white,
+            //   onPressed: () => onWritePressed(key),
+            //   icon: Icon(Icons.save),
+            // ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-Widget buildSliderForCharacteristic(String key) {
-  final Size size = MediaQuery.of(context).size;
+  Widget buildToggleForCharacteristic(String key) {
+    final Size size = MediaQuery.of(context).size;
 
-  return Container(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(size.height * 0.01),
-      color: CustomColors.mainColor_3,
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${key}: ${_sliderValues[key]?.toStringAsFixed(1)}',
-                  style: TextStyle(color: Colors.white),
-                ),
-                Row(
-                  children: [
-                    IconButton(
-                      color: Colors.white,
-                      icon: Icon(Icons.remove),
-                      onPressed: () {
-                        setState(() {
-                          double newValue = _sliderValues[key]! - 1;
-                          if (newValue >= sliderMinMax[key]![0]) {
-                            _sliderValues[key] = newValue;
-                            _controllers[key]?.text =
-                                newValue.toStringAsFixed(1);
-                          }
-                        });
-                      },
-                    ),
-                    Slider(
-                      activeColor: Colors.blueAccent,
-                      value: _sliderValues[key] ?? 0.0,
-                      min: sliderMinMax[key]?.first ?? 0.0,
-                      max: sliderMinMax[key]?.last ?? 100.0,
-                      divisions: sliderDivisions[key] ?? 10,
-                      label: (_sliderValues[key]?.toStringAsFixed(1) ?? '0.0'),
-                      onChanged: (newValue) {
-                        setState(() {
-                          _sliderValues[key] = newValue;
-                          _controllers[key]?.text =
-                              newValue.toStringAsFixed(1);
-                        });
-                      },
-                    ),
-                    IconButton(
-                      color: Colors.white,
-                      icon: Icon(Icons.add),
-                      onPressed: () {
-                        setState(() {
-                          double newValue = _sliderValues[key]! + 1;
-                          if (newValue <= sliderMinMax[key]![1]) {
-                            _sliderValues[key] = newValue;
-                            _controllers[key]?.text =
-                                newValue.toStringAsFixed(1);
-                          }
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ],
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(size.height * 0.01),
+        color: CustomColors.mainColor_3,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  Text(
+                    key.replaceAll('_', ' '),
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                  Spacer(),
+                  Switch(
+                    activeColor: Colors.grey,
+                    value: toggleValues[key] ?? false,
+                    onChanged: (bool newValue) {
+                      setState(() {
+                        toggleValues[key] = newValue;
+                        _controllers[key]?.text = newValue ? '1' : '0';
+                      });
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
-          SizedBox(width: 8),
-          IconButton(
-            color: Colors.white,
-            onPressed: () => onWritePressed(key),
-            icon: Icon(Icons.save),
-          ),
-        ],
+            // SizedBox(width: 8),
+            // IconButton(
+            //   color: Colors.white,
+            //   onPressed: () => onWritePressed(key),
+            //   icon: Icon(Icons.save),
+            // ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-Widget buildToggleForCharacteristic(String key) {
-  final Size size = MediaQuery.of(context).size;
+  // Map<String, String> lastSentValues = {};
 
-  return Container(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(size.height * 0.01),
-      color: CustomColors.mainColor_3,
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: Row(
-              children: [
-                Text(
-                  key.replaceAll('_', ' '),
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
-                SizedBox(width: 8),
-                Switch(
-                  activeColor: Colors.grey,
-                  value: _toggleValues[key] ?? false,
-                  onChanged: (bool newValue) {
-                    setState(() {
-                      _toggleValues[key] = newValue;
-                      _controllers[key]?.text = newValue ? '1' : '0';
-                    });
-                  },
-                ),
-              ],
-            ),
-          ),
-          SizedBox(width: 8),
-          IconButton(
-            color: Colors.white,
-            onPressed: () => onWritePressed(key),
-            icon: Icon(Icons.save),
-          ),
-        ],
-      ),
-    ),
-  );
-}
+  // Future<void> onSendAllPressed() async {
+  //   bool allSuccess = true;
+  //   String summaryMessage = '';
 
- Future<void> onSendAllPressed() async {
+  //   for (String characteristicName in uuid_algoBMS_write.keys) {
+  //     String? characteristicUuid = uuid_algoBMS_write[characteristicName];
+  //     String value = _controllers[characteristicName]?.text ?? '';
+
+  //     if (value.isEmpty || characteristicUuid == null) {
+  //       summaryMessage +=
+  //           '$characteristicName Write: No value provided or invalid UUID\n';
+  //       allSuccess = false;
+  //       continue;
+  //     }
+
+  //     // Check if the value has changed since the last send
+  //     if (lastSentValues[characteristicName] == value) {
+  //       summaryMessage +=
+  //           '$characteristicName Write: Value unchanged, not sending\n';
+  //       continue;
+  //     }
+
+  //     BluetoothCharacteristic? targetCharacteristic;
+
+  //     for (var service in _services) {
+  //       for (var characteristic in service.characteristics) {
+  //         if (characteristic.uuid.toString() == characteristicUuid) {
+  //           targetCharacteristic = characteristic;
+  //           break;
+  //         }
+  //       }
+  //       if (targetCharacteristic != null) break;
+  //     }
+
+  //     if (targetCharacteristic != null) {
+  //       try {
+  //         if (targetCharacteristic.properties.writeWithoutResponse) {
+  //           await targetCharacteristic.write(value.codeUnits,
+  //               withoutResponse: true);
+  //           summaryMessage += '$characteristicName Write: Success\n';
+  //         } else if (targetCharacteristic.properties.write) {
+  //           await targetCharacteristic.write(value.codeUnits,
+  //               withoutResponse: false);
+  //           summaryMessage += '$characteristicName Write: Success\n';
+  //         } else {
+  //           summaryMessage +=
+  //               '$characteristicName Write: Characteristic not writable\n';
+  //           allSuccess = false;
+  //         }
+  //         // Update the last sent value after a successful send
+  //         lastSentValues[characteristicName] = value;
+  //       } catch (e) {
+  //         summaryMessage += '$characteristicName Write: Error - $e\n';
+  //         allSuccess = false;
+  //       }
+  //     } else {
+  //       summaryMessage +=
+  //           '$characteristicName Write: Characteristic not found\n';
+  //       allSuccess = false;
+  //     }
+  //   }
+
+  //   Snackbar.show(ABC.c, summaryMessage, success: allSuccess);
+  // }
+
+  Map<String, String> lastSentValues = {};
+
+  Future<void> onSendAllPressed() async {
     bool allSuccess = true;
     String summaryMessage = '';
+    List<String> compulsoryItems = [
+      "Battery_id",
+      "Battery_DSG_C",
+      "Battery_CHG_C"
+    ];
 
+    // Check if all compulsory items are set
+    for (String item in compulsoryItems) {
+      String value = _controllers[item]?.text ?? '';
+      if (value.isEmpty) {
+        summaryMessage += '$item Write: Compulsory item not set\n';
+        allSuccess = false;
+      }
+    }
+
+    // If any compulsory item is not set, show a message and return
+    if (!allSuccess) {
+      Snackbar.show(ABC.c, summaryMessage, success: false);
+      return;
+    }
+
+    // Proceed with the write operations
     for (String characteristicName in uuid_algoBMS_write.keys) {
       String? characteristicUuid = uuid_algoBMS_write[characteristicName];
       String value = _controllers[characteristicName]?.text ?? '';
 
       if (value.isEmpty || characteristicUuid == null) {
-        summaryMessage += '$characteristicName Write: No value provided or invalid UUID\n';
+        summaryMessage +=
+            '$characteristicName Write: No value provided or invalid UUID\n';
         allSuccess = false;
+        continue;
+      }
+
+      // Check if the value has changed since the last send
+      if (lastSentValues[characteristicName] == value) {
+        summaryMessage +=
+            '$characteristicName Write: Value unchanged, not sending\n';
         continue;
       }
 
@@ -1016,28 +927,33 @@ Widget buildToggleForCharacteristic(String key) {
       if (targetCharacteristic != null) {
         try {
           if (targetCharacteristic.properties.writeWithoutResponse) {
-            await targetCharacteristic.write(value.codeUnits, withoutResponse: true);
+            await targetCharacteristic.write(value.codeUnits,
+                withoutResponse: true);
             summaryMessage += '$characteristicName Write: Success\n';
           } else if (targetCharacteristic.properties.write) {
-            await targetCharacteristic.write(value.codeUnits, withoutResponse: false);
+            await targetCharacteristic.write(value.codeUnits,
+                withoutResponse: false);
             summaryMessage += '$characteristicName Write: Success\n';
           } else {
-            summaryMessage += '$characteristicName Write: Characteristic not writable\n';
+            summaryMessage +=
+                '$characteristicName Write: Characteristic not writable\n';
             allSuccess = false;
           }
+          // Update the last sent value after a successful send
+          lastSentValues[characteristicName] = value;
         } catch (e) {
           summaryMessage += '$characteristicName Write: Error - $e\n';
           allSuccess = false;
         }
       } else {
-        summaryMessage += '$characteristicName Write: Characteristic not found\n';
+        summaryMessage +=
+            '$characteristicName Write: Characteristic not found\n';
         allSuccess = false;
       }
     }
 
     Snackbar.show(ABC.c, summaryMessage, success: allSuccess);
   }
-
 
   Widget stateSelectorShow() {
     final Size size = MediaQuery.of(context).size;
@@ -1052,7 +968,9 @@ Widget buildToggleForCharacteristic(String key) {
     }
 
     switch (_currentBmsState) {
-      case 0: // Idle Mode
+      case 1:
+      case 2:
+      case 5: // Idle Mode
         return Container(
           height: size.height * 0.05,
           color: Colors.blue,
@@ -1078,7 +996,7 @@ Widget buildToggleForCharacteristic(String key) {
                   })),
         );
 
-      case 1: // Charging Mode
+      case 4: // Charging Mode
         return Container(
           height: size.height * 0.05,
           color: Colors.green,
@@ -1104,7 +1022,7 @@ Widget buildToggleForCharacteristic(String key) {
                   })),
         );
 
-      case 2: // Discharging Mode
+      case 3: // Discharging Mode
         return Container(
           height: size.height * 0.05,
           color: Colors.red,
@@ -1170,13 +1088,15 @@ Widget buildToggleForCharacteristic(String key) {
     }
 
     switch (_currentBmsState) {
-      case 0:
+      case 1:
+      case 2:
+      case 5:
         return bottomNavigationBar();
 
-      case 1:
+      case 4:
         return SizedBox.shrink();
 
-      case 2:
+      case 3:
         return SizedBox.shrink();
 
       default:
@@ -1184,33 +1104,33 @@ Widget buildToggleForCharacteristic(String key) {
     }
   }
 
-  Widget bottomNavigationBar (){
+  Widget bottomNavigationBar() {
     final Size size = MediaQuery.of(context).size;
     return Container(
-          decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  colors: [Colors.white, Colors.grey.shade500],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter)),
-          child: NavigationBar(
-            indicatorColor: Colors.black12,
-            surfaceTintColor: Colors.transparent,
-            backgroundColor: Colors.transparent,
-            height: size.height * 0.075,
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: (int index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-            destinations: <NavigationDestination>[
-              NavigationDestination(
-                  icon: Icon(Icons.my_library_books), label: "Data Monitoring"),
-              NavigationDestination(
-                  icon: Icon(Icons.edit), label: "Data Configuration")
-            ],
-          ),
-        );
+      decoration: BoxDecoration(
+          gradient: LinearGradient(
+              colors: [Colors.white, Colors.grey.shade500],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter)),
+      child: NavigationBar(
+        indicatorColor: Colors.black12,
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: Colors.transparent,
+        height: size.height * 0.075,
+        selectedIndex: _selectedIndex,
+        onDestinationSelected: (int index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        destinations: <NavigationDestination>[
+          NavigationDestination(
+              icon: Icon(Icons.my_library_books), label: "Data Monitoring"),
+          NavigationDestination(
+              icon: Icon(Icons.edit), label: "Data Configuration")
+        ],
+      ),
+    );
   }
 
   Widget buildDisplayData(BuildContext context) {
@@ -1269,6 +1189,28 @@ Widget buildToggleForCharacteristic(String key) {
 
   Widget idleWidget() {
     final Size size = MediaQuery.of(context).size;
+    double batteryVoltage = data["Battery_voltage"] != null
+        ? double.parse(data["Battery_voltage"]!)
+        : 0.0;
+
+    double batteryTemperature = data["Battery_temperature"] != null
+        ? double.parse(data["Battery_temperature"]!)
+        : 0.0;
+
+    double batteryHealthStatus = data["Battery_health_status"] != null
+        ? double.parse(data["Battery_health_status"]!)
+        : 0.0;
+
+    double packageTotalCapacity = data["Package_total_capacity"] != null
+        ? double.parse(data["Package_total_capacity"]!)
+        : 0.0;
+
+    double batteryCycleCount = data["Battery_cycle_count"] != null
+        ? double.parse(data["Battery_cycle_count"]!)
+        : 0.0;
+
+    double bmsFault =
+        data["BMS_fault"] != null ? double.parse(data["BMS_fault"]!) : 0.0;
 
     Future<void> refreshData() async {
       setState(() {
@@ -1292,14 +1234,11 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                  data["Battery_voltage"] != null
-                      ? "${data["Battery_voltage"]} V"
-                      : "NA",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontSize: size.height * 0.018),
-                ),
+                    (batteryVoltage * 0.001).toStringAsFixed(3) + ' V',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
               ),
             ),
             SizedBox(
@@ -1316,9 +1255,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["Battery_temperature"] != null
-                        ? "${data["Battery_temperature"]} °C"
-                        : "NA",
+                    (batteryTemperature * 0.01).toStringAsFixed(2) + ' °C',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1339,9 +1276,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["Battery_health_status"] != null
-                        ? "${data["Battery_health_status"]} %"
-                        : "NA",
+                    (batteryHealthStatus * 0.001).toStringAsFixed(3) + ' %',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1362,9 +1297,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["Package_total_capacity"] != null
-                        ? "${data["Package_total_capacity"]} Ah"
-                        : "NA",
+                    (packageTotalCapacity * 1).toStringAsFixed(0) + ' mAh',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1384,10 +1317,7 @@ Widget buildToggleForCharacteristic(String key) {
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
-                trailing: Text(
-                    data["Battery_cycle_count"] != null
-                        ? "${data["Battery_cycle_count"]}"
-                        : "NA",
+                trailing: Text((batteryCycleCount * 1).toStringAsFixed(0) + ' ',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1407,8 +1337,7 @@ Widget buildToggleForCharacteristic(String key) {
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
-                trailing: Text(
-                    data["BMS_fault"] != null ? "${data["BMS_fault"]}" : "NA",
+                trailing: Text((bmsFault * 1).toStringAsFixed(0) + ' ',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1423,6 +1352,109 @@ Widget buildToggleForCharacteristic(String key) {
 
   Widget chargingWidget() {
     final Size size = MediaQuery.of(context).size;
+
+    double batteryVoltage = data["Battery_voltage"] != null
+        ? double.parse(data["Battery_voltage"]!)
+        : 0.0;
+
+    double batteryCurrent = data["Battery_current"] != null
+        ? double.parse(data["Battery_current"]!)
+        : 0.0;
+
+    double batteryTemperature = data["Battery_temperature"] != null
+        ? double.parse(data["Battery_temperature"]!)
+        : 0.0;
+
+    double batteryHealthStatus = data["Battery_health_status"] != null
+        ? double.parse(data["Battery_health_status"]!)
+        : 0.0;
+
+    double packageTotalCapacity = data["Package_total_capacity"] != null
+        ? double.parse(data["Package_total_capacity"]!)
+        : 0.0;
+
+    double packageRemainingCapacity = data["Package_remaining_capacity"] != null
+        ? double.parse(data["Package_remaining_capacity"]!)
+        : 0.0;
+
+    double batteryFullCharge = data["Battery_full_charge"] != null
+        ? double.parse(data["Battery_full_charge"]!)
+        : 0.0;
+
+    double chargingPorfileCV = data["Charging_Porfile_cv"] != null
+        ? double.parse(data["Charging_Porfile_cv"]!)
+        : 0.0;
+
+    double chargingPorfileCC = data["Charging_Porfile_cc"] != null
+        ? double.parse(data["Charging_Porfile_cc"]!)
+        : 0.0;
+
+    double cell1Voltage = data["cell1_voltage"] != null
+        ? double.parse(data["cell1_voltage"]!)
+        : 0.0;
+
+    double cell2Voltage = data["cell2_voltage"] != null
+        ? double.parse(data["cell2_voltage"]!)
+        : 0.0;
+
+    double cell3Voltage = data["cell3_voltage"] != null
+        ? double.parse(data["cell3_voltage"]!)
+        : 0.0;
+
+    double cell4Voltage = data["cell4_voltage"] != null
+        ? double.parse(data["cell4_voltage"]!)
+        : 0.0;
+
+    double cell5Voltage = data["cell5_voltage"] != null
+        ? double.parse(data["cell5_voltage"]!)
+        : 0.0;
+
+    double cell6Voltage = data["cell6_voltage"] != null
+        ? double.parse(data["cell6_voltage"]!)
+        : 0.0;
+
+    double cell7Voltage = data["cell7_voltage"] != null
+        ? double.parse(data["cell7_voltage"]!)
+        : 0.0;
+
+    double cell8Voltage = data["cell8_voltage"] != null
+        ? double.parse(data["cell8_voltage"]!)
+        : 0.0;
+
+    double cell9Voltage = data["cell9_voltage"] != null
+        ? double.parse(data["cell9_voltage"]!)
+        : 0.0;
+
+    double cell10Voltage = data["cell10_voltage"] != null
+        ? double.parse(data["cell10_voltage"]!)
+        : 0.0;
+
+    double cell11Voltage = data["cell11_voltage"] != null
+        ? double.parse(data["cell11_voltage"]!)
+        : 0.0;
+
+    double cell12Voltage = data["cell12_voltage"] != null
+        ? double.parse(data["cell12_voltage"]!)
+        : 0.0;
+
+    double cell13Voltage = data["cell13_voltage"] != null
+        ? double.parse(data["cell13_voltage"]!)
+        : 0.0;
+
+    double cell14Voltage = data["cell14_voltage"] != null
+        ? double.parse(data["cell14_voltage"]!)
+        : 0.0;
+
+    double cell15Voltage = data["cell15_voltage"] != null
+        ? double.parse(data["cell15_voltage"]!)
+        : 0.0;
+
+    double cell16Voltage = data["cell16_voltage"] != null
+        ? double.parse(data["cell16_voltage"]!)
+        : 0.0;
+
+    double bmsFault =
+        data["BMS_fault"] != null ? double.parse(data["BMS_fault"]!) : 0.0;
 
     Future<void> refreshData() async {
       setState(() {
@@ -1446,9 +1478,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["Battery_voltage"] != null
-                        ? "${data["Battery_voltage"]} V"
-                        : "NA",
+                    (batteryVoltage * 0.001).toStringAsFixed(3) + ' V',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1469,9 +1499,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["Battery_current"] != null
-                        ? "${data["Battery_current"]} A"
-                        : "NA",
+                    (batteryCurrent * 0.01).toStringAsFixed(2) + ' A',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1492,9 +1520,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["Battery_temperature"] != null
-                        ? "${data["Battery_temperature"]} °C"
-                        : "NA",
+                    (batteryTemperature * 0.01).toStringAsFixed(2) + ' °C',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1515,9 +1541,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["Battery_health_status"] != null
-                        ? "${data["Battery_health_status"]} %"
-                        : "NA",
+                    (batteryHealthStatus * 0.001).toStringAsFixed(2) + ' %',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1538,9 +1562,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["Package_total_capacity"] != null
-                        ? "${data["Package_total_capacity"]} Ah"
-                        : "NA",
+                    (packageTotalCapacity * 1).toStringAsFixed(0) + ' mAh',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1561,9 +1583,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["Package_remaining_capacity"] != null
-                        ? "${data["Package_remaining_capacity"]} Ah"
-                        : "NA",
+                    (packageRemainingCapacity * 1).toStringAsFixed(0) + ' mAh',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1584,9 +1604,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["Battery_full_charge"] != null
-                        ? "${data["Battery_full_charge"]} mins"
-                        : "NA",
+                    (batteryFullCharge * 0.01).toStringAsFixed(2) + ' mins',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1607,9 +1625,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["Charging_Porfile_cv"] != null
-                        ? "${data["Charging_Porfile_cv"]} V"
-                        : "NA",
+                    (chargingPorfileCV * 0.001).toStringAsFixed(3) + ' V',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1630,9 +1646,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["Charging_Porfile_cc"] != null
-                        ? "${data["Charging_Porfile_cc"]} A"
-                        : "NA",
+                    (chargingPorfileCC * 0.001).toStringAsFixed(3) + ' A',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1652,10 +1666,7 @@ Widget buildToggleForCharacteristic(String key) {
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
-                trailing: Text(
-                    data["cell1_voltage"] != null
-                        ? "${data["cell1_voltage"]} V"
-                        : "NA",
+                trailing: Text((cell1Voltage * 0.001).toStringAsFixed(3) + ' V',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1675,10 +1686,7 @@ Widget buildToggleForCharacteristic(String key) {
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
-                trailing: Text(
-                    data["cell2_voltage"] != null
-                        ? "${data["cell2_voltage"]} V"
-                        : "NA",
+                trailing: Text((cell2Voltage * 0.001).toStringAsFixed(3) + ' V',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1698,10 +1706,7 @@ Widget buildToggleForCharacteristic(String key) {
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
-                trailing: Text(
-                    data["cell3_voltage"] != null
-                        ? "${data["cell3_voltage"]} V"
-                        : "NA",
+                trailing: Text((cell3Voltage * 0.001).toStringAsFixed(3) + ' V',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1721,10 +1726,7 @@ Widget buildToggleForCharacteristic(String key) {
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
-                trailing: Text(
-                    data["cell4_voltage"] != null
-                        ? "${data["cell4_voltage"]} V"
-                        : "NA",
+                trailing: Text((cell4Voltage * 0.001).toStringAsFixed(3) + ' V',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1744,10 +1746,7 @@ Widget buildToggleForCharacteristic(String key) {
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
-                trailing: Text(
-                    data["cell5_voltage"] != null
-                        ? "${data["cell5_voltage"]} V"
-                        : "NA",
+                trailing: Text((cell5Voltage * 0.001).toStringAsFixed(3) + ' V',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1767,10 +1766,7 @@ Widget buildToggleForCharacteristic(String key) {
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
-                trailing: Text(
-                    data["cell6_voltage"] != null
-                        ? "${data["cell6_voltage"]} V"
-                        : "NA",
+                trailing: Text((cell6Voltage * 0.001).toStringAsFixed(3) + ' V',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1790,10 +1786,7 @@ Widget buildToggleForCharacteristic(String key) {
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
-                trailing: Text(
-                    data["cell7_voltage"] != null
-                        ? "${data["cell7_voltage"]} V"
-                        : "NA",
+                trailing: Text((cell7Voltage * 0.001).toStringAsFixed(3) + ' V',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1813,10 +1806,7 @@ Widget buildToggleForCharacteristic(String key) {
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
-                trailing: Text(
-                    data["cell8_voltage"] != null
-                        ? "${data["cell8_voltage"]} V"
-                        : "NA",
+                trailing: Text((cell8Voltage * 0.001).toStringAsFixed(3) + ' V',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1836,10 +1826,7 @@ Widget buildToggleForCharacteristic(String key) {
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
-                trailing: Text(
-                    data["cell9_voltage"] != null
-                        ? "${data["cell9_voltage"]} V"
-                        : "NA",
+                trailing: Text((cell9Voltage * 0.001).toStringAsFixed(3) + ' V',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1860,9 +1847,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["cell10_voltage"] != null
-                        ? "${data["cell10_voltage"]} V"
-                        : "NA",
+                    (cell10Voltage * 0.001).toStringAsFixed(3) + ' V',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1883,9 +1868,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["cell11_voltage"] != null
-                        ? "${data["cell11_voltage"]} V"
-                        : "NA",
+                    (cell11Voltage * 0.001).toStringAsFixed(3) + ' V',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1906,9 +1889,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["cell12_voltage"] != null
-                        ? "${data["cell12_voltage"]} V"
-                        : "NA",
+                    (cell12Voltage * 0.001).toStringAsFixed(3) + ' V',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1929,9 +1910,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["cell13_voltage"] != null
-                        ? "${data["cell13_voltage"]} V"
-                        : "NA",
+                    (cell13Voltage * 0.001).toStringAsFixed(3) + ' V',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1952,9 +1931,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["cell14_voltage"] != null
-                        ? "${data["cell14_voltage"]} V"
-                        : "NA",
+                    (cell14Voltage * 0.001).toStringAsFixed(3) + ' V',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1975,9 +1952,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["cell15_voltage"] != null
-                        ? "${data["cell15_voltage"]} V"
-                        : "NA",
+                    (cell15Voltage * 0.001).toStringAsFixed(3) + ' V',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1998,9 +1973,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["cell16_voltage"] != null
-                        ? "${data["cell16_voltage"]} V"
-                        : "NA",
+                    (cell16Voltage * 0.001).toStringAsFixed(3) + ' V',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -2020,8 +1993,7 @@ Widget buildToggleForCharacteristic(String key) {
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
-                trailing: Text(
-                    data["BMS_fault"] != null ? "${data["BMS_fault"]}" : "NA",
+                trailing: Text((bmsFault * 1).toStringAsFixed(0) + ' ',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -2036,6 +2008,37 @@ Widget buildToggleForCharacteristic(String key) {
 
   Widget dischargingWidget() {
     final Size size = MediaQuery.of(context).size;
+
+    double batteryVoltage = data["Battery_voltage"] != null
+        ? double.parse(data["Battery_voltage"]!)
+        : 0.0;
+
+    double batteryCurrent = data["Battery_current"] != null
+        ? double.parse(data["Battery_current"]!)
+        : 0.0;
+
+    double batteryTemperature = data["Battery_temperature"] != null
+        ? double.parse(data["Battery_temperature"]!)
+        : 0.0;
+
+    double batteryHealthStatus = data["Battery_health_status"] != null
+        ? double.parse(data["Battery_health_status"]!)
+        : 0.0;
+
+    double packageTotalCapacity = data["Package_total_capacity"] != null
+        ? double.parse(data["Package_total_capacity"]!)
+        : 0.0;
+
+    double packageRemainingCapacity = data["Package_remaining_capacity"] != null
+        ? double.parse(data["Package_remaining_capacity"]!)
+        : 0.0;
+
+    double batteryDischarge = data["Battery_discharge"] != null
+        ? double.parse(data["Battery_discharge"]!)
+        : 0.0;
+
+    double bmsFault =
+        data["BMS_fault"] != null ? double.parse(data["BMS_fault"]!) : 0.0;
 
     Future<void> refreshData() async {
       setState(() {
@@ -2059,9 +2062,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["Battery_voltage"] != null
-                        ? "${data["Battery_voltage"]} V"
-                        : "NA",
+                    (batteryVoltage * 0.001).toStringAsFixed(2) + ' V',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -2082,9 +2083,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["Battery_current"] != null
-                        ? "${data["Battery_current"]} A"
-                        : "NA",
+                    (batteryCurrent * 0.01).toStringAsFixed(2) + ' A',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -2105,9 +2104,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["Battery_temperature"] != null
-                        ? "${data["Battery_temperature"]} °C"
-                        : "NA",
+                    (batteryTemperature * 0.01).toStringAsFixed(2) + ' °C',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -2128,9 +2125,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["Battery_health_status"] != null
-                        ? "${data["Battery_health_status"]} %"
-                        : "NA",
+                    (batteryHealthStatus * 0.001).toStringAsFixed(3) + ' %',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -2151,9 +2146,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["Package_total_capacity"] != null
-                        ? "${data["Package_total_capacity"]} Ah"
-                        : "NA",
+                    (packageTotalCapacity * 1).toStringAsFixed(0) + ' mAh',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -2174,9 +2167,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["Package_remaining_capacity"] != null
-                        ? "${data["Package_remaining_capacity"]} Ah"
-                        : "NA",
+                    (packageRemainingCapacity * 1).toStringAsFixed(0) + ' mAh',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -2197,9 +2188,7 @@ Widget buildToggleForCharacteristic(String key) {
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 trailing: Text(
-                    data["Battery_discharge"] != null
-                        ? "${data["Battery_discharge"]} mins"
-                        : "NA",
+                    (batteryDischarge * 0.01).toStringAsFixed(2) + ' mins',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -2219,8 +2208,7 @@ Widget buildToggleForCharacteristic(String key) {
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
-                trailing: Text(
-                    data["BMS_fault"] != null ? "${data["BMS_fault"]}" : "NA",
+                trailing: Text((bmsFault * 1).toStringAsFixed(0) + ' ',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
