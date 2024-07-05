@@ -1,6 +1,7 @@
 import 'package:algo_safe/main.dart';
 import 'package:algo_safe/utils/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 // ignore: camel_case_types
 class splash_screen extends StatefulWidget {
@@ -44,10 +45,12 @@ class _splash_screenState extends State<splash_screen> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
               Center(child: Image.asset("assets/images/Algofet primary subtext.png",height: size.height*0.6,width: size.width*0.8)),
+              SizedBox(
+                height: size.height * 0.25,
+                width: size.width * 0.5,
+                child: Lottie.asset("assets/gifs/drone_flying.json")),
               Center(child: Text("AlgoSAFE",style: TextStyle(fontSize: size.height*0.05),)),
-              const CircularProgressIndicator(
-                color: Colors.black,
-              )
+              
             ],),
           ),
         )
@@ -73,9 +76,3 @@ Route _createRoute() {
     },
   );
 }
-
-
-
-
-
-

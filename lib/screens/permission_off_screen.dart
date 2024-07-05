@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:algo_safe/utils/colors.dart';
 import 'package:algo_safe/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:location/location.dart';
+import 'package:lottie/lottie.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 // ignore: must_be_immutable
@@ -15,18 +17,13 @@ class BluetoothOffScreen extends StatelessWidget {
   
 
   Widget buildBluetoothOffIcon(BuildContext context) {
-    return const Row(
+    final Size size = MediaQuery.of(context).size;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(
-          Icons.bluetooth_disabled,
-          size: 200.0,
-          color: Colors.black54,
-        ),
-        Icon(
-          Icons.location_off_sharp,
-          size: 200.0,
-          color: Colors.black54,
-        ),
+        SizedBox(height: size.height * 0.125,child: Lottie.asset("assets/gifs/bluetooth.json")),
+        SizedBox(height: size.height * 0.15,child: Lottie.asset("assets/gifs/location.json")),
       ],
     );
   }
@@ -57,7 +54,7 @@ class BluetoothOffScreen extends StatelessWidget {
     String? state = adapterState?.toString().split(".").last;
     return Text(
       //
-      'Bluetooth and Location is ${state ?? 'not available'}',
+      'Enable Bluetooth and Location',
       style: Theme.of(context).primaryTextTheme.titleSmall?.copyWith(color: Colors.black,fontSize: size.height*0.025),
     );
   }
@@ -66,7 +63,10 @@ class BluetoothOffScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: ElevatedButton(
-        child: const Text('TURN ON'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: CustomColors.mainColor_1
+        ),
+        child: const Text('Enable and Proceed',style: TextStyle(color: Colors.white),),
         onPressed: () async {
           try {
             if (Platform.isAndroid) {
