@@ -228,7 +228,7 @@ class _ScanScreenState extends State<ScanScreen> {
             backgroundColor: Colors.white,
               toolbarHeight: size.height * 0.05,
               flexibleSpace: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 24, 0, 0),
+                padding: const EdgeInsets.fromLTRB(0, 28, 0, 0),
                 child: Container(
                   color: CustomColors.mainColor_1,
                 ),
