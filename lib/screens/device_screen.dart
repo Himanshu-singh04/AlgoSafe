@@ -3,10 +3,12 @@ import 'dart:typed_data';
 import 'package:algo_safe/constants/uuid_list.dart';
 import 'package:algo_safe/utils/colors.dart';
 import 'package:algo_safe/utils/snack_bar.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../widgets/service_tile.dart';
 import '../widgets/characteristic_tile.dart';
 import '../widgets/descriptor_tile.dart';
@@ -200,6 +202,70 @@ class _DeviceScreenState extends State<DeviceScreen> {
         )
         .toList();
   }
+
+  // Future<void> sendFileOverBLE(Uint8List data) async {
+  //   FlutterBluePlus flutterBluePlus = FlutterBluePlus();
+  //   List<BluetoothDevice> devices = [];
+
+  //   // Scan for BLE devices
+  //   FlutterBluePlus.startScan(timeout: Duration(seconds: 4));
+  //   FlutterBluePlus.scanResults.listen((results) {
+  //     for (ScanResult result in results) {
+  //       if (!devices.contains(result.device)) {
+  //         devices.add(result.device);
+  //         print('Found device: ${result.device.name}');
+  //       }
+  //     }
+  //   });
+
+  //   // Connect to the first discovered device
+  //   BluetoothDevice device = devices.first;
+  //   await device.connect();
+
+  //   // Discover services and characteristics
+  //   List<BluetoothService> services = await device.discoverServices();
+  //   BluetoothCharacteristic? characteristic;
+
+  //   // Replace with your characteristic UUID
+  //   String characteristicUuid = "eb67b8e6-eaa9-411a-9de2-534fb9263c71";
+
+  //   for (BluetoothService service in services) {
+  //     for (BluetoothCharacteristic c in service.characteristics) {
+  //       if (c.uuid.toString().toLowerCase() == characteristicUuid.toLowerCase()) {
+  //         characteristic = c;
+  //         break;
+  //       }
+  //     }
+  //     if (characteristic != null) {
+  //       break;
+  //     }
+  //   }
+
+  //   // Check if characteristic was found
+  //   if (characteristic == null) {
+  //     print('Write characteristic not found');
+  //     return;
+  //   }
+
+  //   // Calculate chunk size and send data in chunks
+  //   int chunkSize = 20; // Adjust chunk size as per your requirement
+  //   int dataLength = data.length;
+  //   int offset = 0;
+
+  //   while (offset < dataLength) {
+  //     int end = (offset + chunkSize < dataLength) ? offset + chunkSize : dataLength;
+  //     Uint8List chunk = data.sublist(offset, end);
+  //     await characteristic.write(chunk);
+  //     print("Sent chunk ${offset ~/ chunkSize + 1} of ${dataLength ~/ chunkSize}");
+  //     offset += chunkSize;
+  //     await Future.delayed(Duration(milliseconds: 100)); // Optional delay between chunks
+  //   }
+
+  //   print("File sent successfully");
+
+  //   // Disconnect from device
+  //   await device.disconnect();
+  // }
 
   CharacteristicTile _buildCharacteristicTile(BluetoothCharacteristic c) {
     return CharacteristicTile(
