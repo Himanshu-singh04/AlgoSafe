@@ -394,6 +394,7 @@ Future<void> sendFileOverBLE(BluetoothDevice device, Uint8List data) async {
     int end = (offset + chunkSize < dataLength) ? offset + chunkSize : dataLength;
     Uint8List chunk = data.sublist(offset, end);
     await characteristic.write(chunk);
+    print(data);
     print("Sent chunk ${offset ~/ chunkSize + 1} of ${dataLength ~/ chunkSize}");
     offset += chunkSize;
     await Future.delayed(Duration(milliseconds: 100)); // Optional delay between chunks

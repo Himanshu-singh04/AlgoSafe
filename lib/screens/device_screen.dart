@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:algo_safe/constants/uuid_list.dart';
 import 'package:algo_safe/utils/colors.dart';
 import 'package:algo_safe/utils/snack_bar.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
