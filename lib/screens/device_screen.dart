@@ -5,7 +5,6 @@ import 'package:algo_safe/utils/colors.dart';
 import 'package:algo_safe/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import '../widgets/service_tile.dart';
 import '../widgets/characteristic_tile.dart';
@@ -22,45 +21,32 @@ class DeviceScreen extends StatefulWidget {
 }
 
 class _DeviceScreenState extends State<DeviceScreen> {
-  int? _rssi;
-  int? _mtuSize;
-  BluetoothConnectionState _connectionState =
+  int? rssi;
+  BluetoothConnectionState connection_state =
       BluetoothConnectionState.disconnected;
-  List<BluetoothService> _services = [];
-  bool _isDiscoveringServices = false;
-  bool _isConnecting = false;
-  bool _isDisconnecting = false;
-  var _currentBmsState = 0; // 125: idle, 4: charging, 3:discharging
-  var _numberOfCells = 0;
+  List<BluetoothService> services = [];
+  bool is_discovering_services = false;
+  bool is_connecting = false;
+  bool is_disconnecting = false;
+  var BMS_current_state = 0; // 125: idle, 4: charging, 3:discharging
 
   late StreamSubscription<BluetoothConnectionState>
-      _connectionStateSubscription;
-  late StreamSubscription<bool> _isConnectingSubscription;
-  late StreamSubscription<bool> _isDisconnectingSubscription;
-  late StreamSubscription<int> _mtuSubscription;
-  int _selectedIndex = 0;
+      connection_state_subscription;
+  late StreamSubscription<bool> is_connecting_subscription;
+  late StreamSubscription<bool> is_disconnecting_subscription;
+  late StreamSubscription<int> mtu_subscription;
+  int BMS_read_write_selector = 0;
 
-  Map<String, String> data = {};
-  // final TextEditingController _writeController = TextEditingController();
-  final Map<String, TextEditingController> _controllers = {
+  Map<String, String> data_fetched = {};
+
+  final Map<String, TextEditingController> BMS_write_controller = {
     for (var key in uuids.keys) key: TextEditingController()
   };
 
-  final Map<String, TextEditingController> _ccontrollers = {
-    "Battery_constant_current": TextEditingController(),
-    "Battery_peak_current": TextEditingController(),
-    "Battery_max_voltage": TextEditingController(),
-    "Battery_min_voltage": TextEditingController(),
-    "Battery_operating_temperature": TextEditingController(),
-    "Battery_id": TextEditingController(),
-    "Battery_DSG_C": TextEditingController(),
-    "Battery_CHG_C": TextEditingController(),
-  };
-
-  void _delayedRefreshFunction() {
+  void delayed_refresh_function() {
     Future.delayed(Duration(seconds: 2), () {
       setState(() {
-        onRefreshPressed();
+        on_refresh_pressed();
       });
     });
   }
@@ -68,39 +54,32 @@ class _DeviceScreenState extends State<DeviceScreen> {
   @override
   void initState() {
     super.initState();
-    _delayedRefreshFunction();
+    delayed_refresh_function();
 
-    _connectionStateSubscription =
+    connection_state_subscription =
         widget.device.connectionState.listen((state) async {
-      _connectionState = state;
+      connection_state = state;
       if (state == BluetoothConnectionState.connected) {
-        _services = []; // must rediscover services
+        services = []; // must rediscover services
       }
-      if (state == BluetoothConnectionState.connected && _rssi == null) {
-        _rssi = await widget.device.readRssi();
+      if (state == BluetoothConnectionState.connected && rssi == null) {
+        rssi = await widget.device.readRssi();
       }
       if (mounted) {
         setState(() {});
       }
     });
 
-    _mtuSubscription = widget.device.mtu.listen((value) {
-      _mtuSize = value;
+    is_connecting_subscription = widget.device.isConnecting.listen((value) {
+      is_connecting = value;
       if (mounted) {
         setState(() {});
       }
     });
 
-    _isConnectingSubscription = widget.device.isConnecting.listen((value) {
-      _isConnecting = value;
-      if (mounted) {
-        setState(() {});
-      }
-    });
-
-    _isDisconnectingSubscription =
+    is_disconnecting_subscription =
         widget.device.isDisconnecting.listen((value) {
-      _isDisconnecting = value;
+      is_disconnecting = value;
       if (mounted) {
         setState(() {});
       }
@@ -109,18 +88,18 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
   @override
   void dispose() {
-    _connectionStateSubscription.cancel();
-    _mtuSubscription.cancel();
-    _isConnectingSubscription.cancel();
-    _isDisconnectingSubscription.cancel();
+    connection_state_subscription.cancel();
+    mtu_subscription.cancel();
+    is_connecting_subscription.cancel();
+    is_disconnecting_subscription.cancel();
     super.dispose();
   }
 
-  bool get isConnected {
-    return _connectionState == BluetoothConnectionState.connected;
+  bool get is_connected {
+    return connection_state == BluetoothConnectionState.connected;
   }
 
-  Future onConnectPressed() async {
+  Future on_connect_pressed() async {
     try {
       await widget.device.connectAndUpdateStream();
       Snackbar.show(ABC.c, "Connect: Success", success: true);
@@ -135,7 +114,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
     }
   }
 
-  Future onCancelPressed() async {
+  Future on_cancel_pressed() async {
     try {
       await widget.device.disconnectAndUpdateStream(queue: false);
       Snackbar.show(ABC.c, "Cancel: Success", success: true);
@@ -144,7 +123,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
     }
   }
 
-  Future onDisconnectPressed() async {
+  Future on_disconnect_pressed() async {
     try {
       await widget.device.disconnectAndUpdateStream();
       Snackbar.show(ABC.c, "Disconnect: Success", success: true);
@@ -154,12 +133,12 @@ class _DeviceScreenState extends State<DeviceScreen> {
     }
   }
 
-  Future onRefreshPressed() async {
+  Future on_refresh_pressed() async {
     try {
-      _isDiscoveringServices = true;
+      is_discovering_services = true;
       setState(() {});
-      _services = await widget.device.discoverServices();
-      for (var service in _services) {
+      services = await widget.device.discoverServices();
+      for (var service in services) {
         for (var characteristic in service.characteristics) {
           if (uuids.containsValue(characteristic.uuid.toString())) {
             subscribeToCharacteristic(characteristic);
@@ -173,35 +152,25 @@ class _DeviceScreenState extends State<DeviceScreen> {
     }
     if (mounted) {
       setState(() {
-        _isDiscoveringServices = false;
+        is_discovering_services = false;
       });
     }
   }
 
-  Future onRequestMtuPressed() async {
-    try {
-      await widget.device.requestMtu(223, predelay: 0);
-      Snackbar.show(ABC.c, "Request Mtu: Success", success: true);
-    } catch (e) {
-      Snackbar.show(ABC.c, prettyException("Change Mtu Error:", e),
-          success: false);
-    }
-  }
-
-  List<Widget> _buildServiceTiles(BuildContext context, BluetoothDevice d) {
-    return _services
+  List<Widget> build_service_tiles(BuildContext context, BluetoothDevice d) {
+    return services
         .map(
           (s) => ServiceTile(
             service: s,
             characteristicTiles: s.characteristics
-                .map((c) => _buildCharacteristicTile(c))
+                .map((c) => build_characteristic_tile(c))
                 .toList(),
           ),
         )
         .toList();
   }
 
-  CharacteristicTile _buildCharacteristicTile(BluetoothCharacteristic c) {
+  CharacteristicTile build_characteristic_tile(BluetoothCharacteristic c) {
     return CharacteristicTile(
       characteristic: c,
       descriptorTiles:
@@ -210,7 +179,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
     );
   }
 
-  Widget buildSpinner(BuildContext context) {
+  Widget build_spinner(BuildContext context) {
     return const Padding(
       padding: EdgeInsets.all(14.0),
       child: AspectRatio(
@@ -223,44 +192,14 @@ class _DeviceScreenState extends State<DeviceScreen> {
     );
   }
 
-  Widget buildRemoteId(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(4),
-          child: Text(
-            '${widget.device.remoteId}',
-            style: const TextStyle(fontSize: 20),
-          ),
-        ),
-        const Spacer(),
-        stateSelectorShow()
-      ],
-    );
-  }
-
-  Widget buildRssiTile(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        isConnected
-            ? const Icon(Icons.bluetooth_connected)
-            : const Icon(Icons.bluetooth_disabled),
-        Text(((isConnected && _rssi != null) ? '${_rssi!} dBm' : ''),
-            style: Theme.of(context).textTheme.bodySmall)
-      ],
-    );
-  }
-
-  Future onDiscoverServicesPressed() async {
+  Future on_discover_services_pressed() async {
     if (mounted) {
       setState(() {
-        _isDiscoveringServices = true;
+        is_discovering_services = true;
       });
     }
     try {
-      _services = await widget.device.discoverServices();
+      services = await widget.device.discoverServices();
       Snackbar.show(ABC.c, "Discover Services: Success", success: true);
     } catch (e) {
       Snackbar.show(ABC.c, prettyException("Discover Services Error:", e),
@@ -268,30 +207,12 @@ class _DeviceScreenState extends State<DeviceScreen> {
     }
     if (mounted) {
       setState(() {
-        _isDiscoveringServices = false;
+        is_discovering_services = false;
       });
     }
   }
 
-  Widget buildGetServices(BuildContext context) {
-    return IndexedStack(
-      index: (_isDiscoveringServices) ? 1 : 0,
-      children: <Widget>[
-        TextButton(
-          onPressed: () {
-            onDiscoverServicesPressed();
-            _buildServiceTiles(context, widget.device);
-          },
-          child: const Text(
-            "Get Services",
-            style: TextStyle(color: Colors.blueAccent),
-          ),
-        ),
-      ],
-    );
-  }
-
-  int parseUint16(List<int> value) {
+  int parse_uint16(List<int> value) {
     final ByteData byteData = ByteData.sublistView(Uint8List.fromList(value));
     return byteData.getUint16(0, Endian.little);
   }
@@ -310,50 +231,50 @@ class _DeviceScreenState extends State<DeviceScreen> {
           parsedValue = value[0].toString();
         } else if (value.length >= 2) {
           // uint16 parsing
-          parsedValue = parseUint16(value).toString();
+          parsedValue = parse_uint16(value).toString();
         } else {
           parsedValue = 'Unknown value';
         }
 
         setState(() {
-          data[characteristicKey] = parsedValue;
+          data_fetched[characteristicKey] = parsedValue;
         });
       }
     });
   }
 
-  Widget stateSelected() {
-    Widget abc = idleWidget();
-    var statevalue = data["BMS_state"];
+  Widget display_for_BMS() {
+    Widget abc = BMS_idle_widget();
+    var statevalue = data_fetched["BMS_state"];
     if (statevalue is String) {
-      _currentBmsState = int.tryParse(statevalue) ?? 0;
-      print("${_currentBmsState} BMSstate");
+      BMS_current_state = int.tryParse(statevalue) ?? 0;
+      print("${BMS_current_state} BMSstate");
     } else if (statevalue is int) {
       // ignore: cast_from_null_always_fails
-      _currentBmsState = statevalue as int;
-      print("${_currentBmsState} BMSstate");
+      BMS_current_state = statevalue as int;
+      print("${BMS_current_state} BMSstate");
     } else {
-      _currentBmsState = 0;
-      print("${_currentBmsState} BMSstate");
+      BMS_current_state = 0;
+      print("${BMS_current_state} BMSstate");
     }
 
-    switch (_currentBmsState) {
+    switch (BMS_current_state) {
       case 1:
       case 2:
       case 5:
-        abc = idleWidget();
+        abc = BMS_idle_widget();
         break;
 
       case 4:
-        abc = chargingWidget();
+        abc = BMS_charging_widget();
         break;
 
       case 3:
-        abc = dischargingWidget();
+        abc = BMS_discharging_widget();
         break;
 
       default:
-        abc = idleWidget();
+        abc = BMS_idle_widget();
         break;
     }
     return abc;
@@ -367,7 +288,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
   Future<void> onWritePressed(String characteristicName) async {
     String? characteristicUuid = uuids[characteristicName];
-    String value = _controllers[characteristicName]?.text ?? '';
+    String value = BMS_write_controller[characteristicName]?.text ?? '';
 
     // Validate input values
     if (value.isEmpty || characteristicUuid == null) {
@@ -382,7 +303,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
     BluetoothCharacteristic? targetCharacteristic;
 
     // Find the target characteristic by UUID
-    for (var service in _services) {
+    for (var service in services) {
       for (var characteristic in service.characteristics) {
         if (characteristic.uuid.toString() == characteristicUuid) {
           targetCharacteristic = characteristic;
@@ -583,7 +504,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
             Expanded(
               child: TextFormField(
                 style: TextStyle(color: Colors.white),
-                controller: _controllers[key],
+                controller: BMS_write_controller[key],
                 decoration: InputDecoration(
                   labelText: key.replaceAll('_', ' '),
                   labelStyle: TextStyle(color: Colors.white),
@@ -625,12 +546,12 @@ class _DeviceScreenState extends State<DeviceScreen> {
           children: [
             Expanded(
               child: DropdownButtonFormField<String>(
-                value: _controllers[key]?.text.isEmpty == true
+                value: BMS_write_controller[key]?.text.isEmpty == true
                     ? null
-                    : _controllers[key]?.text,
+                    : BMS_write_controller[key]?.text,
                 onChanged: (newValue) {
                   setState(() {
-                    _controllers[key]?.text = newValue!;
+                    BMS_write_controller[key]?.text = newValue!;
                   });
                 },
                 items: dropdownItems[key]?.map((String value) {
@@ -700,7 +621,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                             double newValue = _sliderValues[key]! - 1;
                             if (newValue >= sliderMinMax[key]![0]) {
                               _sliderValues[key] = newValue;
-                              _controllers[key]?.text =
+                              BMS_write_controller[key]?.text =
                                   newValue.toStringAsFixed(1);
                             }
                           });
@@ -720,7 +641,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                           onChanged: (newValue) {
                             setState(() {
                               _sliderValues[key] = newValue;
-                              _controllers[key]?.text =
+                              BMS_write_controller[key]?.text =
                                   newValue.toStringAsFixed(1);
                             });
                           },
@@ -735,7 +656,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                             double newValue = _sliderValues[key]! + 1;
                             if (newValue <= sliderMinMax[key]![1]) {
                               _sliderValues[key] = newValue;
-                              _controllers[key]?.text =
+                              BMS_write_controller[key]?.text =
                                   newValue.toStringAsFixed(1);
                             }
                           });
@@ -784,7 +705,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                     onChanged: (bool newValue) {
                       setState(() {
                         toggleValues[key] = newValue;
-                        _controllers[key]?.text = newValue ? '1' : '0';
+                        BMS_write_controller[key]?.text = newValue ? '1' : '0';
                       });
                     },
                   ),
@@ -811,7 +732,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
     for (String characteristicName in uuid_algoBMS_write.keys) {
       String? characteristicUuid = uuid_algoBMS_write[characteristicName];
-      String value = _controllers[characteristicName]?.text ?? '';
+      String value = BMS_write_controller[characteristicName]?.text ?? '';
 
       if (value.isEmpty || characteristicUuid == null) {
         summaryMessage +=
@@ -829,7 +750,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
       BluetoothCharacteristic? targetCharacteristic;
 
-      for (var service in _services) {
+      for (var service in services) {
         for (var characteristic in service.characteristics) {
           if (characteristic.uuid.toString() == characteristicUuid) {
             targetCharacteristic = characteristic;
@@ -917,7 +838,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
   //     BluetoothCharacteristic? targetCharacteristic;
 
-  //     for (var service in _services) {
+  //     for (var service in services) {
   //       for (var characteristic in service.characteristics) {
   //         if (characteristic.uuid.toString() == characteristicUuid) {
   //           targetCharacteristic = characteristic;
@@ -960,17 +881,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
   Widget stateSelectorShow() {
     final Size size = MediaQuery.of(context).size;
-    var statevalue = data["BMS_state"];
+    var statevalue = data_fetched["BMS_state"];
     if (statevalue is String) {
-      _currentBmsState = int.tryParse(statevalue) ?? 0;
+      BMS_current_state = int.tryParse(statevalue) ?? 0;
     } else if (statevalue is int) {
       // ignore: cast_from_null_always_fails
-      _currentBmsState = statevalue as int;
+      BMS_current_state = statevalue as int;
     } else {
-      _currentBmsState = 0;
+      BMS_current_state = 0;
     }
 
-    switch (_currentBmsState) {
+    switch (BMS_current_state) {
       case 1:
       case 2:
       case 5: // Idle Mode
@@ -1080,17 +1001,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
   Widget navShow() {
     final Size size = MediaQuery.of(context).size;
-    var navValue = data["BMS_state"];
+    var navValue = data_fetched["BMS_state"];
     if (navValue is String) {
-      _currentBmsState = int.tryParse(navValue) ?? 0;
+      BMS_current_state = int.tryParse(navValue) ?? 0;
     } else if (navValue is int) {
       // ignore: cast_from_null_always_fails
-      _currentBmsState = navValue as int;
+      BMS_current_state = navValue as int;
     } else {
-      _currentBmsState = 0;
+      BMS_current_state = 0;
     }
 
-    switch (_currentBmsState) {
+    switch (BMS_current_state) {
       case 1:
       case 2:
       case 5:
@@ -1133,10 +1054,10 @@ class _DeviceScreenState extends State<DeviceScreen> {
           surfaceTintColor: Colors.transparent,
           backgroundColor: Colors.transparent,
           height: size.height * 0.1,
-          selectedIndex: _selectedIndex,
+          selectedIndex: BMS_read_write_selector,
           onDestinationSelected: (int index) {
             setState(() {
-              _selectedIndex = index;
+              BMS_read_write_selector = index;
             });
           },
           destinations: <NavigationDestination>[
@@ -1154,11 +1075,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
     BluetoothDevice connectedDevice =
         BluetoothDevice(remoteId: widget.device.remoteId);
     return IndexedStack(
-      index: (_isDiscoveringServices) ? 1 : 0,
+      index: (is_discovering_services) ? 1 : 0,
       children: <Widget>[
         FloatingActionButton.extended(
             backgroundColor: CustomColors.mainColor_3,
-            onPressed: onRefreshPressed,
+            onPressed: on_refresh_pressed,
             label: const Icon(
               Icons.refresh_rounded,
               color: Colors.white,
@@ -1177,25 +1098,25 @@ class _DeviceScreenState extends State<DeviceScreen> {
     );
   }
 
-  Widget buildMtuTile(BuildContext context) {
-    return ListTile(
-        title: const Text('MTU Size'),
-        subtitle: Text('$_mtuSize bytes'),
-        trailing: IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: onRequestMtuPressed,
-        ));
-  }
+  // Widget buildMtuTile(BuildContext context) {
+  //   return ListTile(
+  //       title: const Text('MTU Size'),
+  //       subtitle: Text('$_mtuSize bytes'),
+  //       trailing: IconButton(
+  //         icon: const Icon(Icons.edit),
+  //         onPressed: onRequestMtuPressed,
+  //       ));
+  // }
 
   Widget buildConnectButton(BuildContext context) {
     return Row(children: [
-      if (_isConnecting || _isDisconnecting) buildSpinner(context),
+      if (is_connecting || is_disconnecting) build_spinner(context),
       TextButton(
-          onPressed: _isConnecting
-              ? onCancelPressed
-              : (isConnected ? onDisconnectPressed : onConnectPressed),
+          onPressed: is_connecting
+              ? on_cancel_pressed
+              : (is_connected ? on_disconnect_pressed : on_connect_pressed),
           child: Text(
-            _isConnecting ? "CANCEL" : (isConnected ? "DISCONNECT" : "CONNECT"),
+            is_connecting ? "CANCEL" : (is_connected ? "DISCONNECT" : "CONNECT"),
             style: Theme.of(context)
                 .primaryTextTheme
                 .labelLarge
@@ -1204,34 +1125,34 @@ class _DeviceScreenState extends State<DeviceScreen> {
     ]);
   }
 
-  Widget idleWidget() {
+  Widget BMS_idle_widget() {
     final Size size = MediaQuery.of(context).size;
-    double batteryVoltage = data["Battery_voltage"] != null
-        ? double.parse(data["Battery_voltage"]!)
+    double batteryVoltage = data_fetched["Battery_voltage"] != null
+        ? double.parse(data_fetched["Battery_voltage"]!)
         : 0.0;
 
-    double batteryTemperature = data["Battery_temperature"] != null
-        ? double.parse(data["Battery_temperature"]!)
+    double batteryTemperature = data_fetched["Battery_temperature"] != null
+        ? double.parse(data_fetched["Battery_temperature"]!)
         : 0.0;
 
-    double batteryHealthStatus = data["Battery_health_status"] != null
-        ? double.parse(data["Battery_health_status"]!)
+    double batteryHealthStatus = data_fetched["Battery_health_status"] != null
+        ? double.parse(data_fetched["Battery_health_status"]!)
         : 0.0;
 
-    double packageTotalCapacity = data["Package_total_capacity"] != null
-        ? double.parse(data["Package_total_capacity"]!)
+    double packageTotalCapacity = data_fetched["Package_total_capacity"] != null
+        ? double.parse(data_fetched["Package_total_capacity"]!)
         : 0.0;
 
-    double batteryCycleCount = data["Battery_cycle_count"] != null
-        ? double.parse(data["Battery_cycle_count"]!)
+    double batteryCycleCount = data_fetched["Battery_cycle_count"] != null
+        ? double.parse(data_fetched["Battery_cycle_count"]!)
         : 0.0;
 
     double bmsFault =
-        data["BMS_fault"] != null ? double.parse(data["BMS_fault"]!) : 0.0;
+        data_fetched["BMS_fault"] != null ? double.parse(data_fetched["BMS_fault"]!) : 0.0;
 
     Future<void> refreshData() async {
       setState(() {
-        onRefreshPressed();
+        on_refresh_pressed();
       });
     }
 
@@ -1367,115 +1288,115 @@ class _DeviceScreenState extends State<DeviceScreen> {
     );
   }
 
-  Widget chargingWidget() {
+  Widget BMS_charging_widget() {
     final Size size = MediaQuery.of(context).size;
 
-    double batteryVoltage = data["Battery_voltage"] != null
-        ? double.parse(data["Battery_voltage"]!)
+    double batteryVoltage = data_fetched["Battery_voltage"] != null
+        ? double.parse(data_fetched["Battery_voltage"]!)
         : 0.0;
 
-    double batteryCurrent = data["Battery_current"] != null
-        ? double.parse(data["Battery_current"]!)
+    double batteryCurrent = data_fetched["Battery_current"] != null
+        ? double.parse(data_fetched["Battery_current"]!)
         : 0.0;
 
-    double batteryTemperature = data["Battery_temperature"] != null
-        ? double.parse(data["Battery_temperature"]!)
+    double batteryTemperature = data_fetched["Battery_temperature"] != null
+        ? double.parse(data_fetched["Battery_temperature"]!)
         : 0.0;
 
-    double batteryHealthStatus = data["Battery_health_status"] != null
-        ? double.parse(data["Battery_health_status"]!)
+    double batteryHealthStatus = data_fetched["Battery_health_status"] != null
+        ? double.parse(data_fetched["Battery_health_status"]!)
         : 0.0;
 
-    double packageTotalCapacity = data["Package_total_capacity"] != null
-        ? double.parse(data["Package_total_capacity"]!)
+    double packageTotalCapacity = data_fetched["Package_total_capacity"] != null
+        ? double.parse(data_fetched["Package_total_capacity"]!)
         : 0.0;
 
-    double packageRemainingCapacity = data["Package_remaining_capacity"] != null
-        ? double.parse(data["Package_remaining_capacity"]!)
+    double packageRemainingCapacity = data_fetched["Package_remaining_capacity"] != null
+        ? double.parse(data_fetched["Package_remaining_capacity"]!)
         : 0.0;
 
-    double batteryFullCharge = data["Battery_full_charge"] != null
-        ? double.parse(data["Battery_full_charge"]!)
+    double batteryFullCharge = data_fetched["Battery_full_charge"] != null
+        ? double.parse(data_fetched["Battery_full_charge"]!)
         : 0.0;
 
-    double chargingPorfileCV = data["Charging_Porfile_cv"] != null
-        ? double.parse(data["Charging_Porfile_cv"]!)
+    double chargingPorfileCV = data_fetched["Charging_Porfile_cv"] != null
+        ? double.parse(data_fetched["Charging_Porfile_cv"]!)
         : 0.0;
 
-    double chargingPorfileCC = data["Charging_Porfile_cc"] != null
-        ? double.parse(data["Charging_Porfile_cc"]!)
+    double chargingPorfileCC = data_fetched["Charging_Porfile_cc"] != null
+        ? double.parse(data_fetched["Charging_Porfile_cc"]!)
         : 0.0;
 
-    double cell1Voltage = data["cell1_voltage"] != null
-        ? double.parse(data["cell1_voltage"]!)
+    double cell1Voltage = data_fetched["cell1_voltage"] != null
+        ? double.parse(data_fetched["cell1_voltage"]!)
         : 0.0;
 
-    double cell2Voltage = data["cell2_voltage"] != null
-        ? double.parse(data["cell2_voltage"]!)
+    double cell2Voltage = data_fetched["cell2_voltage"] != null
+        ? double.parse(data_fetched["cell2_voltage"]!)
         : 0.0;
 
-    double cell3Voltage = data["cell3_voltage"] != null
-        ? double.parse(data["cell3_voltage"]!)
+    double cell3Voltage = data_fetched["cell3_voltage"] != null
+        ? double.parse(data_fetched["cell3_voltage"]!)
         : 0.0;
 
-    double cell4Voltage = data["cell4_voltage"] != null
-        ? double.parse(data["cell4_voltage"]!)
+    double cell4Voltage = data_fetched["cell4_voltage"] != null
+        ? double.parse(data_fetched["cell4_voltage"]!)
         : 0.0;
 
-    double cell5Voltage = data["cell5_voltage"] != null
-        ? double.parse(data["cell5_voltage"]!)
+    double cell5Voltage = data_fetched["cell5_voltage"] != null
+        ? double.parse(data_fetched["cell5_voltage"]!)
         : 0.0;
 
-    double cell6Voltage = data["cell6_voltage"] != null
-        ? double.parse(data["cell6_voltage"]!)
+    double cell6Voltage = data_fetched["cell6_voltage"] != null
+        ? double.parse(data_fetched["cell6_voltage"]!)
         : 0.0;
 
-    double cell7Voltage = data["cell7_voltage"] != null
-        ? double.parse(data["cell7_voltage"]!)
+    double cell7Voltage = data_fetched["cell7_voltage"] != null
+        ? double.parse(data_fetched["cell7_voltage"]!)
         : 0.0;
 
-    double cell8Voltage = data["cell8_voltage"] != null
-        ? double.parse(data["cell8_voltage"]!)
+    double cell8Voltage = data_fetched["cell8_voltage"] != null
+        ? double.parse(data_fetched["cell8_voltage"]!)
         : 0.0;
 
-    double cell9Voltage = data["cell9_voltage"] != null
-        ? double.parse(data["cell9_voltage"]!)
+    double cell9Voltage = data_fetched["cell9_voltage"] != null
+        ? double.parse(data_fetched["cell9_voltage"]!)
         : 0.0;
 
-    double cell10Voltage = data["cell10_voltage"] != null
-        ? double.parse(data["cell10_voltage"]!)
+    double cell10Voltage = data_fetched["cell10_voltage"] != null
+        ? double.parse(data_fetched["cell10_voltage"]!)
         : 0.0;
 
-    double cell11Voltage = data["cell11_voltage"] != null
-        ? double.parse(data["cell11_voltage"]!)
+    double cell11Voltage = data_fetched["cell11_voltage"] != null
+        ? double.parse(data_fetched["cell11_voltage"]!)
         : 0.0;
 
-    double cell12Voltage = data["cell12_voltage"] != null
-        ? double.parse(data["cell12_voltage"]!)
+    double cell12Voltage = data_fetched["cell12_voltage"] != null
+        ? double.parse(data_fetched["cell12_voltage"]!)
         : 0.0;
 
-    double cell13Voltage = data["cell13_voltage"] != null
-        ? double.parse(data["cell13_voltage"]!)
+    double cell13Voltage = data_fetched["cell13_voltage"] != null
+        ? double.parse(data_fetched["cell13_voltage"]!)
         : 0.0;
 
-    double cell14Voltage = data["cell14_voltage"] != null
-        ? double.parse(data["cell14_voltage"]!)
+    double cell14Voltage = data_fetched["cell14_voltage"] != null
+        ? double.parse(data_fetched["cell14_voltage"]!)
         : 0.0;
 
-    double cell15Voltage = data["cell15_voltage"] != null
-        ? double.parse(data["cell15_voltage"]!)
+    double cell15Voltage = data_fetched["cell15_voltage"] != null
+        ? double.parse(data_fetched["cell15_voltage"]!)
         : 0.0;
 
-    double cell16Voltage = data["cell16_voltage"] != null
-        ? double.parse(data["cell16_voltage"]!)
+    double cell16Voltage = data_fetched["cell16_voltage"] != null
+        ? double.parse(data_fetched["cell16_voltage"]!)
         : 0.0;
 
     double bmsFault =
-        data["BMS_fault"] != null ? double.parse(data["BMS_fault"]!) : 0.0;
+        data_fetched["BMS_fault"] != null ? double.parse(data_fetched["BMS_fault"]!) : 0.0;
 
     Future<void> refreshData() async {
       setState(() {
-        onRefreshPressed();
+        on_refresh_pressed();
       });
     }
 
@@ -2023,43 +1944,43 @@ class _DeviceScreenState extends State<DeviceScreen> {
     );
   }
 
-  Widget dischargingWidget() {
+  Widget BMS_discharging_widget() {
     final Size size = MediaQuery.of(context).size;
 
-    double batteryVoltage = data["Battery_voltage"] != null
-        ? double.parse(data["Battery_voltage"]!)
+    double batteryVoltage = data_fetched["Battery_voltage"] != null
+        ? double.parse(data_fetched["Battery_voltage"]!)
         : 0.0;
 
-    double batteryCurrent = data["Battery_current"] != null
-        ? double.parse(data["Battery_current"]!)
+    double batteryCurrent = data_fetched["Battery_current"] != null
+        ? double.parse(data_fetched["Battery_current"]!)
         : 0.0;
 
-    double batteryTemperature = data["Battery_temperature"] != null
-        ? double.parse(data["Battery_temperature"]!)
+    double batteryTemperature = data_fetched["Battery_temperature"] != null
+        ? double.parse(data_fetched["Battery_temperature"]!)
         : 0.0;
 
-    double batteryHealthStatus = data["Battery_health_status"] != null
-        ? double.parse(data["Battery_health_status"]!)
+    double batteryHealthStatus = data_fetched["Battery_health_status"] != null
+        ? double.parse(data_fetched["Battery_health_status"]!)
         : 0.0;
 
-    double packageTotalCapacity = data["Package_total_capacity"] != null
-        ? double.parse(data["Package_total_capacity"]!)
+    double packageTotalCapacity = data_fetched["Package_total_capacity"] != null
+        ? double.parse(data_fetched["Package_total_capacity"]!)
         : 0.0;
 
-    double packageRemainingCapacity = data["Package_remaining_capacity"] != null
-        ? double.parse(data["Package_remaining_capacity"]!)
+    double packageRemainingCapacity = data_fetched["Package_remaining_capacity"] != null
+        ? double.parse(data_fetched["Package_remaining_capacity"]!)
         : 0.0;
 
-    double batteryDischarge = data["Battery_discharge"] != null
-        ? double.parse(data["Battery_discharge"]!)
+    double batteryDischarge = data_fetched["Battery_discharge"] != null
+        ? double.parse(data_fetched["Battery_discharge"]!)
         : 0.0;
 
     double bmsFault =
-        data["BMS_fault"] != null ? double.parse(data["BMS_fault"]!) : 0.0;
+        data_fetched["BMS_fault"] != null ? double.parse(data_fetched["BMS_fault"]!) : 0.0;
 
     Future<void> refreshData() async {
       setState(() {
-        onRefreshPressed();
+        on_refresh_pressed();
       });
     }
 
@@ -2241,7 +2162,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    final List<Widget> read_write_screens = [stateSelected(), writeScreen()];
+    final List<Widget> read_write_screens = [display_for_BMS(), writeScreen()];
 
     return ScaffoldMessenger(
       key: Snackbar.snackBarKeyC,
@@ -2276,7 +2197,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 SizedBox(
                   height: size.height * 0.01,
                 ),
-                read_write_screens[_selectedIndex]
+                read_write_screens[BMS_read_write_selector]
               ],
             ),
           ),
