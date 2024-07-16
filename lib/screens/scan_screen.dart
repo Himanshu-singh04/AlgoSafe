@@ -1,15 +1,11 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:algo_safe/utils/colors.dart';
 import 'package:algo_safe/utils/snack_bar.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:location/location.dart';
 import 'package:lottie/lottie.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import 'device_screen.dart';
 import '../widgets/system_device_tile.dart';
@@ -42,7 +38,7 @@ class _ScanScreenState extends State<ScanScreen> {
         setState(() {});
       }
     }, onError: (e) {
-      Snackbar.show(ABC.b, prettyException("Scan Error:", e), success: false);
+      Snackbar.show(ABC.b, pretty_exception("Scan Error:", e), success: false);
     });
 
     _isScanningSubscription = FlutterBluePlus.isScanning.listen((state) {
@@ -64,13 +60,13 @@ class _ScanScreenState extends State<ScanScreen> {
     try {
       _systemDevices = await FlutterBluePlus.systemDevices;
     } catch (e) {
-      Snackbar.show(ABC.b, prettyException("System Devices Error:", e),
+      Snackbar.show(ABC.b, pretty_exception("System Devices Error:", e),
           success: false);
     }
     try {
       await FlutterBluePlus.startScan(timeout: const Duration(seconds: 15));
     } catch (e) {
-      Snackbar.show(ABC.b, prettyException("Start Scan Error:", e),
+      Snackbar.show(ABC.b, pretty_exception("Start Scan Error:", e),
           success: false);
     }
     if (mounted) {
@@ -84,7 +80,7 @@ class _ScanScreenState extends State<ScanScreen> {
     try {
       FlutterBluePlus.stopScan();
     } catch (e) {
-      Snackbar.show(ABC.b, prettyException("Stop Scan Error:", e),
+      Snackbar.show(ABC.b, pretty_exception("Stop Scan Error:", e),
           success: false);
     }
   }
@@ -93,8 +89,8 @@ class _ScanScreenState extends State<ScanScreen> {
     setState(() {
       onStopPressed();
     });
-    device.connectAndUpdateStream().catchError((e) {
-      Snackbar.show(ABC.c, prettyException("Connect Error:", e),
+    device.connect_and_update_stream().catchError((e) {
+      Snackbar.show(ABC.c, pretty_exception("Connect Error:", e),
           success: false);
     });
     MaterialPageRoute route = MaterialPageRoute(
@@ -126,7 +122,7 @@ class _ScanScreenState extends State<ScanScreen> {
         child: InkWell(
           child: SizedBox(
             height: size.height * 0.05,
-            child: Lottie.asset("assets/gifs/scan_stop.json"),
+            child: Lottie.asset("assets/gifs/stop_scan.json"),
           ),
           onTap: onStopPressed,
         ),

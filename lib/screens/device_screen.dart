@@ -6,6 +6,7 @@ import 'package:algo_safe/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:lottie/lottie.dart';
 import '../widgets/service_tile.dart';
 import '../widgets/characteristic_tile.dart';
 import '../widgets/descriptor_tile.dart';
@@ -20,7 +21,8 @@ class DeviceScreen extends StatefulWidget {
   State<DeviceScreen> createState() => _DeviceScreenState();
 }
 
-class _DeviceScreenState extends State<DeviceScreen> {
+class _DeviceScreenState extends State<DeviceScreen>
+    with SingleTickerProviderStateMixin {
   int? rssi;
   BluetoothConnectionState connection_state =
       BluetoothConnectionState.disconnected;
@@ -34,8 +36,9 @@ class _DeviceScreenState extends State<DeviceScreen> {
       connection_state_subscription;
   late StreamSubscription<bool> is_connecting_subscription;
   late StreamSubscription<bool> is_disconnecting_subscription;
-  late StreamSubscription<int> mtu_subscription;
   int BMS_read_write_selector = 0;
+
+  late AnimationController BMS_mode_controller;
 
   Map<String, String> data_fetched = {};
 
@@ -55,6 +58,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
   void initState() {
     super.initState();
     delayed_refresh_function();
+    BMS_mode_controller = AnimationController(vsync: this);
 
     connection_state_subscription =
         widget.device.connectionState.listen((state) async {
@@ -70,7 +74,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
       }
     });
 
-    is_connecting_subscription = widget.device.isConnecting.listen((value) {
+    is_connecting_subscription = widget.device.is_connecting.listen((value) {
       is_connecting = value;
       if (mounted) {
         setState(() {});
@@ -78,7 +82,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
     });
 
     is_disconnecting_subscription =
-        widget.device.isDisconnecting.listen((value) {
+        widget.device.is_disconnecting.listen((value) {
       is_disconnecting = value;
       if (mounted) {
         setState(() {});
@@ -88,8 +92,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
   @override
   void dispose() {
+    BMS_mode_controller.dispose();
     connection_state_subscription.cancel();
-    mtu_subscription.cancel();
     is_connecting_subscription.cancel();
     is_disconnecting_subscription.cancel();
     super.dispose();
@@ -101,14 +105,14 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
   Future on_connect_pressed() async {
     try {
-      await widget.device.connectAndUpdateStream();
+      await widget.device.connect_and_update_stream();
       Snackbar.show(ABC.c, "Connect: Success", success: true);
     } catch (e) {
       if (e is FlutterBluePlusException &&
           e.code == FbpErrorCode.connectionCanceled.index) {
         // ignore connections canceled by the user
       } else {
-        Snackbar.show(ABC.c, prettyException("Connect Error:", e),
+        Snackbar.show(ABC.c, pretty_exception("Connect Error:", e),
             success: false);
       }
     }
@@ -116,19 +120,20 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
   Future on_cancel_pressed() async {
     try {
-      await widget.device.disconnectAndUpdateStream(queue: false);
+      await widget.device.disconnect_and_update_stream(queue: false);
       Snackbar.show(ABC.c, "Cancel: Success", success: true);
     } catch (e) {
-      Snackbar.show(ABC.c, prettyException("Cancel Error:", e), success: false);
+      Snackbar.show(ABC.c, pretty_exception("Cancel Error:", e),
+          success: false);
     }
   }
 
   Future on_disconnect_pressed() async {
     try {
-      await widget.device.disconnectAndUpdateStream();
+      await widget.device.disconnect_and_update_stream();
       Snackbar.show(ABC.c, "Disconnect: Success", success: true);
     } catch (e) {
-      Snackbar.show(ABC.c, prettyException("Disconnect Error:", e),
+      Snackbar.show(ABC.c, pretty_exception("Disconnect Error:", e),
           success: false);
     }
   }
@@ -141,13 +146,13 @@ class _DeviceScreenState extends State<DeviceScreen> {
       for (var service in services) {
         for (var characteristic in service.characteristics) {
           if (uuids.containsValue(characteristic.uuid.toString())) {
-            subscribeToCharacteristic(characteristic);
+            subscribe_to_characteristic(characteristic);
           }
         }
       }
       Snackbar.show(ABC.c, "Discover Services: Success", success: true);
     } catch (e) {
-      Snackbar.show(ABC.c, prettyException("Discover Services Error:", e),
+      Snackbar.show(ABC.c, pretty_exception("Discover Services Error:", e),
           success: false);
     }
     if (mounted) {
@@ -202,7 +207,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
       services = await widget.device.discoverServices();
       Snackbar.show(ABC.c, "Discover Services: Success", success: true);
     } catch (e) {
-      Snackbar.show(ABC.c, prettyException("Discover Services Error:", e),
+      Snackbar.show(ABC.c, pretty_exception("Discover Services Error:", e),
           success: false);
     }
     if (mounted) {
@@ -217,147 +222,147 @@ class _DeviceScreenState extends State<DeviceScreen> {
     return byteData.getUint16(0, Endian.little);
   }
 
-  Future<void> subscribeToCharacteristic(
+  Future<void> subscribe_to_characteristic(
       BluetoothCharacteristic characteristic) async {
     await characteristic.setNotifyValue(true);
     characteristic.value.listen((value) {
-      String characteristicKey = uuids.keys
+      String characteristic_key = uuids.keys
           .firstWhere((key) => uuids[key] == characteristic.uuid.toString());
 
       if (value.isNotEmpty) {
-        String parsedValue;
+        String parsed_value;
         if (value.length == 1) {
           // uint8 parsing
-          parsedValue = value[0].toString();
+          parsed_value = value[0].toString();
         } else if (value.length >= 2) {
           // uint16 parsing
-          parsedValue = parse_uint16(value).toString();
+          parsed_value = parse_uint16(value).toString();
         } else {
-          parsedValue = 'Unknown value';
+          parsed_value = 'Unknown value';
         }
 
         setState(() {
-          data_fetched[characteristicKey] = parsedValue;
+          data_fetched[characteristic_key] = parsed_value;
         });
       }
     });
   }
 
-  Widget display_for_BMS() {
-    Widget abc = BMS_idle_widget();
-    var statevalue = data_fetched["BMS_state"];
-    if (statevalue is String) {
-      BMS_current_state = int.tryParse(statevalue) ?? 0;
-      print("${BMS_current_state} BMSstate");
-    } else if (statevalue is int) {
+  Widget BMS_state_display() {
+    Widget temp = BMS_idle_widget();
+    var state_value = data_fetched["BMS_state"];
+    if (state_value is String) {
+      BMS_current_state = int.tryParse(state_value) ?? 0;
+      // print("${BMS_current_state} BMSstate");
+    } else if (state_value is int) {
       // ignore: cast_from_null_always_fails
-      BMS_current_state = statevalue as int;
-      print("${BMS_current_state} BMSstate");
+      BMS_current_state = state_value as int;
+      // print("${BMS_current_state} BMSstate");
     } else {
       BMS_current_state = 0;
-      print("${BMS_current_state} BMSstate");
+      // print("${BMS_current_state} BMSstate");
     }
 
     switch (BMS_current_state) {
       case 1:
       case 2:
       case 5:
-        abc = BMS_idle_widget();
+        temp = BMS_idle_widget();
         break;
 
       case 4:
-        abc = BMS_charging_widget();
+        temp = BMS_charging_widget();
         break;
 
       case 3:
-        abc = BMS_discharging_widget();
+        temp = BMS_discharging_widget();
         break;
 
       default:
-        abc = BMS_idle_widget();
+        temp = BMS_idle_widget();
         break;
     }
-    return abc;
+    return temp;
   }
 
-  Future writeCharacteristic(
+  Future write_characteristic(
       BluetoothCharacteristic characteristic, String value) async {
     List<int> bytes = value.codeUnits;
     await characteristic.write(bytes, withoutResponse: true);
   }
 
-  Future<void> onWritePressed(String characteristicName) async {
-    String? characteristicUuid = uuids[characteristicName];
-    String value = BMS_write_controller[characteristicName]?.text ?? '';
+  Future<void> on_write_pressed(String characteristic_name) async {
+    String? characteristic_uuid = uuids[characteristic_name];
+    String value = BMS_write_controller[characteristic_name]?.text ?? '';
 
     // Validate input values
-    if (value.isEmpty || characteristicUuid == null) {
+    if (value.isEmpty || characteristic_uuid == null) {
       Snackbar.show(
         ABC.c,
-        "$characteristicName Write: No value provided or invalid UUID",
+        "$characteristic_name Write: No value provided or invalid UUID",
         success: false,
       );
       return; // Skip if no value is provided or UUID is invalid
     }
 
-    BluetoothCharacteristic? targetCharacteristic;
+    BluetoothCharacteristic? target_characteristic;
 
     // Find the target characteristic by UUID
     for (var service in services) {
       for (var characteristic in service.characteristics) {
-        if (characteristic.uuid.toString() == characteristicUuid) {
-          targetCharacteristic = characteristic;
+        if (characteristic.uuid.toString() == characteristic_uuid) {
+          target_characteristic = characteristic;
           break;
         }
       }
-      if (targetCharacteristic != null) break;
+      if (target_characteristic != null) break;
     }
 
-    if (targetCharacteristic != null) {
+    if (target_characteristic != null) {
       try {
         // Check if the characteristic supports write without response
-        if (targetCharacteristic.properties.writeWithoutResponse) {
-          await targetCharacteristic.write(value.codeUnits,
+        if (target_characteristic.properties.writeWithoutResponse) {
+          await target_characteristic.write(value.codeUnits,
               withoutResponse: true);
-          Snackbar.show(ABC.c, "$characteristicName Write: Success",
+          Snackbar.show(ABC.c, "$characteristic_name Write: Success",
               success: true);
         }
         // Check if the characteristic supports write with response
-        else if (targetCharacteristic.properties.write) {
-          await targetCharacteristic.write(value.codeUnits,
+        else if (target_characteristic.properties.write) {
+          await target_characteristic.write(value.codeUnits,
               withoutResponse: false);
-          Snackbar.show(ABC.c, "$characteristicName Write: Success",
+          Snackbar.show(ABC.c, "$characteristic_name Write: Success",
               success: true);
         }
         // Characteristic is not writable
         else {
           Snackbar.show(
             ABC.c,
-            "$characteristicName Write: Characteristic not writable",
+            "$characteristic_name Write: Characteristic not writable",
             success: false,
           );
         }
       } catch (e) {
         Snackbar.show(
           ABC.c,
-          "$characteristicName Write: Error - $e",
+          "$characteristic_name Write: Error - $e",
           success: false,
         );
       }
     } else {
       Snackbar.show(
         ABC.c,
-        "$characteristicName Write: Characteristic not found",
+        "$characteristic_name Write: Characteristic not found",
         success: false,
       );
     }
   }
 
-  Map<String, List<String>> dropdownItems = {
+  Map<String, List<String>> drop_down_items = {
     "Battery_configuration": ["2", "4", "6", "8", "10", "12", "14", "16"],
   };
 
-  final Map<String, double> _sliderValues = {
+  final Map<String, double> slider_values = {
     "Battery_constant_current": 0.0,
     "Battery_peak_current": 0.0,
     "Battery_max_voltage": 0.0,
@@ -365,7 +370,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
     "Battery_operating_temperature": 0.0,
   };
 
-  Map<String, List<double>> sliderMinMax = {
+  Map<String, List<double>> slider_min_max = {
     "Battery_constant_current": [0.0, 180.0],
     "Battery_peak_current": [0.0, 180.0],
     "Battery_max_voltage": [0.0, 4350.0],
@@ -373,7 +378,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
     "Battery_operating_temperature": [0.0, 80.0],
   };
 
-  Map<String, int> sliderDivisions = {
+  Map<String, int> slider_divisions = {
     "Battery_constant_current": 90,
     "Battery_peak_current": 90,
     "Battery_max_voltage": 87,
@@ -381,70 +386,30 @@ class _DeviceScreenState extends State<DeviceScreen> {
     "Battery_operating_temperature": 80,
   };
 
-  Map<String, bool> toggleValues = {
+  Map<String, bool> toggle_values = {
     "Battery_DSG_C": false,
     "Battery_CHG_C": false,
   };
 
-  final _formKey = GlobalKey<FormState>();
+  final form_key = GlobalKey<FormState>();
 
-  // Widget writeScreen() {
-  //   final Size size = MediaQuery.of(context).size;
-  //   return Expanded(
-  //     child: Form(
-  //       key: _formKey,
-  //       child: ListView(
-  //         children: [
-  //           // buildDropdownForCharacteristic("Battery_configuration"),
-  //           // SizedBox(height: size.height * 0.01),
-  //           buildSliderForCharacteristic("Battery_constant_current"),
-  //           SizedBox(height: size.height * 0.01),
-  //           buildSliderForCharacteristic("Battery_peak_current"),
-  //           SizedBox(height: size.height * 0.01),
-  //           buildSliderForCharacteristic("Battery_max_voltage"),
-  //           SizedBox(height: size.height * 0.01),
-  //           buildSliderForCharacteristic("Battery_min_voltage"),
-  //           SizedBox(height: size.height * 0.01),
-  //           buildSliderForCharacteristic("Battery_operating_temperature"),
-  //           SizedBox(height: size.height * 0.01),
-  //           buildTextFieldForCharacteristic("Battery_id", isRequired: true),
-  //           // SizedBox(height: size.height * 0.01),
-  //           // buildTextFieldForCharacteristic("BMS_id", isRequired: true),
-  //           SizedBox(height: size.height * 0.01),
-  //           buildToggleForCharacteristic("Battery_DSG_C"),
-  //           SizedBox(height: size.height * 0.01),
-  //           buildToggleForCharacteristic("Battery_CHG_C"),
-  //           SizedBox(height: size.height * 0.02),
-  //           ElevatedButton(
-  //             onPressed: () {
-  //               if (_formKey.currentState!.validate()) {
-  //                 onSendAllPressed();
-  //               }
-  //             },
-  //             child: Text('Send'),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  Widget writeScreen() {
+  Widget BMS_write_screen() {
     final Size size = MediaQuery.of(context).size;
     return Expanded(
       child: Form(
-        key: _formKey,
+        key: form_key,
         child: ListView(
           children: [
             ExpansionTile(
               title: Text('Compulsory Fields'),
               initiallyExpanded: true,
               children: [
-                // buildDropdownForCharacteristic("Battery_configuration"),
+                // build_drop_down_for_characteristic("Battery_configuration"),
                 // SizedBox(height: size.height * 0.01),
-                buildTextFieldForCharacteristic("Battery_id", isRequired: true),
+                build_text_field_for_characteristic("Battery_id",
+                    is_required: true),
                 SizedBox(height: size.height * 0.01),
-                // buildTextFieldForCharacteristic("BMS_id", isRequired: true),
+                // build_text_field_for_characteristic("BMS_id", isRequired: true),
                 // SizedBox(height: size.height * 0.01),
               ],
             ),
@@ -453,19 +418,20 @@ class _DeviceScreenState extends State<DeviceScreen> {
               title: Text('Default Values'),
               initiallyExpanded: true,
               children: [
-                buildSliderForCharacteristic("Battery_constant_current"),
+                build_slider_for_characteristic("Battery_constant_current"),
                 SizedBox(height: size.height * 0.01),
-                buildSliderForCharacteristic("Battery_peak_current"),
+                build_slider_for_characteristic("Battery_peak_current"),
                 SizedBox(height: size.height * 0.01),
-                buildSliderForCharacteristic("Battery_max_voltage"),
+                build_slider_for_characteristic("Battery_max_voltage"),
                 SizedBox(height: size.height * 0.01),
-                buildSliderForCharacteristic("Battery_min_voltage"),
+                build_slider_for_characteristic("Battery_min_voltage"),
                 SizedBox(height: size.height * 0.01),
-                buildSliderForCharacteristic("Battery_operating_temperature"),
+                build_slider_for_characteristic(
+                    "Battery_operating_temperature"),
                 SizedBox(height: size.height * 0.01),
-                buildToggleForCharacteristic("Battery_DSG_C"),
+                build_toggle_for_characteristic("Battery_DSG_C"),
                 SizedBox(height: size.height * 0.01),
-                buildToggleForCharacteristic("Battery_CHG_C"),
+                build_toggle_for_characteristic("Battery_CHG_C"),
               ],
             ),
             SizedBox(height: size.height * 0.02),
@@ -473,8 +439,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
               style: ElevatedButton.styleFrom(
                   backgroundColor: CustomColors.mainColor_1),
               onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  onSendAllPressed();
+                if (form_key.currentState!.validate()) {
+                  on_send_all_pressed();
                 }
               },
               child: Text(
@@ -488,8 +454,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
     );
   }
 
-  Widget buildTextFieldForCharacteristic(String key,
-      {bool isRequired = false}) {
+  Widget build_text_field_for_characteristic(String key,
+      {bool is_required = false}) {
     final Size size = MediaQuery.of(context).size;
 
     return Container(
@@ -510,7 +476,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   labelStyle: TextStyle(color: Colors.white),
                   border: InputBorder.none,
                 ),
-                validator: isRequired
+                validator: is_required
                     ? (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter $key';
@@ -523,7 +489,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
             // SizedBox(width: 8),
             // IconButton(
             //   color: Colors.white,
-            //   onPressed: () => onWritePressed(key),
+            //   onPressed: () => on_write_pressed(key),
             //   icon: Icon(Icons.save),
             // ),
           ],
@@ -532,7 +498,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
     );
   }
 
-  Widget buildDropdownForCharacteristic(String key) {
+  Widget build_drop_down_for_characteristic(String key) {
     final Size size = MediaQuery.of(context).size;
 
     return Container(
@@ -549,12 +515,12 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 value: BMS_write_controller[key]?.text.isEmpty == true
                     ? null
                     : BMS_write_controller[key]?.text,
-                onChanged: (newValue) {
+                onChanged: (new_value) {
                   setState(() {
-                    BMS_write_controller[key]?.text = newValue!;
+                    BMS_write_controller[key]?.text = new_value!;
                   });
                 },
-                items: dropdownItems[key]?.map((String value) {
+                items: drop_down_items[key]?.map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(
@@ -582,7 +548,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
             // SizedBox(width: 8),
             // IconButton(
             //   color: Colors.white,
-            //   onPressed: () => onWritePressed(key),
+            //   onPressed: () => on_write_pressed(key),
             //   icon: Icon(Icons.save),
             // ),
           ],
@@ -591,7 +557,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
     );
   }
 
-  Widget buildSliderForCharacteristic(String key) {
+  Widget build_slider_for_characteristic(String key) {
     final Size size = MediaQuery.of(context).size;
 
     return Container(
@@ -608,7 +574,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '${key}: ${_sliderValues[key]?.toStringAsFixed(1)}',
+                    '${key}: ${slider_values[key]?.toStringAsFixed(1)}',
                     style: TextStyle(color: Colors.white),
                   ),
                   Row(
@@ -618,11 +584,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
                         icon: Icon(Icons.remove),
                         onPressed: () {
                           setState(() {
-                            double newValue = _sliderValues[key]! - 1;
-                            if (newValue >= sliderMinMax[key]![0]) {
-                              _sliderValues[key] = newValue;
+                            double new_value = slider_values[key]! - 1;
+                            if (new_value >= slider_min_max[key]![0]) {
+                              slider_values[key] = new_value;
                               BMS_write_controller[key]?.text =
-                                  newValue.toStringAsFixed(1);
+                                  new_value.toStringAsFixed(1);
                             }
                           });
                         },
@@ -632,17 +598,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                         width: size.width * 0.65,
                         child: Slider(
                           activeColor: Colors.blueAccent,
-                          value: _sliderValues[key] ?? 0.0,
-                          min: sliderMinMax[key]?.first ?? 0.0,
-                          max: sliderMinMax[key]?.last ?? 100.0,
-                          divisions: sliderDivisions[key] ?? 10,
+                          value: slider_values[key] ?? 0.0,
+                          min: slider_min_max[key]?.first ?? 0.0,
+                          max: slider_min_max[key]?.last ?? 100.0,
+                          divisions: slider_divisions[key] ?? 10,
                           label:
-                              (_sliderValues[key]?.toStringAsFixed(1) ?? '0.0'),
-                          onChanged: (newValue) {
+                              (slider_values[key]?.toStringAsFixed(1) ?? '0.0'),
+                          onChanged: (new_value) {
                             setState(() {
-                              _sliderValues[key] = newValue;
+                              slider_values[key] = new_value;
                               BMS_write_controller[key]?.text =
-                                  newValue.toStringAsFixed(1);
+                                  new_value.toStringAsFixed(1);
                             });
                           },
                         ),
@@ -653,11 +619,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
                         icon: Icon(Icons.add),
                         onPressed: () {
                           setState(() {
-                            double newValue = _sliderValues[key]! + 1;
-                            if (newValue <= sliderMinMax[key]![1]) {
-                              _sliderValues[key] = newValue;
+                            double new_value = slider_values[key]! + 1;
+                            if (new_value <= slider_min_max[key]![1]) {
+                              slider_values[key] = new_value;
                               BMS_write_controller[key]?.text =
-                                  newValue.toStringAsFixed(1);
+                                  new_value.toStringAsFixed(1);
                             }
                           });
                         },
@@ -670,7 +636,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
             // SizedBox(width: 8),
             // IconButton(
             //   color: Colors.white,
-            //   onPressed: () => onWritePressed(key),
+            //   onPressed: () => on_write_pressed(key),
             //   icon: Icon(Icons.save),
             // ),
           ],
@@ -679,7 +645,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
     );
   }
 
-  Widget buildToggleForCharacteristic(String key) {
+  Widget build_toggle_for_characteristic(String key) {
     final Size size = MediaQuery.of(context).size;
 
     return Container(
@@ -701,11 +667,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   Spacer(),
                   Switch(
                     activeColor: Colors.grey,
-                    value: toggleValues[key] ?? false,
-                    onChanged: (bool newValue) {
+                    value: toggle_values[key] ?? false,
+                    onChanged: (bool new_value) {
                       setState(() {
-                        toggleValues[key] = newValue;
-                        BMS_write_controller[key]?.text = newValue ? '1' : '0';
+                        toggle_values[key] = new_value;
+                        BMS_write_controller[key]?.text = new_value ? '1' : '0';
                       });
                     },
                   ),
@@ -715,7 +681,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
             // SizedBox(width: 8),
             // IconButton(
             //   color: Colors.white,
-            //   onPressed: () => onWritePressed(key),
+            //   onPressed: () => on_write_pressed(key),
             //   icon: Icon(Icons.save),
             // ),
           ],
@@ -724,71 +690,71 @@ class _DeviceScreenState extends State<DeviceScreen> {
     );
   }
 
-  Map<String, String> lastSentValues = {};
+  Map<String, String> last_sent_values = {};
 
-  Future<void> onSendAllPressed() async {
-    bool allSuccess = true;
-    String summaryMessage = '';
+  Future<void> on_send_all_pressed() async {
+    bool all_success = true;
+    String summary_message = '';
 
-    for (String characteristicName in uuid_algoBMS_write.keys) {
-      String? characteristicUuid = uuid_algoBMS_write[characteristicName];
-      String value = BMS_write_controller[characteristicName]?.text ?? '';
+    for (String characteristic_name in uuid_algoBMS_write.keys) {
+      String? characteristic_uuid = uuid_algoBMS_write[characteristic_name];
+      String value = BMS_write_controller[characteristic_name]?.text ?? '';
 
-      if (value.isEmpty || characteristicUuid == null) {
-        summaryMessage +=
-            '$characteristicName Write: No value provided or invalid UUID\n';
-        allSuccess = false;
+      if (value.isEmpty || characteristic_uuid == null) {
+        summary_message +=
+            '$characteristic_name Write: No value provided or invalid UUID\n';
+        all_success = false;
         continue;
       }
 
       // Check if the value has changed since the last send
-      if (lastSentValues[characteristicName] == value) {
-        summaryMessage +=
-            '$characteristicName Write: Value unchanged, not sending\n';
+      if (last_sent_values[characteristic_name] == value) {
+        summary_message +=
+            '$characteristic_name Write: Value unchanged, not sending\n';
         continue;
       }
 
-      BluetoothCharacteristic? targetCharacteristic;
+      BluetoothCharacteristic? target_characteristic;
 
       for (var service in services) {
         for (var characteristic in service.characteristics) {
-          if (characteristic.uuid.toString() == characteristicUuid) {
-            targetCharacteristic = characteristic;
+          if (characteristic.uuid.toString() == characteristic_uuid) {
+            target_characteristic = characteristic;
             break;
           }
         }
-        if (targetCharacteristic != null) break;
+        if (target_characteristic != null) break;
       }
 
-      if (targetCharacteristic != null) {
+      if (target_characteristic != null) {
         try {
-          if (targetCharacteristic.properties.writeWithoutResponse) {
-            await targetCharacteristic.write(value.codeUnits,
+          if (target_characteristic.properties.writeWithoutResponse) {
+            await target_characteristic.write(value.codeUnits,
                 withoutResponse: true);
-            summaryMessage += '$characteristicName Write: Success\n';
-          } else if (targetCharacteristic.properties.write) {
-            await targetCharacteristic.write(value.codeUnits,
+            summary_message += '$characteristic_name Write: Success\n';
+          } else if (target_characteristic.properties.write) {
+            await target_characteristic.write(value.codeUnits,
                 withoutResponse: false);
-            summaryMessage += '$characteristicName Write: Success\n';
+            summary_message += '$characteristic_name Write: Success\n';
           } else {
-            summaryMessage +=
-                '$characteristicName Write: Characteristic not writable\n';
-            allSuccess = false;
+            summary_message +=
+                '$characteristic_name Write: Characteristic not writable\n';
+            all_success = false;
           }
           // Update the last sent value after a successful send
-          lastSentValues[characteristicName] = value;
+          last_sent_values[characteristic_name] = value;
         } catch (e) {
-          summaryMessage += '$characteristicName Write: Error - $e\n';
-          allSuccess = false;
+          summary_message += '$characteristic_name Write: Error - $e\n';
+          all_success = false;
         }
       } else {
-        summaryMessage +=
-            '$characteristicName Write: Characteristic not found\n';
-        allSuccess = false;
+        summary_message +=
+            '$characteristic_name Write: Characteristic not found\n';
+        all_success = false;
       }
     }
 
-    Snackbar.show(ABC.c, summaryMessage, success: allSuccess);
+    Snackbar.show(ABC.c, summary_message, success: all_success);
   }
 
   // Map<String, String> lastSentValues = {};
@@ -879,14 +845,14 @@ class _DeviceScreenState extends State<DeviceScreen> {
   //   Snackbar.show(ABC.c, summaryMessage, success: allSuccess);
   // }
 
-  Widget stateSelectorShow() {
+  Widget BMS_state_show() {
     final Size size = MediaQuery.of(context).size;
-    var statevalue = data_fetched["BMS_state"];
-    if (statevalue is String) {
-      BMS_current_state = int.tryParse(statevalue) ?? 0;
-    } else if (statevalue is int) {
+    var state_value = data_fetched["BMS_state"];
+    if (state_value is String) {
+      BMS_current_state = int.tryParse(state_value) ?? 0;
+    } else if (state_value is int) {
       // ignore: cast_from_null_always_fails
-      BMS_current_state = statevalue as int;
+      BMS_current_state = state_value as int;
     } else {
       BMS_current_state = 0;
     }
@@ -910,6 +876,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.power_off),
+                          // Lottie.asset("assets/gifs/charging.json"),
                           Text(
                             "IDLE MODE",
                             style: TextStyle(fontSize: 20),
@@ -935,7 +902,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.battery_charging_full),
+                          // Icon(Icons.battery_charging_full),
+                          Lottie.asset("assets/gifs/charging.json"),
                           Text(
                             "CHARGE MODE",
                             style: TextStyle(fontSize: 20),
@@ -961,7 +929,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.battery_alert_sharp),
+                          // Icon(Icons.battery_alert_sharp),
+                          Lottie.asset("assets/gifs/charging.json",reverse: true),
                           Text(
                             "DISCHARGE MODE",
                             style: TextStyle(fontSize: 20),
@@ -999,14 +968,14 @@ class _DeviceScreenState extends State<DeviceScreen> {
     }
   }
 
-  Widget navShow() {
-    final Size size = MediaQuery.of(context).size;
-    var navValue = data_fetched["BMS_state"];
-    if (navValue is String) {
-      BMS_current_state = int.tryParse(navValue) ?? 0;
-    } else if (navValue is int) {
+  Widget navigation_bar() {
+    // final Size size = MediaQuery.of(context).size;
+    var nav_value = data_fetched["BMS_state"];
+    if (nav_value is String) {
+      BMS_current_state = int.tryParse(nav_value) ?? 0;
+    } else if (nav_value is int) {
       // ignore: cast_from_null_always_fails
-      BMS_current_state = navValue as int;
+      BMS_current_state = nav_value as int;
     } else {
       BMS_current_state = 0;
     }
@@ -1015,7 +984,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
       case 1:
       case 2:
       case 5:
-        return bottomNavigationBar();
+        return bottom_navigation_bar();
 
       case 4:
         return SizedBox.shrink();
@@ -1024,31 +993,31 @@ class _DeviceScreenState extends State<DeviceScreen> {
         return SizedBox.shrink();
 
       default:
-        return bottomNavigationBar();
+        return bottom_navigation_bar();
     }
   }
 
-  Widget bottomNavigationBar() {
+  Widget bottom_navigation_bar() {
     final Size size = MediaQuery.of(context).size;
     return Container(
       height: size.height * 0.075,
       decoration: BoxDecoration(
-        color: CustomColors.mainColor_1,
-        borderRadius: BorderRadius.circular(20)
-      ),
+          color: CustomColors.mainColor_1,
+          borderRadius: BorderRadius.circular(20)),
       child: Theme(
         data: Theme.of(context).copyWith(
-          navigationBarTheme: NavigationBarThemeData(
-            labelTextStyle: MaterialStateProperty.resolveWith<TextStyle>(
-              (Set<MaterialState> states) {
-                if (states.contains(MaterialState.selected)) {
-                  return TextStyle(color: Colors.grey); // Color for selected label
-                }
-                return TextStyle(color: Colors.white); // Color for unselected labels
-              },
-            ),
-          )
-        ),
+            navigationBarTheme: NavigationBarThemeData(
+          labelTextStyle: MaterialStateProperty.resolveWith<TextStyle>(
+            (Set<MaterialState> states) {
+              if (states.contains(MaterialState.selected)) {
+                return TextStyle(
+                    color: Colors.grey); // Color for selected label
+              }
+              return TextStyle(
+                  color: Colors.white); // Color for unselected labels
+            },
+          ),
+        )),
         child: NavigationBar(
           indicatorColor: CustomColors.mainColor_3,
           surfaceTintColor: Colors.transparent,
@@ -1062,53 +1031,21 @@ class _DeviceScreenState extends State<DeviceScreen> {
           },
           destinations: <NavigationDestination>[
             NavigationDestination(
-                icon: Icon(Icons.my_library_books,color: Colors.white,), label: "Data Monitoring"),
+                icon: Icon(
+                  Icons.my_library_books,
+                  color: Colors.white,
+                ),
+                label: "Data Monitoring"),
             NavigationDestination(
-                icon: Icon(Icons.edit,color: Colors.white), label: "Data Configuration")
+                icon: Icon(Icons.edit, color: Colors.white),
+                label: "Data Configuration")
           ],
         ),
       ),
     );
   }
 
-  Widget buildDisplayData(BuildContext context) {
-    BluetoothDevice connectedDevice =
-        BluetoothDevice(remoteId: widget.device.remoteId);
-    return IndexedStack(
-      index: (is_discovering_services) ? 1 : 0,
-      children: <Widget>[
-        FloatingActionButton.extended(
-            backgroundColor: CustomColors.mainColor_3,
-            onPressed: on_refresh_pressed,
-            label: const Icon(
-              Icons.refresh_rounded,
-              color: Colors.white,
-            )),
-        const IconButton(
-          icon: SizedBox(
-            width: 18.0,
-            height: 18.0,
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation(Colors.grey),
-            ),
-          ),
-          onPressed: null,
-        ),
-      ],
-    );
-  }
-
-  // Widget buildMtuTile(BuildContext context) {
-  //   return ListTile(
-  //       title: const Text('MTU Size'),
-  //       subtitle: Text('$_mtuSize bytes'),
-  //       trailing: IconButton(
-  //         icon: const Icon(Icons.edit),
-  //         onPressed: onRequestMtuPressed,
-  //       ));
-  // }
-
-  Widget buildConnectButton(BuildContext context) {
+  Widget build_connect_button(BuildContext context) {
     return Row(children: [
       if (is_connecting || is_disconnecting) build_spinner(context),
       TextButton(
@@ -1116,7 +1053,9 @@ class _DeviceScreenState extends State<DeviceScreen> {
               ? on_cancel_pressed
               : (is_connected ? on_disconnect_pressed : on_connect_pressed),
           child: Text(
-            is_connecting ? "CANCEL" : (is_connected ? "DISCONNECT" : "CONNECT"),
+            is_connecting
+                ? "CANCEL"
+                : (is_connected ? "DISCONNECT" : "CONNECT"),
             style: Theme.of(context)
                 .primaryTextTheme
                 .labelLarge
@@ -1147,10 +1086,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
         ? double.parse(data_fetched["Battery_cycle_count"]!)
         : 0.0;
 
-    double bmsFault =
-        data_fetched["BMS_fault"] != null ? double.parse(data_fetched["BMS_fault"]!) : 0.0;
+    double bmsFault = data_fetched["BMS_fault"] != null
+        ? double.parse(data_fetched["BMS_fault"]!)
+        : 0.0;
 
-    Future<void> refreshData() async {
+    Future<void> refresh_data() async {
       setState(() {
         on_refresh_pressed();
       });
@@ -1158,7 +1098,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
     return Expanded(
       child: RefreshIndicator(
-        onRefresh: refreshData,
+        onRefresh: refresh_data,
         child: ListView(
           children: [
             Container(
@@ -1311,9 +1251,10 @@ class _DeviceScreenState extends State<DeviceScreen> {
         ? double.parse(data_fetched["Package_total_capacity"]!)
         : 0.0;
 
-    double packageRemainingCapacity = data_fetched["Package_remaining_capacity"] != null
-        ? double.parse(data_fetched["Package_remaining_capacity"]!)
-        : 0.0;
+    double packageRemainingCapacity =
+        data_fetched["Package_remaining_capacity"] != null
+            ? double.parse(data_fetched["Package_remaining_capacity"]!)
+            : 0.0;
 
     double batteryFullCharge = data_fetched["Battery_full_charge"] != null
         ? double.parse(data_fetched["Battery_full_charge"]!)
@@ -1391,10 +1332,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
         ? double.parse(data_fetched["cell16_voltage"]!)
         : 0.0;
 
-    double bmsFault =
-        data_fetched["BMS_fault"] != null ? double.parse(data_fetched["BMS_fault"]!) : 0.0;
+    double bmsFault = data_fetched["BMS_fault"] != null
+        ? double.parse(data_fetched["BMS_fault"]!)
+        : 0.0;
 
-    Future<void> refreshData() async {
+    Future<void> refresh_data() async {
       setState(() {
         on_refresh_pressed();
       });
@@ -1402,7 +1344,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
     return Expanded(
       child: RefreshIndicator(
-        onRefresh: refreshData,
+        onRefresh: refresh_data,
         child: ListView(
           children: [
             Container(
@@ -1967,18 +1909,20 @@ class _DeviceScreenState extends State<DeviceScreen> {
         ? double.parse(data_fetched["Package_total_capacity"]!)
         : 0.0;
 
-    double packageRemainingCapacity = data_fetched["Package_remaining_capacity"] != null
-        ? double.parse(data_fetched["Package_remaining_capacity"]!)
-        : 0.0;
+    double packageRemainingCapacity =
+        data_fetched["Package_remaining_capacity"] != null
+            ? double.parse(data_fetched["Package_remaining_capacity"]!)
+            : 0.0;
 
     double batteryDischarge = data_fetched["Battery_discharge"] != null
         ? double.parse(data_fetched["Battery_discharge"]!)
         : 0.0;
 
-    double bmsFault =
-        data_fetched["BMS_fault"] != null ? double.parse(data_fetched["BMS_fault"]!) : 0.0;
+    double bmsFault = data_fetched["BMS_fault"] != null
+        ? double.parse(data_fetched["BMS_fault"]!)
+        : 0.0;
 
-    Future<void> refreshData() async {
+    Future<void> refresh_data() async {
       setState(() {
         on_refresh_pressed();
       });
@@ -1986,7 +1930,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
     return Expanded(
       child: RefreshIndicator(
-        onRefresh: refreshData,
+        onRefresh: refresh_data,
         child: ListView(
           children: [
             Container(
@@ -2159,10 +2103,34 @@ class _DeviceScreenState extends State<DeviceScreen> {
     );
   }
 
+  Widget BMS_display(){
+    final Size size = MediaQuery.of(context).size;
+    final List<Widget> read_write_screens = [BMS_state_display(), BMS_write_screen()];
+
+    return Padding(padding: EdgeInsets.all(size.height * 0.01),
+    child: Column(
+      children: [
+        SizedBox(height: size.height * 0.01),
+                BMS_state_show(),
+                Container(
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          colors: [Colors.white, Colors.grey.shade500],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter)),
+                ),
+                SizedBox(height: size.height * 0.01),
+                SizedBox(
+                  height: size.height * 0.01,
+                ),
+                read_write_screens[BMS_read_write_selector]
+      ],
+    ),);
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    final List<Widget> read_write_screens = [display_for_BMS(), writeScreen()];
 
     return ScaffoldMessenger(
       key: Snackbar.snackBarKeyC,
@@ -2177,35 +2145,16 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 color: CustomColors.mainColor_1,
               ),
             ),
-            title: Text(widget.device.platformName,style: TextStyle(color: Colors.white),),
-            actions: [buildConnectButton(context)],
-          ),
-          body: Padding(
-            padding: EdgeInsets.all(size.height * 0.01),
-            child: Column(
-              children: [
-                SizedBox(height: size.height * 0.01),
-                stateSelectorShow(),
-                Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          colors: [Colors.white, Colors.grey.shade500],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter)),
-                ),
-                SizedBox(height: size.height * 0.01),
-                SizedBox(
-                  height: size.height * 0.01,
-                ),
-                read_write_screens[BMS_read_write_selector]
-              ],
+            title: Text(
+              widget.device.platformName,
+              style: TextStyle(color: Colors.white),
             ),
+            actions: [build_connect_button(context)],
           ),
-          // floatingActionButton: buildDisplayData(context),
-          // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          body: BMS_display(),
           bottomNavigationBar: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: navShow(),
+            child: navigation_bar(),
           )),
     );
   }

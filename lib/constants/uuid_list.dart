@@ -4,6 +4,8 @@ Map<String, String> uuid_service = {
 };
 
 Map<String, String> uuids = {
+    "Service_ID" : "66eae0f3-bea4-496e-ac81-d591677dd9aa",
+
     "BMS_state": "606d63cb-6f2c-42d0-9a1d-c3c20749c487",
     "Battery_configuration": "53072650-6e04-40f5-89a0-5914d2324b3b",
     "Battery_voltage": "6c1e0a36-f854-49f2-a78f-3db43f6424b1",

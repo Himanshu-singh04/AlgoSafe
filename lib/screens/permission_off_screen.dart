@@ -51,7 +51,7 @@ class BluetoothOffScreen extends StatelessWidget {
 
   Widget buildTitle(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    String? state = adapterState?.toString().split(".").last;
+    // String? state = adapterState?.toString().split(".").last;
     return Text(
       //
       'Enable Bluetooth and Location',
@@ -74,7 +74,7 @@ class BluetoothOffScreen extends StatelessWidget {
               _toggleLocation();
             }
           } catch (e) {
-            Snackbar.show(ABC.a, prettyException("Error Turning On:", e), success: false);
+            Snackbar.show(ABC.a, pretty_exception("Error Turning On:", e), success: false);
           }
         },
       ),

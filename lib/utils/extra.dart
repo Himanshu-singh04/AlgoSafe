@@ -16,15 +16,15 @@ extension Extra on BluetoothDevice {
     return _dglobal[remoteId]!;
   }
 
-  Stream<bool> get isConnecting {
+  Stream<bool> get is_connecting {
     return _cstream.stream;
   }
 
-  Stream<bool> get isDisconnecting {
+  Stream<bool> get is_disconnecting {
     return _dstream.stream;
   }
 
-  Future<void> connectAndUpdateStream() async {
+  Future<void> connect_and_update_stream() async {
     _cstream.add(true);
     try {
       await connect(mtu: null);
@@ -33,7 +33,7 @@ extension Extra on BluetoothDevice {
     }
   }
 
-  Future<void> disconnectAndUpdateStream({bool queue = true}) async {
+  Future<void> disconnect_and_update_stream({bool queue = true}) async {
     _dstream.add(true);
     try {
       await disconnect(queue: queue);
