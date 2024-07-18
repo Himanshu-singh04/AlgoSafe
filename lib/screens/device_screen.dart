@@ -252,14 +252,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
     print(state_value);
     if (state_value is String) {
       BMS_current_state = int.tryParse(state_value) ?? 0;
-      // print("${BMS_current_state} BMSstate");
     } else if (state_value is int) {
       // ignore: cast_from_null_always_fails
       BMS_current_state = state_value as int;
-      // print("${BMS_current_state} BMSstate");
     } else {
       BMS_current_state = 0;
-      // print("${BMS_current_state} BMSstate");
     }
 
     switch (BMS_current_state) {
@@ -289,14 +286,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
     var state_value = data_fetched["AlgoPAD_state"]; // AlgoPAD Status
     if (state_value is String) {
       AlgoPAD_current_state = int.tryParse(state_value) ?? 0;
-      // print("${BMS_current_state} BMSstate");
     } else if (state_value is int) {
       // ignore: cast_from_null_always_fails
       AlgoPAD_current_state = state_value as int;
-      // print("${BMS_current_state} BMSstate");
     } else {
       AlgoPAD_current_state = 0;
-      // print("${BMS_current_state} BMSstate");
     }
 
     switch (AlgoPAD_current_state) {
@@ -3387,25 +3381,47 @@ class _DeviceScreenState extends State<DeviceScreen> {
       BMS_write_screen()
     ];
 
-    return Padding(
-      padding: EdgeInsets.all(size.height * 0.01),
-      child: Column(
-        children: [
-          SizedBox(height: size.height * 0.01),
-          BMS_state_show(),
-          Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    colors: [Colors.white, Colors.grey.shade500],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter)),
+    return Scaffold(
+      appBar: AppBar(
+        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: Colors.white,
+        toolbarHeight: size.height * 0.05,
+        flexibleSpace: Padding(
+          padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+          child: Container(
+            color: CustomColors.mainColor_1,
           ),
-          SizedBox(height: size.height * 0.01),
-          SizedBox(
-            height: size.height * 0.01,
-          ),
-          read_write_screens[BMS_read_write_selector]
-        ],
+        ),
+        title: Text(
+          widget.device.platformName,
+          style: TextStyle(color: Colors.white),
+        ),
+        actions: [build_connect_button(context)],
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(size.height * 0.01),
+        child: Column(
+          children: [
+            SizedBox(height: size.height * 0.01),
+            BMS_state_show(),
+            Container(
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      colors: [Colors.white, Colors.grey.shade500],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter)),
+            ),
+            SizedBox(height: size.height * 0.01),
+            SizedBox(
+              height: size.height * 0.01,
+            ),
+            read_write_screens[BMS_read_write_selector]
+          ],
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: BMS_navigation_bar(),
       ),
     );
   }
@@ -3466,10 +3482,6 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
   Widget AlgoPAD_display() {
     final Size size = MediaQuery.of(context).size;
-    final List<Widget> read_write_screens = [
-      AlgoPAD_idle_widget(),
-      BMS_write_screen()
-    ];
 
     return Padding(
       padding: EdgeInsets.all(size.height * 0.01),
@@ -3488,18 +3500,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
           SizedBox(
             height: size.height * 0.01,
           ),
-          read_write_screens[BMS_read_write_selector]
+          AlgoPAD_state_display()
         ],
       ),
     );
   }
 
-  Widget build_body(){
+  Widget build_body() {
     Widget temp = BMS_display();
     var nav_value = data_fetched["Product_Id"];
     if (nav_value is String) {
       product_state = int.tryParse(nav_value) ?? 0;
-      print(product_state);
     } else if (nav_value is int) {
       // ignore: cast_from_null_always_fails
       product_state = nav_value as int;
@@ -3507,15 +3518,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
       product_state = 0;
     }
 
-    if(product_state == 10101){
+    if (product_state == 10101) {
       temp = BMS_display();
-    }
-
-    else if(product_state == 20101){
+    } else if (product_state == 20101) {
       temp = AlgoX_display();
-    }
-
-    else if(product_state == 30101){
+    } else if (product_state == 30101) {
       temp = AlgoPAD_display();
     }
 
