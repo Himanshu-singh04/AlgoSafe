@@ -5,6 +5,7 @@ Map<String, String> uuid_service = {
 
 Map<String, String> uuids = {
   "Service_ID": "66eae0f3-bea4-496e-ac81-d591677dd9aa",
+
   "Product_Id": "a4beceb7-689d-4e1f-bee6-b59358dde0ea",
   "BMS_state": "606d63cb-6f2c-42d0-9a1d-c3c20749c487",
   "Battery_voltage": "6c1e0a36-f854-49f2-a78f-3db43f6424b1",
@@ -37,6 +38,7 @@ Map<String, String> uuids = {
   "Battery_discharge": "24688ee9-9c1d-45bf-ba47-2b36cb92ace5",
   "Drone_status": "1efa6f0c-2ab4-44ca-8153-71b32678c4c3",
   "Charging_status": "cc32c0bb-218b-4b7f-808c-63dc94dd5c08",
+
   "Battery_cell_nos": "6bd6c397-e8dc-4d41-991d-8f2e887b7061",
   "Battery_capacity": "0731d816-a269-4397-a7e5-0d1bf16310be",
   "Battery_constant_current": "fd049ff1-670c-40fe-98b8-00504699f8c1",
@@ -54,6 +56,8 @@ Map<String, String> uuids = {
   "DSG_UnderVoltage": "f9e62d2c-82f6-4cb4-ae6c-4b5b19b4c918",
   "Battery_DSG_C": "6fc9cfaf-cbf9-4c28-866d-6ef4e4e5440a",
   "SOC": "14df897e-b1cc-4b16-8df0-d032bc92a875",
+
+  "AlgoPAD_state": "e7735642-e777-4f90-84ef-6c8c5bf42e1f",
   "Charging_type": "26b83d0d-4d66-45f2-8afb-32f1fed254aa",
   "Cell_Chemistry": "4b9eba9d-3523-4311-ba81-9e4e18d5f491",
   "Algox_Cell_Nos": "d57ec39e-8789-4aa6-89de-5d2ea01fa5aa",
