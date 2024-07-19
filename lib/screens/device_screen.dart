@@ -284,6 +284,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
   Widget AlgoPAD_state_display() {
     Widget temp = AlgoPAD_idle_widget();
     var state_value = data_fetched["AlgoPAD_state"]; // AlgoPAD Status
+    print(state_value);
     if (state_value is String) {
       AlgoPAD_current_state = int.tryParse(state_value) ?? 0;
     } else if (state_value is int) {
@@ -321,72 +322,78 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
     // Validate input values
     if (value.isEmpty || characteristic_uuid == null) {
-      Snackbar.show(
-        ABC.c,
-        "$characteristic_name Write: No value provided or invalid UUID",
-        success: false,
-      );
+      // Snackbar.show(
+      //   ABC.c,
+      //   "$characteristic_name Write: No value provided or invalid UUID",
+      //   success: false,
+      // );
       return; // Skip if no value is provided or UUID is invalid
     }
 
-    BluetoothCharacteristic? target_characteristic;
+    List<BluetoothCharacteristic> target_characteristics = [];
 
-    // Find the target characteristic by UUID
+    // Find all target characteristics by UUID
     for (var service in services) {
       for (var characteristic in service.characteristics) {
         if (characteristic.uuid.toString() == characteristic_uuid) {
-          target_characteristic = characteristic;
-          break;
+          target_characteristics.add(characteristic);
         }
       }
-      if (target_characteristic != null) break;
     }
 
-    if (target_characteristic != null) {
-      try {
-        // Check if the characteristic supports write without response
-        if (target_characteristic.properties.writeWithoutResponse) {
-          await target_characteristic.write(value.codeUnits,
-              withoutResponse: true);
-          Snackbar.show(ABC.c, "$characteristic_name Write: Success",
-              success: true);
+    if (target_characteristics.isNotEmpty) {
+      for (var target_characteristic in target_characteristics) {
+        try {
+          // Check if the characteristic supports write without response
+          if (target_characteristic.properties.writeWithoutResponse) {
+            await target_characteristic.write(value.codeUnits,
+                withoutResponse: true);
+            // Snackbar.show(ABC.c,
+            //     "$characteristic_name Write to ${target_characteristic.uuid}: Success",
+            //     success: true);
+          }
+          // Check if the characteristic supports write with response
+          else if (target_characteristic.properties.write) {
+            await target_characteristic.write(value.codeUnits,
+                withoutResponse: false);
+            // Snackbar.show(ABC.c,
+            //     "$characteristic_name Write to ${target_characteristic.uuid}: Success",
+            //     success: true);
+          }
+          // Characteristic is not writable
+          else {
+            // Snackbar.show(
+            //   ABC.c,
+            //   "$characteristic_name Write to ${target_characteristic.uuid}: Characteristic not writable",
+            //   success: false,
+            // );
+          }
+        } catch (e) {
+          // Snackbar.show(
+          //   ABC.c,
+          //   "$characteristic_name Write to ${target_characteristic.uuid}: Error - $e",
+          //   success: false,
+          // );
         }
-        // Check if the characteristic supports write with response
-        else if (target_characteristic.properties.write) {
-          await target_characteristic.write(value.codeUnits,
-              withoutResponse: false);
-          Snackbar.show(ABC.c, "$characteristic_name Write: Success",
-              success: true);
-        }
-        // Characteristic is not writable
-        else {
-          Snackbar.show(
-            ABC.c,
-            "$characteristic_name Write: Characteristic not writable",
-            success: false,
-          );
-        }
-      } catch (e) {
-        Snackbar.show(
-          ABC.c,
-          "$characteristic_name Write: Error - $e",
-          success: false,
-        );
       }
     } else {
-      Snackbar.show(
-        ABC.c,
-        "$characteristic_name Write: Characteristic not found",
-        success: false,
-      );
+      // Snackbar.show(
+      //   ABC.c,
+      //   "$characteristic_name Write: Characteristics not found",
+      //   success: false,
+      // );
     }
   }
 
   Map<String, List<String>> drop_down_items = {
-    "Battery_configuration": ["2", "4", "6", "8", "10", "12", "14", "16"],
+    "Battery_cell_nos": ["2", "4", "6", "8", "10", "12", "14", "16"],
+    "Charging_type": ["Fast Charge", "Balance Charge", "Storage Charge"],
+    "Cell_Chemistry": ["LiPo", "LiIon", "LiHv", "LiFe"],
+    "Algox_Cell_Nos": ["2", "4", "6", "8", "10", "12", "14", "16"],
   };
 
   final Map<String, double> slider_values = {
+    "Algox_Current": 0.0,
     "Battery_constant_current": 0.0,
     "Battery_peak_current": 0.0,
     "Battery_max_voltage": 0.0,
@@ -395,6 +402,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
   };
 
   Map<String, List<double>> slider_min_max = {
+    "Algox_Current": [0.0, 100.0],
     "Battery_constant_current": [0.0, 180.0],
     "Battery_peak_current": [0.0, 180.0],
     "Battery_max_voltage": [0.0, 4350.0],
@@ -403,6 +411,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
   };
 
   Map<String, int> slider_divisions = {
+    "Algox_Current": 20,
     "Battery_constant_current": 90,
     "Battery_peak_current": 90,
     "Battery_max_voltage": 87,
@@ -411,6 +420,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
   };
 
   Map<String, bool> toggle_values = {
+    "Start_Charging": false,
     "Battery_DSG_C": false,
     "Battery_CHG_C": false,
   };
@@ -424,39 +434,122 @@ class _DeviceScreenState extends State<DeviceScreen> {
         key: BMS_form_key,
         child: ListView(
           children: [
-            ExpansionTile(
-              title: Text('Compulsory Fields'),
-              initiallyExpanded: true,
-              children: [
-                // build_drop_down_for_characteristic("Battery_configuration"),
-                // SizedBox(height: size.height * 0.01),
-                build_text_field_for_characteristic("Battery_id",
-                    is_required: true),
-                SizedBox(height: size.height * 0.01),
-                // build_text_field_for_characteristic("BMS_id", isRequired: true),
-                // SizedBox(height: size.height * 0.01),
-              ],
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(size.height * 0.01),
+                color: CustomColors.mainColor_1,
+              ),
+              child: ExpansionTile(
+                title: Text(
+                  'Compulsory Fields',
+                  style: TextStyle(color: Colors.white),
+                ),
+                initiallyExpanded: false,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child:
+                        build_drop_down_for_characteristic("Battery_cell_nos"),
+                  ),
+                  SizedBox(height: size.height * 0.01),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: build_text_field_for_characteristic("Battery_id"),
+                  ),
+                  SizedBox(height: size.height * 0.01),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: build_text_field_for_characteristic("BMS_id"),
+                  ),
+                  SizedBox(height: size.height * 0.01),
+                ],
+              ),
             ),
             SizedBox(height: size.height * 0.02),
-            ExpansionTile(
-              title: Text('Default Values'),
-              initiallyExpanded: true,
-              children: [
-                build_slider_for_characteristic("Battery_constant_current"),
-                SizedBox(height: size.height * 0.01),
-                build_slider_for_characteristic("Battery_peak_current"),
-                SizedBox(height: size.height * 0.01),
-                build_slider_for_characteristic("Battery_max_voltage"),
-                SizedBox(height: size.height * 0.01),
-                build_slider_for_characteristic("Battery_min_voltage"),
-                SizedBox(height: size.height * 0.01),
-                build_slider_for_characteristic(
-                    "Battery_operating_temperature"),
-                SizedBox(height: size.height * 0.01),
-                build_toggle_for_characteristic("Battery_DSG_C"),
-                SizedBox(height: size.height * 0.01),
-                build_toggle_for_characteristic("Battery_CHG_C"),
-              ],
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(size.height * 0.01),
+                color: CustomColors.mainColor_1,
+              ),
+              child: ExpansionTile(
+                title: Text(
+                  'Default Values',
+                  style: TextStyle(color: Colors.white),
+                ),
+                initiallyExpanded: false,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: build_slider_for_characteristic("Battery_capacity"),
+                  ),
+                  SizedBox(height: size.height * 0.01),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: build_slider_for_characteristic("Battery_constant_current"),
+                  ),
+                  SizedBox(height: size.height * 0.01),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: build_slider_for_characteristic("Battery_peak_current"),
+                  ),
+                  SizedBox(height: size.height * 0.01),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: build_slider_for_characteristic("Battery_max_voltage"),
+                  ),
+                  SizedBox(height: size.height * 0.01),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: build_slider_for_characteristic("Battery_min_voltage"),
+                  ),
+                  SizedBox(height: size.height * 0.01),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: build_slider_for_characteristic(
+                        "Battery_operating_temperature"),
+                  ),
+                  SizedBox(height: size.height * 0.01),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: build_toggle_for_characteristic("Battery_DSG_C"),
+                  ),
+                  SizedBox(height: size.height * 0.01),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: build_toggle_for_characteristic("DSG_OverCurrent"),
+                  ),
+                  SizedBox(height: size.height * 0.01),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: build_toggle_for_characteristic("CHG_OverVoltage"),
+                  ),
+                  SizedBox(height: size.height * 0.01),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: build_toggle_for_characteristic("DSG_OverTemperature"),
+                  ),
+                  SizedBox(height: size.height * 0.01),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: build_toggle_for_characteristic("CHG_OverTemperature"),
+                  ),
+                  SizedBox(height: size.height * 0.01),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: build_toggle_for_characteristic("DSG_UnderVoltage"),
+                  ),
+                  SizedBox(height: size.height * 0.01),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: build_toggle_for_characteristic("Battery_CHG_C"),
+                  ),
+                  SizedBox(height: size.height * 0.01),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: build_slider_for_characteristic("SOC"),
+                  ),
+                ],
+              ),
             ),
             SizedBox(height: size.height * 0.02),
             ElevatedButton(
@@ -464,7 +557,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   backgroundColor: CustomColors.mainColor_1),
               onPressed: () {
                 if (BMS_form_key.currentState!.validate()) {
-                  on_send_all_pressed();
+                  BMS_on_send_all_pressed();
                 }
               },
               child: Text(
@@ -478,54 +571,78 @@ class _DeviceScreenState extends State<DeviceScreen> {
     );
   }
 
+  final AlgoX_form_key = GlobalKey<FormState>();
+
   Widget AlgoX_write_screen() {
     final Size size = MediaQuery.of(context).size;
     return Expanded(
       child: Form(
-        key: BMS_form_key,
+        key: AlgoX_form_key,
         child: ListView(
           children: [
-            ExpansionTile(
-              title: Text('Compulsory Fields'),
-              initiallyExpanded: true,
-              children: [
-                // build_drop_down_for_characteristic("Battery_configuration"),
-                // SizedBox(height: size.height * 0.01),
-                build_text_field_for_characteristic("Battery_id",
-                    is_required: true),
-                SizedBox(height: size.height * 0.01),
-                // build_text_field_for_characteristic("BMS_id", isRequired: true),
-                // SizedBox(height: size.height * 0.01),
-              ],
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(size.height * 0.01),
+                color: CustomColors.mainColor_1,
+              ),
+              child: ExpansionTile(
+                title: Text(
+                  'Compulsory Fields',
+                  style: TextStyle(color: Colors.white),
+                ),
+                initiallyExpanded: false,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: build_drop_down_for_characteristic("Charging_type"),
+                  ),
+                  SizedBox(height: size.height * 0.01),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: build_drop_down_for_characteristic("Cell_Chemistry"),
+                  ),
+                  SizedBox(height: size.height * 0.01),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: build_drop_down_for_characteristic("Algox_Cell_Nos"),
+                  ),
+                  SizedBox(height: size.height * 0.01),
+                ],
+              ),
             ),
             SizedBox(height: size.height * 0.02),
-            ExpansionTile(
-              title: Text('Default Values'),
-              initiallyExpanded: true,
-              children: [
-                build_slider_for_characteristic("Battery_constant_current"),
-                SizedBox(height: size.height * 0.01),
-                build_slider_for_characteristic("Battery_peak_current"),
-                SizedBox(height: size.height * 0.01),
-                build_slider_for_characteristic("Battery_max_voltage"),
-                SizedBox(height: size.height * 0.01),
-                build_slider_for_characteristic("Battery_min_voltage"),
-                SizedBox(height: size.height * 0.01),
-                build_slider_for_characteristic(
-                    "Battery_operating_temperature"),
-                SizedBox(height: size.height * 0.01),
-                build_toggle_for_characteristic("Battery_DSG_C"),
-                SizedBox(height: size.height * 0.01),
-                build_toggle_for_characteristic("Battery_CHG_C"),
-              ],
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(size.height * 0.01),
+                color: CustomColors.mainColor_1,
+              ),
+              child: ExpansionTile(
+                title: Text(
+                  'Default Values',
+                  style: TextStyle(color: Colors.white),
+                ),
+                initiallyExpanded: false,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: build_slider_for_characteristic("Algox_Current"),
+                  ),
+                  SizedBox(height: size.height * 0.01),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: build_toggle_for_characteristic("Start_Charging"),
+                  ),
+                  SizedBox(height: size.height * 0.01),
+                ],
+              ),
             ),
             SizedBox(height: size.height * 0.02),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                   backgroundColor: CustomColors.mainColor_1),
               onPressed: () {
-                if (BMS_form_key.currentState!.validate()) {
-                  on_send_all_pressed();
+                if (AlgoX_form_key.currentState!.validate()) {
+                  AlgoX_on_send_all_pressed();
                 }
               },
               child: Text(
@@ -554,6 +671,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
           children: [
             Expanded(
               child: TextFormField(
+                keyboardType: TextInputType.number,
                 style: TextStyle(color: Colors.white),
                 controller: BMS_write_controller[key],
                 decoration: InputDecoration(
@@ -775,9 +893,9 @@ class _DeviceScreenState extends State<DeviceScreen> {
     );
   }
 
-  Map<String, String> last_sent_values = {};
+  Map<String, String> BMS_last_sent_values = {};
 
-  Future<void> on_send_all_pressed() async {
+  Future<void> BMS_on_send_all_pressed() async {
     bool all_success = true;
     String summary_message = '';
 
@@ -793,7 +911,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
       }
 
       // Check if the value has changed since the last send
-      if (last_sent_values[characteristic_name] == value) {
+      if (BMS_last_sent_values[characteristic_name] == value) {
         summary_message +=
             '$characteristic_name Write: Value unchanged, not sending\n';
         continue;
@@ -827,7 +945,74 @@ class _DeviceScreenState extends State<DeviceScreen> {
             all_success = false;
           }
           // Update the last sent value after a successful send
-          last_sent_values[characteristic_name] = value;
+          BMS_last_sent_values[characteristic_name] = value;
+        } catch (e) {
+          summary_message += '$characteristic_name Write: Error - $e\n';
+          all_success = false;
+        }
+      } else {
+        summary_message +=
+            '$characteristic_name Write: Characteristic not found\n';
+        all_success = false;
+      }
+    }
+
+    Snackbar.show(ABC.c, summary_message, success: all_success);
+  }
+
+  Map<String, String> AlgoX_last_sent_values = {};
+
+  Future<void> AlgoX_on_send_all_pressed() async {
+    bool all_success = true;
+    String summary_message = '';
+
+    for (String characteristic_name in uuid_algoX_write.keys) {
+      String? characteristic_uuid = uuid_algoX_write[characteristic_name];
+      String value = BMS_write_controller[characteristic_name]?.text ?? '';
+
+      if (value.isEmpty || characteristic_uuid == null) {
+        summary_message +=
+            '$characteristic_name Write: No value provided or invalid UUID\n';
+        all_success = false;
+        continue;
+      }
+
+      // Check if the value has changed since the last send
+      if (AlgoX_last_sent_values[characteristic_name] == value) {
+        summary_message +=
+            '$characteristic_name Write: Value unchanged, not sending\n';
+        continue;
+      }
+
+      BluetoothCharacteristic? target_characteristic;
+
+      for (var service in services) {
+        for (var characteristic in service.characteristics) {
+          if (characteristic.uuid.toString() == characteristic_uuid) {
+            target_characteristic = characteristic;
+            break;
+          }
+        }
+        if (target_characteristic != null) break;
+      }
+
+      if (target_characteristic != null) {
+        try {
+          if (target_characteristic.properties.writeWithoutResponse) {
+            await target_characteristic.write(value.codeUnits,
+                withoutResponse: true);
+            summary_message += '$characteristic_name Write: Success\n';
+          } else if (target_characteristic.properties.write) {
+            await target_characteristic.write(value.codeUnits,
+                withoutResponse: false);
+            summary_message += '$characteristic_name Write: Success\n';
+          } else {
+            summary_message +=
+                '$characteristic_name Write: Characteristic not writable\n';
+            all_success = false;
+          }
+          // Update the last sent value after a successful send
+          AlgoX_last_sent_values[characteristic_name] = value;
         } catch (e) {
           summary_message += '$characteristic_name Write: Error - $e\n';
           all_success = false;
@@ -961,10 +1146,20 @@ class _DeviceScreenState extends State<DeviceScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.power_off),
-                          // Lottie.asset("assets/gifs/charging.json"),
+                          SizedBox(
+                            width: size.width * 0.01,
+                          ),
                           Text(
                             "IDLE MODE",
                             style: TextStyle(fontSize: 20),
+                          ),
+                          Spacer(),
+                          Text(
+                            "AlgoBMS",
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          SizedBox(
+                            width: size.width * 0.01,
                           ),
                         ],
                       ),
@@ -987,11 +1182,21 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Icon(Icons.battery_charging_full),
                           Lottie.asset("assets/gifs/charging.json"),
+                          SizedBox(
+                            width: size.width * 0.01,
+                          ),
                           Text(
                             "CHARGE MODE",
                             style: TextStyle(fontSize: 20),
+                          ),
+                          Spacer(),
+                          Text(
+                            "AlgoBMS",
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          SizedBox(
+                            width: size.width * 0.01,
                           ),
                         ],
                       ),
@@ -1017,9 +1222,20 @@ class _DeviceScreenState extends State<DeviceScreen> {
                           // Icon(Icons.battery_alert_sharp),
                           Lottie.asset("assets/gifs/charging.json",
                               reverse: true),
+                          SizedBox(
+                            width: size.width * 0.01,
+                          ),
                           Text(
                             "DISCHARGE MODE",
                             style: TextStyle(fontSize: 20),
+                          ),
+                          Spacer(),
+                          Text(
+                            "AlgoBMS",
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          SizedBox(
+                            width: size.width * 0.01,
                           ),
                         ],
                       ),
@@ -1042,9 +1258,20 @@ class _DeviceScreenState extends State<DeviceScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.power_off),
+                          SizedBox(
+                            width: size.width * 0.01,
+                          ),
                           Text(
                             "IDLE MODE",
                             style: TextStyle(fontSize: 20),
+                          ),
+                          Spacer(),
+                          Text(
+                            "AlgoBMS",
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          SizedBox(
+                            width: size.width * 0.01,
                           ),
                         ],
                       ),
@@ -1083,10 +1310,20 @@ class _DeviceScreenState extends State<DeviceScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.power_off),
-                          // Lottie.asset("assets/gifs/charging.json"),
+                          SizedBox(
+                            width: size.width * 0.01,
+                          ),
                           Text(
                             "IDLE MODE",
                             style: TextStyle(fontSize: 20),
+                          ),
+                          Spacer(),
+                          Text(
+                            "AlgoPAD",
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          SizedBox(
+                            width: size.width * 0.01,
                           ),
                         ],
                       ),
@@ -1109,11 +1346,21 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Icon(Icons.battery_charging_full),
                           Lottie.asset("assets/gifs/charging.json"),
+                          SizedBox(
+                            width: size.width * 0.01,
+                          ),
                           Text(
                             "CHARGE MODE",
                             style: TextStyle(fontSize: 20),
+                          ),
+                          Spacer(),
+                          Text(
+                            "AlgoPAD",
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          SizedBox(
+                            width: size.width * 0.01,
                           ),
                         ],
                       ),
@@ -1137,9 +1384,20 @@ class _DeviceScreenState extends State<DeviceScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.power_off),
+                          SizedBox(
+                            width: size.width * 0.01,
+                          ),
                           Text(
                             "IDLE MODE",
                             style: TextStyle(fontSize: 20),
+                          ),
+                          Spacer(),
+                          Text(
+                            "AlgoPAD",
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          SizedBox(
+                            width: size.width * 0.01,
                           ),
                         ],
                       ),
@@ -1489,7 +1747,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
-                trailing: Text((droneStatus * 0.001).toStringAsFixed(3) + ' V',
+                trailing: Text(droneStatus == 1 ? 'Present' : "Not Present",
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -1509,8 +1767,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white),
                 ),
-                trailing: Text(
-                    (chargingStatus * 0.01).toStringAsFixed(2) + ' °C',
+                trailing: Text(chargingStatus == 1 ? "Active" : "Inactive",
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -3433,49 +3690,81 @@ class _DeviceScreenState extends State<DeviceScreen> {
       AlgoX_write_screen()
     ];
 
-    return Padding(
-      padding: EdgeInsets.all(size.height * 0.01),
-      child: Column(
-        children: [
-          SizedBox(height: size.height * 0.01),
-          Container(
-            height: size.height * 0.05,
-            color: Colors.blue,
-            child: Padding(
-                padding: const EdgeInsets.all(4),
-                child: TweenAnimationBuilder<double>(
-                    tween: Tween<double>(begin: 0.0, end: 1.0),
-                    duration: Duration(seconds: 2),
-                    builder: (context, value, child) {
-                      return Opacity(
-                        opacity: value,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.power_off),
-                            // Lottie.asset("assets/gifs/charging.json"),
-                            Text(
-                              "CHARGE MODE",
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          ],
-                        ),
-                      );
-                    })),
+    return Scaffold(
+      appBar: AppBar(
+        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: Colors.white,
+        toolbarHeight: size.height * 0.05,
+        flexibleSpace: Padding(
+          padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+          child: Container(
+            color: CustomColors.mainColor_1,
           ),
-          Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    colors: [Colors.white, Colors.grey.shade500],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter)),
-          ),
-          SizedBox(height: size.height * 0.01),
-          SizedBox(
-            height: size.height * 0.01,
-          ),
-          read_write_screens[AlgoX_read_write_selector]
-        ],
+        ),
+        title: Text(
+          widget.device.platformName,
+          style: TextStyle(color: Colors.white),
+        ),
+        actions: [build_connect_button(context)],
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(size.height * 0.01),
+        child: Column(
+          children: [
+            SizedBox(height: size.height * 0.01),
+            Container(
+              height: size.height * 0.05,
+              color: Colors.green,
+              child: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0.0, end: 1.0),
+                      duration: Duration(seconds: 2),
+                      builder: (context, value, child) {
+                        return Opacity(
+                          opacity: value,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Lottie.asset("assets/gifs/charging.json"),
+                              SizedBox(
+                                width: size.width * 0.01,
+                              ),
+                              Text(
+                                "CHARGE MODE",
+                                style: TextStyle(fontSize: 20),
+                              ),
+                              Spacer(),
+                              Text(
+                                "AlgoX",
+                                style: TextStyle(fontSize: 20),
+                              ),
+                              SizedBox(
+                                width: size.width * 0.01,
+                              ),
+                            ],
+                          ),
+                        );
+                      })),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      colors: [Colors.white, Colors.grey.shade500],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter)),
+            ),
+            SizedBox(height: size.height * 0.01),
+            SizedBox(
+              height: size.height * 0.01,
+            ),
+            read_write_screens[AlgoX_read_write_selector]
+          ],
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: AlgoX_bottom_navigation_bar(),
       ),
     );
   }
@@ -3483,25 +3772,43 @@ class _DeviceScreenState extends State<DeviceScreen> {
   Widget AlgoPAD_display() {
     final Size size = MediaQuery.of(context).size;
 
-    return Padding(
-      padding: EdgeInsets.all(size.height * 0.01),
-      child: Column(
-        children: [
-          SizedBox(height: size.height * 0.01),
-          BMS_state_show(),
-          Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    colors: [Colors.white, Colors.grey.shade500],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter)),
+    return Scaffold(
+      appBar: AppBar(
+        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: Colors.white,
+        toolbarHeight: size.height * 0.05,
+        flexibleSpace: Padding(
+          padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+          child: Container(
+            color: CustomColors.mainColor_1,
           ),
-          SizedBox(height: size.height * 0.01),
-          SizedBox(
-            height: size.height * 0.01,
-          ),
-          AlgoPAD_state_display()
-        ],
+        ),
+        title: Text(
+          widget.device.platformName,
+          style: TextStyle(color: Colors.white),
+        ),
+        actions: [build_connect_button(context)],
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(size.height * 0.01),
+        child: Column(
+          children: [
+            SizedBox(height: size.height * 0.01),
+            AlgoPAD_state_show(),
+            Container(
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      colors: [Colors.white, Colors.grey.shade500],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter)),
+            ),
+            SizedBox(height: size.height * 0.01),
+            SizedBox(
+              height: size.height * 0.01,
+            ),
+            AlgoPAD_state_display()
+          ],
+        ),
       ),
     );
   }
@@ -3531,32 +3838,6 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
-
-    return ScaffoldMessenger(
-      key: Snackbar.snackBarKeyC,
-      child: Scaffold(
-          appBar: AppBar(
-            iconTheme: IconThemeData(color: Colors.white),
-            backgroundColor: Colors.white,
-            toolbarHeight: size.height * 0.05,
-            flexibleSpace: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
-              child: Container(
-                color: CustomColors.mainColor_1,
-              ),
-            ),
-            title: Text(
-              widget.device.platformName,
-              style: TextStyle(color: Colors.white),
-            ),
-            actions: [build_connect_button(context)],
-          ),
-          body: build_body(),
-          bottomNavigationBar: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: BMS_navigation_bar(),
-          )),
-    );
+    return ScaffoldMessenger(key: Snackbar.snackBarKeyC, child: build_body());
   }
 }
