@@ -3828,11 +3828,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
       product_state = 0;
     }
 
-    if (product_state == 10101) {
+    if (product_state == 2775) {
       temp = BMS_display();
-    } else if (product_state == 20101) {
+    } else if (product_state == 4E85) {
       temp = AlgoX_display();
-    } else if (product_state == 30101) {
+    } else if (product_state == 7595) {
       temp = AlgoPAD_display();
     }
 
