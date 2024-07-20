@@ -167,8 +167,8 @@ Map<String, String> uuid_algoX_charge_read = {
 
 // ignore: non_constant_identifier_names
 Map<String, String> uuid_algoX_write = {
-  "Charging_type": "26b83d0d-4d66-45f2-8afb-32f1fed254aa",
-  "Cell_Chemistry": "4b9eba9d-3523-4311-ba81-9e4e18d5f491",
+  // "Charging_type": "26b83d0d-4d66-45f2-8afb-32f1fed254aa",
+  // "Cell_Chemistry": "4b9eba9d-3523-4311-ba81-9e4e18d5f491",
   "Algox_Cell_Nos": "d57ec39e-8789-4aa6-89de-5d2ea01fa5aa",
   "Algox_Current": "ad187c83-f94f-49fe-a686-6ab132447069",
   "Start_Charging": "9027cc8b-da21-4c8a-95c2-44fc448834f4",

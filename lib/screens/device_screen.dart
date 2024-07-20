@@ -592,16 +592,16 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 ),
                 initiallyExpanded: false,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: build_drop_down_for_characteristic("Charging_type"),
-                  ),
-                  SizedBox(height: size.height * 0.01),
-                  Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: build_drop_down_for_characteristic("Cell_Chemistry"),
-                  ),
-                  SizedBox(height: size.height * 0.01),
+                  // Padding(
+                  //   padding: const EdgeInsets.all(4.0),
+                  //   child: build_drop_down_for_characteristic("Charging_type"),
+                  // ),
+                  // SizedBox(height: size.height * 0.01),
+                  // Padding(
+                  //   padding: const EdgeInsets.all(4.0),
+                  //   child: build_drop_down_for_characteristic("Cell_Chemistry"),
+                  // ),
+                  // SizedBox(height: size.height * 0.01),
                   Padding(
                     padding: const EdgeInsets.all(4.0),
                     child: build_drop_down_for_characteristic("Algox_Cell_Nos"),
