@@ -485,22 +485,26 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   SizedBox(height: size.height * 0.01),
                   Padding(
                     padding: const EdgeInsets.all(4.0),
-                    child: build_slider_for_characteristic("Battery_constant_current"),
+                    child: build_slider_for_characteristic(
+                        "Battery_constant_current"),
                   ),
                   SizedBox(height: size.height * 0.01),
                   Padding(
                     padding: const EdgeInsets.all(4.0),
-                    child: build_slider_for_characteristic("Battery_peak_current"),
+                    child:
+                        build_slider_for_characteristic("Battery_peak_current"),
                   ),
                   SizedBox(height: size.height * 0.01),
                   Padding(
                     padding: const EdgeInsets.all(4.0),
-                    child: build_slider_for_characteristic("Battery_max_voltage"),
+                    child:
+                        build_slider_for_characteristic("Battery_max_voltage"),
                   ),
                   SizedBox(height: size.height * 0.01),
                   Padding(
                     padding: const EdgeInsets.all(4.0),
-                    child: build_slider_for_characteristic("Battery_min_voltage"),
+                    child:
+                        build_slider_for_characteristic("Battery_min_voltage"),
                   ),
                   SizedBox(height: size.height * 0.01),
                   Padding(
@@ -526,12 +530,14 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   SizedBox(height: size.height * 0.01),
                   Padding(
                     padding: const EdgeInsets.all(4.0),
-                    child: build_toggle_for_characteristic("DSG_OverTemperature"),
+                    child:
+                        build_toggle_for_characteristic("DSG_OverTemperature"),
                   ),
                   SizedBox(height: size.height * 0.01),
                   Padding(
                     padding: const EdgeInsets.all(4.0),
-                    child: build_toggle_for_characteristic("CHG_OverTemperature"),
+                    child:
+                        build_toggle_for_characteristic("CHG_OverTemperature"),
                   ),
                   SizedBox(height: size.height * 0.01),
                   Padding(
@@ -628,11 +634,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
                     child: build_slider_for_characteristic("Algox_Current"),
                   ),
                   SizedBox(height: size.height * 0.01),
-                  Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: build_toggle_for_characteristic("Start_Charging"),
-                  ),
-                  SizedBox(height: size.height * 0.01),
+                  // Padding(
+                  //   padding: const EdgeInsets.all(4.0),
+                  //   child: build_toggle_for_characteristic("Start_Charging"),
+                  // ),
+                  // SizedBox(height: size.height * 0.01),
                 ],
               ),
             ),
@@ -1257,17 +1263,20 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          SizedBox(
+                            width: size.width * 0.01,
+                          ),
                           Icon(Icons.power_off),
                           SizedBox(
                             width: size.width * 0.01,
                           ),
                           Text(
-                            "IDLE MODE",
+                            "MODE",
                             style: TextStyle(fontSize: 20),
                           ),
                           Spacer(),
                           Text(
-                            "AlgoBMS",
+                            "Device",
                             style: TextStyle(fontSize: 20),
                           ),
                           SizedBox(
@@ -3742,6 +3751,37 @@ class _DeviceScreenState extends State<DeviceScreen> {
                               SizedBox(
                                 width: size.width * 0.01,
                               ),
+                              Container(
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(
+                                        size.height * 0.01),
+                                    color: Colors.greenAccent),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: size.width * 0.01,
+                                    ),
+                                    Text("OFF: "),
+                                    Switch(
+                                      value: _isOn,
+                                      onChanged: (bool value) {
+                                        setState(() {
+                                          _isOn = value;
+                                        });
+                                        _sendPowerState(value);
+                                      },
+                                    ),
+                                    Text(" :ON"),
+                                    SizedBox(
+                                      width: size.width * 0.01,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                width: size.width * 0.01,
+                              ),
                             ],
                           ),
                         );
@@ -3762,11 +3802,57 @@ class _DeviceScreenState extends State<DeviceScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: AlgoX_bottom_navigation_bar(),
+      bottomNavigationBar: AnimatedContainer(
+        duration: Duration(milliseconds: 300),
+        height: _isOn ? 0 : size.height * 0.075,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: AlgoX_bottom_navigation_bar(),
+        ),
       ),
     );
+  }
+
+  bool _isOn = false;
+  Future<void> _sendPowerState(bool isOn) async {
+    final String characteristicUuid = '9027cc8b-da21-4c8a-95c2-44fc448834f4';
+    final String value = isOn ? '1' : '0';
+    String summaryMessage = '';
+
+    BluetoothCharacteristic? targetCharacteristic;
+
+    for (var service in services) {
+      for (var characteristic in service.characteristics) {
+        if (characteristic.uuid.toString() == characteristicUuid) {
+          targetCharacteristic = characteristic;
+          break;
+        }
+      }
+      if (targetCharacteristic != null) break;
+    }
+
+    if (targetCharacteristic != null) {
+      try {
+        if (targetCharacteristic.properties.writeWithoutResponse) {
+          await targetCharacteristic.write(value.codeUnits,
+              withoutResponse: true);
+          summaryMessage = 'Power ${isOn ? 'ON' : 'OFF'} Write: Success';
+        } else if (targetCharacteristic.properties.write) {
+          await targetCharacteristic.write(value.codeUnits,
+              withoutResponse: false);
+          summaryMessage = 'Power ${isOn ? 'ON' : 'OFF'} Write: Success';
+        } else {
+          summaryMessage = 'Power Write: Characteristic not writable';
+        }
+      } catch (e) {
+        summaryMessage = 'Power Write: Error - $e';
+      }
+    } else {
+      summaryMessage = 'Power Write: Characteristic not found';
+    }
+
+    Snackbar.show(ABC.c, summaryMessage,
+        success: summaryMessage.contains('Success'));
   }
 
   Widget AlgoPAD_display() {
