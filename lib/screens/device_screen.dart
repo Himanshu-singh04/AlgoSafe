@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:lottie/lottie.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../widgets/service_tile.dart';
 import '../widgets/characteristic_tile.dart';
 import '../widgets/descriptor_tile.dart';
@@ -32,6 +33,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
   var BMS_current_state = 0; // 125: idle, 4: charging, 3:discharging
   var AlgoPAD_current_state = 0; // 1: idle 2: charging
   var product_state = 0;
+  final controller = PageController(viewportFraction: 1, keepPage: true);
+  bool onLastPage = false;
 
   late StreamSubscription<BluetoothConnectionState>
       connection_state_subscription;
@@ -279,6 +282,113 @@ class _DeviceScreenState extends State<DeviceScreen> {
         break;
     }
     return temp;
+  }
+
+  Widget BMS_write_dialog(){
+    final Size size = MediaQuery.of(context).size;
+
+    return Dialog(
+      child: Stack(
+        children: [
+          PageView(
+            onPageChanged: (index) {
+              setState(() {
+                onLastPage = (index == 2);
+              });
+            },
+            controller: controller, // Use the controller here
+            children: [
+              Container(
+                color: Colors.white,
+              ),
+              Container(
+                color: Colors.blue,
+              ),
+              Container(
+                color: Colors.green,
+              ),
+            ],
+          ),
+          Positioned(
+            bottom: 80, // Position the indicator slightly above the buttons
+            left: 0,
+            right: 0,
+            child: Container(
+              alignment: Alignment.center,
+              child: SmoothPageIndicator(
+                controller: controller,
+                count: 3,
+                effect: WormEffect(
+                  dotHeight: 12,
+                  dotWidth: 12,
+                  spacing: 8,
+                  dotColor: Colors.grey,
+                  activeDotColor: Colors.blue,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 16,
+            left: 0,
+            right: 0,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  onLastPage
+                      ? GestureDetector(
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            child: Text("Done"),
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.circular(size.height * 0.01),
+                                color: Colors.red),
+                          ),
+                          onTap: () {
+                            // Add your logic for when the user is done here
+                          },
+                        )
+                      : GestureDetector(
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            child: Text("Next"),
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.circular(size.height * 0.01),
+                                color: Colors.red),
+                          ),
+                          onTap: () {
+                            controller.nextPage(
+                                duration: Duration(milliseconds: 500),
+                                curve: Curves.easeIn);
+                          },
+                        ),
+                  GestureDetector(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      child: Text("Back"),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(size.height * 0.01),
+                          color: Colors.deepOrangeAccent),
+                    ),
+                    onTap: () {
+                      controller.previousPage(
+                          duration: Duration(milliseconds: 500),
+                          curve: Curves.easeIn);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget AlgoPAD_state_display() {

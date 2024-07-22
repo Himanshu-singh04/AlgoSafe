@@ -52,6 +52,7 @@ dependencies:
   file_picker: ^8.0.5
   lottie: ^3.1.2
   curved_navigation_bar: ^1.0.6
+  smooth_page_indicator: ^1.2.0+3
 
 dev_dependencies:
   flutter_test:

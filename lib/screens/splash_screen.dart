@@ -12,15 +12,29 @@ class splash_screen extends StatefulWidget {
 }
 
 // ignore: camel_case_types
-class _splash_screenState extends State<splash_screen> { 
+class _splash_screenState extends State<splash_screen> {
+  // double progress = 0.0;
+
   @override
   void initState() {
     super.initState();
     _navigatetoHome();
+    // _simulateProgress();
   }
 
+  // void _simulateProgress() {
+  //   Future.delayed(Duration(milliseconds: 70), () {
+  //     setState(() {
+  //       progress += 0.02;
+  //       if (progress < 1.0) {
+  //         _simulateProgress();
+  //       }
+  //     });
+  //   });
+  // }
+
   _navigatetoHome() async {
-    await Future.delayed(const Duration(milliseconds: 4000), (){});
+    await Future.delayed(const Duration(milliseconds: 4000), () {});
     // ignore: use_build_context_synchronously
     Navigator.of(context).pushReplacement(_createRoute());
   }
@@ -28,33 +42,56 @@ class _splash_screenState extends State<splash_screen> {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: Colors.white,
-        body: Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(begin: Alignment.topRight,end: Alignment.bottomRight,colors: [CustomColors.teal,CustomColors.gold,CustomColors.mainColor_3])
-          ),
-          child: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-              Center(child: Image.asset("assets/images/Algofet primary subtext.png",height: size.height*0.6,width: size.width*0.8)),
-              SizedBox(
-                height: size.height * 0.25,
-                width: size.width * 0.5,
-                child: Lottie.asset("assets/gifs/drone_flying.json")),
-              Center(child: Text("AlgoSAFE",style: TextStyle(fontSize: size.height*0.05),)),
-              
-            ],),
-          ),
-        )
-      ),
+          backgroundColor: Colors.white,
+          body: Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomRight,
+                    colors: [CustomColors.gold, CustomColors.mainColor_1])),
+            child: Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Center(
+                      child: Image.asset(
+                          "assets/images/Algofet primary subtext.png",
+                          height: size.height * 0.6,
+                          width: size.width * 0.8)),
+                  SizedBox(
+                      height: size.height * 0.25,
+                      width: size.width * 0.5,
+                      child: Lottie.asset("assets/gifs/drone_flying.json")),
+                  // Padding(
+                  //   padding: const EdgeInsets.all(8.0),
+                  //   child: Container(
+                  //     decoration: BoxDecoration(
+                  //       borderRadius: BorderRadius.circular(size.height * 0.01),
+                  //       color: CustomColors.mainColor_1,
+                  //     ),
+                  //     width: size.width * 0.9,
+                  //     height: size.height * 0.01,
+                  //     child: LinearProgressIndicator(
+                  //       value: progress,
+                  //     ),
+                  //   ),
+                  // ),
+                  Center(
+                      child: Text(
+                    "AlgoSAFE",
+                    style: TextStyle(fontSize: size.height * 0.05),
+                  )),
+                ],
+              ),
+            ),
+          )),
     );
   }
 }
