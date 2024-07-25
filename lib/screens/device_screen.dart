@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:lottie/lottie.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../widgets/service_tile.dart';
 import '../widgets/characteristic_tile.dart';
 import '../widgets/descriptor_tile.dart';
@@ -35,6 +34,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
   var product_state = 0;
   final controller = PageController(viewportFraction: 1, keepPage: true);
   bool onLastPage = false;
+  int currentStep = 0;
 
   late StreamSubscription<BluetoothConnectionState>
       connection_state_subscription;
@@ -302,114 +302,114 @@ class _DeviceScreenState extends State<DeviceScreen> {
     );
   }
 
-  Widget BMS_write_dialog() {
-    final Size size = MediaQuery.of(context).size;
+  // Widget BMS_write_dialog() {
+  //   final Size size = MediaQuery.of(context).size;
 
-    return Dialog(
-      child: Stack(
-        children: [
-          PageView(
-            onPageChanged: (index) {
-              setState(() {
-                onLastPage = (index == 2);
-              });
-            },
-            controller: controller, // Use the controller here
-            children: [
-              Container(
-                color: Colors.white,
-              ),
-              Container(
-                color: Colors.blue,
-              ),
-              Container(
-                color: Colors.green,
-              ),
-            ],
-          ),
-          Positioned(
-            bottom: 80, // Position the indicator slightly above the buttons
-            left: 0,
-            right: 0,
-            child: Container(
-              alignment: Alignment.center,
-              child: SmoothPageIndicator(
-                controller: controller,
-                count: 3,
-                effect: WormEffect(
-                  dotHeight: 12,
-                  dotWidth: 12,
-                  spacing: 8,
-                  dotColor: Colors.grey,
-                  activeDotColor: Colors.blue,
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 16,
-            left: 0,
-            right: 0,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  onLastPage
-                      ? GestureDetector(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                            child: Text("Done"),
-                            decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.circular(size.height * 0.01),
-                                color: Colors.red),
-                          ),
-                          onTap: () {
-                            // Add your logic for when the user is done here
-                          },
-                        )
-                      : GestureDetector(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                            child: Text("Next"),
-                            decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.circular(size.height * 0.01),
-                                color: Colors.red),
-                          ),
-                          onTap: () {
-                            controller.nextPage(
-                                duration: Duration(milliseconds: 500),
-                                curve: Curves.easeIn);
-                          },
-                        ),
-                  GestureDetector(
-                    child: Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                      child: Text("Back"),
-                      decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(size.height * 0.01),
-                          color: Colors.deepOrangeAccent),
-                    ),
-                    onTap: () {
-                      controller.previousPage(
-                          duration: Duration(milliseconds: 500),
-                          curve: Curves.easeIn);
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  //   return Dialog(
+  //     child: Stack(
+  //       children: [
+  //         PageView(
+  //           onPageChanged: (index) {
+  //             setState(() {
+  //               onLastPage = (index == 2);
+  //             });
+  //           },
+  //           controller: controller, // Use the controller here
+  //           children: [
+  //             Container(
+  //               color: Colors.white,
+  //             ),
+  //             Container(
+  //               color: Colors.blue,
+  //             ),
+  //             Container(
+  //               color: Colors.green,
+  //             ),
+  //           ],
+  //         ),
+  //         Positioned(
+  //           bottom: 80, // Position the indicator slightly above the buttons
+  //           left: 0,
+  //           right: 0,
+  //           child: Container(
+  //             alignment: Alignment.center,
+  //             child: SmoothPageIndicator(
+  //               controller: controller,
+  //               count: 3,
+  //               effect: WormEffect(
+  //                 dotHeight: 12,
+  //                 dotWidth: 12,
+  //                 spacing: 8,
+  //                 dotColor: Colors.grey,
+  //                 activeDotColor: Colors.blue,
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //         Positioned(
+  //           bottom: 16,
+  //           left: 0,
+  //           right: 0,
+  //           child: Padding(
+  //             padding: const EdgeInsets.symmetric(horizontal: 16.0),
+  //             child: Row(
+  //               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //               children: [
+  //                 onLastPage
+  //                     ? GestureDetector(
+  //                         child: Container(
+  //                           padding: EdgeInsets.symmetric(
+  //                               vertical: 10, horizontal: 20),
+  //                           child: Text("Done"),
+  //                           decoration: BoxDecoration(
+  //                               borderRadius:
+  //                                   BorderRadius.circular(size.height * 0.01),
+  //                               color: Colors.red),
+  //                         ),
+  //                         onTap: () {
+  //                           // Add your logic for when the user is done here
+  //                         },
+  //                       )
+  //                     : GestureDetector(
+  //                         child: Container(
+  //                           padding: EdgeInsets.symmetric(
+  //                               vertical: 10, horizontal: 20),
+  //                           child: Text("Next"),
+  //                           decoration: BoxDecoration(
+  //                               borderRadius:
+  //                                   BorderRadius.circular(size.height * 0.01),
+  //                               color: Colors.red),
+  //                         ),
+  //                         onTap: () {
+  //                           controller.nextPage(
+  //                               duration: Duration(milliseconds: 500),
+  //                               curve: Curves.easeIn);
+  //                         },
+  //                       ),
+  //                 GestureDetector(
+  //                   child: Container(
+  //                     padding:
+  //                         EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+  //                     child: Text("Back"),
+  //                     decoration: BoxDecoration(
+  //                         borderRadius:
+  //                             BorderRadius.circular(size.height * 0.01),
+  //                         color: Colors.deepOrangeAccent),
+  //                   ),
+  //                   onTap: () {
+  //                     controller.previousPage(
+  //                         duration: Duration(milliseconds: 500),
+  //                         curve: Curves.easeIn);
+  //                   },
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget AlgoPAD_state_display() {
     Widget temp = AlgoPAD_idle_widget();
@@ -517,8 +517,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
   Map<String, List<String>> drop_down_items = {
     // "Battery_cell_nos": ["2", "4", "6", "8", "10", "12", "14", "16"],
-    "Charging_type": ["Fast", "Balance", "Storage"],
-    "Cell_Chemistry": ["1", "2", "3", "4"],
+    // "Charging_type": ["1", "2", "3"],
+    // "Cell_Chemistry": ["1", "2", "3", "4"],
     "Algox_Cell_Nos": ["2", "4", "6", "8", "10", "12", "14", "16"],
   };
 
@@ -792,30 +792,204 @@ class _DeviceScreenState extends State<DeviceScreen> {
   //   );
   // }
 
-final AlgoX_form_key = GlobalKey<FormState>();
-int currentStep = 0;
-List<String> characteristics = [
-  "Algox_Cell_Nos",
-  "Algox_Current",
-  "Charging_type",
-  "Cell_Chemistry",
-  "Start_Charging"
-];
+  final AlgoX_form_key = GlobalKey<FormState>();
+  List<String> characteristics = [
+    "Algox_Cell_Nos",
+    "Algox_Current",
+    "Charging_type",
+    "Cell_Chemistry",
+    "Start_Charging"
+  ];
 
-  Map<String, int> cellChemistryMapping = {
-  'LiPo': 1,
-  'LiIon': 2,
-  'LiHv': 3,
-  'LiFe': 4,
-};
+  Widget buildChargingTypeDropdown() {
+    final Size size = MediaQuery.of(context).size;
 
-Map<String, int> chargingTypeMapping = {
-  'Fast Charge': 1,
-  'Balance Charge': 2,
-  'Storage Charge': 3,
-};
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(size.height * 0.01),
+        color: CustomColors.mainColor_3,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: DropdownButtonFormField<String>(
+                value: _getChargingTypeValue(),
+                onChanged: (new_value) {
+                  setState(() {
+                    String mappedValue = '';
+                    switch (new_value) {
+                      case "Fast Charge":
+                        mappedValue = '1';
+                        break;
+                      case "Balance Charge":
+                        mappedValue = '2';
+                        break;
+                      case "Storage Charge":
+                        mappedValue = '3';
+                        break;
+                    }
+                    BMS_write_controller["Charging_type"]?.text = mappedValue;
+                  });
+                },
+                items: ["Fast Charge", "Balance Charge", "Storage Charge"]
+                    .map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(
+                      value,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
+                }).toList(),
+                decoration: InputDecoration(
+                  labelText: "Charging Type",
+                  labelStyle: TextStyle(color: Colors.white),
+                  border: InputBorder.none,
+                ),
+                iconEnabledColor: Colors.white,
+                dropdownColor: CustomColors.mainColor_3,
+                style: TextStyle(color: Colors.white),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select Charging Type';
+                  }
+                  return null;
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-void showAlgoXConfigDialog() {
+  Widget buildCellChemistryDropdown() {
+    final Size size = MediaQuery.of(context).size;
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(size.height * 0.01),
+        color: CustomColors.mainColor_3,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: DropdownButtonFormField<String>(
+                value: _getCellChemistryValue(),
+                onChanged: (new_value) {
+                  setState(() {
+                    String mappedValue = '';
+                    switch (new_value) {
+                      case "LiPo":
+                        mappedValue = '1';
+                        break;
+                      case "LiIon":
+                        mappedValue = '2';
+                        break;
+                      case "LiHv":
+                        mappedValue = '3';
+                        break;
+                      case "LiFe":
+                        mappedValue = '4';
+                        break;
+                    }
+                    BMS_write_controller["Cell_Chemistry"]?.text = mappedValue;
+                  });
+                },
+                items: ["LiPo", "LiIon", "LiHv", "LiFe"].map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(
+                      value,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
+                }).toList(),
+                decoration: InputDecoration(
+                  labelText: "Cell Chemistry",
+                  labelStyle: TextStyle(color: Colors.white),
+                  border: InputBorder.none,
+                ),
+                iconEnabledColor: Colors.white,
+                dropdownColor: CustomColors.mainColor_3,
+                style: TextStyle(color: Colors.white),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select Cell Chemistry';
+                  }
+                  return null;
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String? _getChargingTypeValue() {
+    final textValue = BMS_write_controller["Charging_type"]?.text;
+    switch (textValue) {
+      case '1':
+        return "Fast Charge";
+      case '2':
+        return "Balance Charge";
+      case '3':
+        return "Storage Charge";
+      default:
+        return null;
+    }
+  }
+
+  String? _getCellChemistryValue() {
+    final textValue = BMS_write_controller["Cell_Chemistry"]?.text;
+    switch (textValue) {
+      case '1':
+        return "LiPo";
+      case '2':
+        return "LiIon";
+      case '3':
+        return "LiHv";
+      case '4':
+        return "LiFe";
+      default:
+        return null;
+    }
+  }
+
+  String _getChargingTypeLabel(String? value) {
+    switch (value) {
+      case '1':
+        return 'Fast Charge';
+      case '2':
+        return 'Balance Charge';
+      case '3':
+        return 'Storage Charge';
+      default:
+        return 'Not Set';
+    }
+  }
+
+  String _getCellChemistryLabel(String? value) {
+    switch (value) {
+      case '1':
+        return 'LiPo';
+      case '2':
+        return 'LiIon';
+      case '3':
+        return 'LiHv';
+      case '4':
+        return 'LiFe';
+      default:
+        return 'Not Set';
+    }
+  }
+
+  void showAlgoXConfigDialog() {
   showDialog(
     context: context,
     barrierDismissible: false,
@@ -830,7 +1004,10 @@ void showAlgoXConfigDialog() {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    _buildStepContent(characteristics[currentStep]),
+                    if (currentStep < characteristics.length - 1)
+                      _buildStepContent(characteristics[currentStep])
+                    else
+                      _buildSummaryContent(),
                     SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -844,22 +1021,48 @@ void showAlgoXConfigDialog() {
                             },
                             child: Text("Back"),
                           ),
+                        if (currentStep == 0)
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text("Back"),
+                          ),
                         ElevatedButton(
                           onPressed: () {
-                            if (AlgoX_form_key.currentState!.validate()) {
-                              _sendCharacteristicValue(characteristics[currentStep]);
-                              if (currentStep < characteristics.length - 1) {
-                                setState(() {
-                                  currentStep++;
-                                });
-                              } else {
-                                Navigator.of(context).pop();
-                                // All configurations completed
-                                AlgoX_on_send_all_pressed();
+                            if (currentStep < characteristics.length - 1) {
+                              if (AlgoX_form_key.currentState!.validate()) {
+                                try {
+                                  _sendCharacteristicValue(
+                                      characteristics[currentStep]);
+                                  if (currentStep <
+                                      characteristics.length - 1) {
+                                    setState(() {
+                                      currentStep++;
+                                    });
+                                  }
+                                } catch (e) {
+                                  print("Error occurred: $e");
+                                }
+                              }
+                            } else {
+                              // On the last step, show summary and perform final actions
+                              if (AlgoX_form_key.currentState!.validate()) {
+                                try {
+                                  _sendCharacteristicValue(
+                                      characteristics[currentStep]);
+                                  Navigator.of(context).pop();
+                                  // AlgoX_on_send_all_pressed();
+                                } catch (e) {
+                                  print("Error occurred: $e");
+                                }
                               }
                             }
                           },
-                          child: Text(currentStep == characteristics.length - 1 ? "Finish" : "Next"),
+                          child: Text(
+                              currentStep == characteristics.length - 1
+                                  ? "Finish"
+                                  : "Next"),
                         ),
                       ],
                     ),
@@ -874,54 +1077,129 @@ void showAlgoXConfigDialog() {
   );
 }
 
+
+  Widget _buildSummaryContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Summary",
+          style: TextStyle(fontSize: 18, color: Colors.white),
+        ),
+        SizedBox(height: 10),
+        for (var characteristic in characteristics)
+          if (characteristic != "Start_Charging")
+            Text(
+              '$characteristic: ${_getSummaryValue(characteristic)}',
+              style: TextStyle(color: Colors.black),
+            ),
+        SizedBox(height: 10),
+        buildStartChargingWidget(),
+      ],
+    );
+  }
+
+  String _getSummaryValue(String characteristic) {
+    switch (characteristic) {
+      case "Charging_type":
+        return _getChargingTypeLabel(
+            BMS_write_controller[characteristic]?.text);
+      case "Cell_Chemistry":
+        return _getCellChemistryLabel(
+            BMS_write_controller[characteristic]?.text);
+      default:
+        return BMS_write_controller[characteristic]?.text ?? 'Not Set';
+    }
+  }
+
+  bool _isOn = false;
+
+  Widget buildStartChargingWidget() {
+    final Size size = MediaQuery.of(context).size;
+
+    return StatefulBuilder(builder: (context, setState) {
+      return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(size.height * 0.01),
+          color: Colors.greenAccent,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(width: size.width * 0.01),
+            Text("OFF: "),
+            Switch(
+              value: _isOn,
+              onChanged: (bool value) {
+                setState(() {
+                  _isOn = value;
+                });
+                _sendPowerState(
+                    value); // Call your function to handle the power state
+              },
+            ),
+            Text(" :ON"),
+            SizedBox(width: size.width * 0.01),
+          ],
+        ),
+      );
+    },
+
+    );
+  }
+
   void _sendCharacteristicValue(String characteristic) async {
-  String value = '';
+    String value = '';
 
-  switch (characteristic) {
-    case "Algox_Cell_Nos":
-      value = BMS_write_controller[characteristic]?.text ?? '';
-      break;
-    case "Algox_Current":
-      value = BMS_write_controller[characteristic]?.text ?? '';
-      break;
-    case "Charging_type":
-      String selectedType = BMS_write_controller[characteristic]?.text ?? '';
-      value = chargingTypeMapping[selectedType]?.toString() ?? '';
-      break;
-    case "Cell_Chemistry":
-      String selectedChemistry = BMS_write_controller[characteristic]?.text ?? '';
-      value = cellChemistryMapping[selectedChemistry]?.toString() ?? '';
-      break;
-    case "Start_Charging":
-      value = BMS_write_controller[characteristic]?.text ?? '';
-      break;
-    default:
-      print("Unknown characteristic: $characteristic");
+    switch (characteristic) {
+      case "Algox_Cell_Nos":
+        value = BMS_write_controller[characteristic]?.text ?? '';
+        break;
+      case "Algox_Current":
+        value = BMS_write_controller[characteristic]?.text ?? '';
+        break;
+      case "Charging_type":
+        value = BMS_write_controller[characteristic]?.text ?? '';
+        break;
+      case "Cell_Chemistry":
+        value = BMS_write_controller[characteristic]?.text ?? '';
+        break;
+      case "Start_Charging":
+        value = BMS_write_controller[characteristic]?.text ?? '';
+        break;
+      default:
+        print("Unknown characteristic: $characteristic");
+        return;
+    }
+
+    // Ensure value is not empty
+    if (value.isEmpty) {
+      print("No value set for $characteristic");
       return;
+    }
+
+    // Call the on_write_pressed function
+    await on_write_pressed(characteristic);
+
+    print("Sent value '$value' for $characteristic");
   }
 
-  // Call the on_write_pressed function
-  await on_write_pressed(characteristic);
-
-  print("Sent value '$value' for $characteristic");
-}
-
-Widget _buildStepContent(String characteristic) {
-  switch (characteristic) {
-    case "Algox_Cell_Nos":
-      return build_drop_down_for_characteristic(characteristic);
-    case "Algox_Current":
-      return build_slider_for_characteristic(characteristic);
-    case "Charging_type":
-      return build_drop_down_for_characteristic(characteristic);
-    case "Cell_Chemistry":
-      return build_drop_down_for_characteristic(characteristic);
-    case "Start_Charging":
-      return build_toggle_for_characteristic(characteristic);
-    default:
-      return Container();
+  Widget _buildStepContent(String characteristic) {
+    switch (characteristic) {
+      case "Algox_Cell_Nos":
+        return build_drop_down_for_characteristic(characteristic);
+      case "Algox_Current":
+        return build_text_field_for_characteristic(characteristic);
+      case "Charging_type":
+        return buildChargingTypeDropdown();
+      case "Cell_Chemistry":
+        return buildCellChemistryDropdown();
+      case "Start_Charging":
+        return build_toggle_for_characteristic(characteristic);
+      default:
+        return Container();
+    }
   }
-}
 
   Widget build_text_field_for_characteristic(String key,
       {bool is_required = false}) {
@@ -968,64 +1246,64 @@ Widget _buildStepContent(String characteristic) {
     );
   }
 
- Widget build_drop_down_for_characteristic(String key) {
-  final Size size = MediaQuery.of(context).size;
+  Widget build_drop_down_for_characteristic(String key) {
+    final Size size = MediaQuery.of(context).size;
 
-  return Container(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(size.height * 0.01),
-      color: CustomColors.mainColor_3,
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: DropdownButtonFormField<String>(
-              value: BMS_write_controller[key]?.text.isEmpty == true
-                  ? null
-                  : BMS_write_controller[key]?.text,
-              onChanged: (new_value) {
-                setState(() {
-                  BMS_write_controller[key]?.text = new_value!;
-                });
-              },
-              items: drop_down_items[key]?.map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(
-                    value,
-                    style: TextStyle(color: Colors.white),
-                  ),
-                );
-              }).toList(),
-              decoration: InputDecoration(
-                labelText: key.replaceAll('_', ' '),
-                labelStyle: TextStyle(color: Colors.white),
-                border: InputBorder.none,
-              ),
-              iconEnabledColor: Colors.white,
-              dropdownColor: CustomColors.mainColor_3,
-              style: TextStyle(color: Colors.white),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please select $key';
-                }
-                return null;
-              },
-            ),
-          ),
-          // SizedBox(width: 8),
-          // IconButton(
-          //   color: Colors.white,
-          //   onPressed: () => on_write_pressed(key),
-          //   icon: Icon(Icons.save),
-          // ),
-        ],
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(size.height * 0.01),
+        color: CustomColors.mainColor_3,
       ),
-    ),
-  );
-}
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: DropdownButtonFormField<String>(
+                value: BMS_write_controller[key]?.text.isEmpty == true
+                    ? null
+                    : BMS_write_controller[key]?.text,
+                onChanged: (new_value) {
+                  setState(() {
+                    BMS_write_controller[key]?.text = new_value!;
+                  });
+                },
+                items: drop_down_items[key]?.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(
+                      value,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
+                }).toList(),
+                decoration: InputDecoration(
+                  labelText: key.replaceAll('_', ' '),
+                  labelStyle: TextStyle(color: Colors.white),
+                  border: InputBorder.none,
+                ),
+                iconEnabledColor: Colors.white,
+                dropdownColor: CustomColors.mainColor_3,
+                style: TextStyle(color: Colors.white),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select $key';
+                  }
+                  return null;
+                },
+              ),
+            ),
+            // SizedBox(width: 8),
+            // IconButton(
+            //   color: Colors.white,
+            //   onPressed: () => on_write_pressed(key),
+            //   icon: Icon(Icons.save),
+            // ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget build_slider_for_characteristic(String key) {
     final Size size = MediaQuery.of(context).size;
@@ -1054,8 +1332,8 @@ Widget _buildStepContent(String characteristic) {
                         icon: Icon(Icons.remove),
                         onPressed: () {
                           setState(() {
-                            double new_value = slider_values[key]! - 1;
-                            if (new_value >= slider_min_max[key]![0]) {
+                            double new_value = (slider_values[key] ?? 0) - 1;
+                            if (new_value >= (slider_min_max[key]?[0] ?? 0)) {
                               slider_values[key] = new_value;
                               BMS_write_controller[key]?.text =
                                   new_value.toStringAsFixed(1);
@@ -1065,7 +1343,7 @@ Widget _buildStepContent(String characteristic) {
                       ),
                       Spacer(),
                       Container(
-                        width: size.width * 0.65,
+                        width: size.width * 0.4,
                         child: Slider(
                           activeColor: Colors.blueAccent,
                           value: slider_values[key] ?? 0.0,
@@ -1089,8 +1367,8 @@ Widget _buildStepContent(String characteristic) {
                         icon: Icon(Icons.add),
                         onPressed: () {
                           setState(() {
-                            double new_value = slider_values[key]! + 1;
-                            if (new_value <= slider_min_max[key]![1]) {
+                            double new_value = (slider_values[key] ?? 0) + 1;
+                            if (new_value <= (slider_min_max[key]?[1] ?? 100)) {
                               slider_values[key] = new_value;
                               BMS_write_controller[key]?.text =
                                   new_value.toStringAsFixed(1);
@@ -1103,12 +1381,6 @@ Widget _buildStepContent(String characteristic) {
                 ],
               ),
             ),
-            // SizedBox(width: 8),
-            // IconButton(
-            //   color: Colors.white,
-            //   onPressed: () => on_write_pressed(key),
-            //   icon: Icon(Icons.save),
-            // ),
           ],
         ),
       ),
@@ -1148,12 +1420,6 @@ Widget _buildStepContent(String characteristic) {
                 ],
               ),
             ),
-            // SizedBox(width: 8),
-            // IconButton(
-            //   color: Colors.white,
-            //   onPressed: () => on_write_pressed(key),
-            //   icon: Icon(Icons.save),
-            // ),
           ],
         ),
       ),
@@ -4081,7 +4347,6 @@ Widget _buildStepContent(String characteristic) {
     );
   }
 
-  // bool _isOn = false;
   Future<void> _sendPowerState(bool isOn) async {
     final String characteristicUuid = '9027cc8b-da21-4c8a-95c2-44fc448834f4';
     final String value = isOn ? '1' : '0';
