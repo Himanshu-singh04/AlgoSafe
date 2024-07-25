@@ -278,13 +278,31 @@ class _DeviceScreenState extends State<DeviceScreen> {
         break;
 
       default:
-        temp = BMS_idle_widget();
+        temp = loading();
         break;
     }
     return temp;
   }
 
-  Widget BMS_write_dialog(){
+  Widget loading() {
+    return Dialog(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text("Loading Data...."),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget BMS_write_dialog() {
     final Size size = MediaQuery.of(context).size;
 
     return Dialog(
@@ -370,10 +388,12 @@ class _DeviceScreenState extends State<DeviceScreen> {
                         ),
                   GestureDetector(
                     child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                       child: Text("Back"),
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(size.height * 0.01),
+                          borderRadius:
+                              BorderRadius.circular(size.height * 0.01),
                           color: Colors.deepOrangeAccent),
                     ),
                     onTap: () {
@@ -496,9 +516,9 @@ class _DeviceScreenState extends State<DeviceScreen> {
   }
 
   Map<String, List<String>> drop_down_items = {
-    "Battery_cell_nos": ["2", "4", "6", "8", "10", "12", "14", "16"],
-    "Charging_type": ["Fast Charge", "Balance Charge", "Storage Charge"],
-    "Cell_Chemistry": ["LiPo", "LiIon", "LiHv", "LiFe"],
+    // "Battery_cell_nos": ["2", "4", "6", "8", "10", "12", "14", "16"],
+    "Charging_type": ["Fast", "Balance", "Storage"],
+    "Cell_Chemistry": ["1", "2", "3", "4"],
     "Algox_Cell_Nos": ["2", "4", "6", "8", "10", "12", "14", "16"],
   };
 
@@ -687,90 +707,221 @@ class _DeviceScreenState extends State<DeviceScreen> {
     );
   }
 
-  final AlgoX_form_key = GlobalKey<FormState>();
+  // final AlgoX_form_key = GlobalKey<FormState>();
 
-  Widget AlgoX_write_screen() {
-    final Size size = MediaQuery.of(context).size;
-    return Expanded(
-      child: Form(
-        key: AlgoX_form_key,
-        child: ListView(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(size.height * 0.01),
-                color: CustomColors.mainColor_1,
-              ),
-              child: ExpansionTile(
-                title: Text(
-                  'Compulsory Fields',
-                  style: TextStyle(color: Colors.white),
+  // Widget AlgoX_write_screen() {
+  //   final Size size = MediaQuery.of(context).size;
+  //   return Expanded(
+  //     child: Form(
+  //       key: AlgoX_form_key,
+  //       child: ListView(
+  //         children: [
+  //           Container(
+  //             decoration: BoxDecoration(
+  //               borderRadius: BorderRadius.circular(size.height * 0.01),
+  //               color: CustomColors.mainColor_1,
+  //             ),
+  //             child: ExpansionTile(
+  //               title: Text(
+  //                 'Compulsory Fields',
+  //                 style: TextStyle(color: Colors.white),
+  //               ),
+  //               initiallyExpanded: false,
+  //               children: [
+  //                 // Padding(
+  //                 //   padding: const EdgeInsets.all(4.0),
+  //                 //   child: build_drop_down_for_characteristic("Charging_type"),
+  //                 // ),
+  //                 // SizedBox(height: size.height * 0.01),
+  //                 // Padding(
+  //                 //   padding: const EdgeInsets.all(4.0),
+  //                 //   child: build_drop_down_for_characteristic("Cell_Chemistry"),
+  //                 // ),
+  //                 // SizedBox(height: size.height * 0.01),
+  //                 Padding(
+  //                   padding: const EdgeInsets.all(4.0),
+  //                   child: build_drop_down_for_characteristic("Algox_Cell_Nos"),
+  //                 ),
+  //                 SizedBox(height: size.height * 0.01),
+  //               ],
+  //             ),
+  //           ),
+  //           SizedBox(height: size.height * 0.02),
+  //           Container(
+  //             decoration: BoxDecoration(
+  //               borderRadius: BorderRadius.circular(size.height * 0.01),
+  //               color: CustomColors.mainColor_1,
+  //             ),
+  //             child: ExpansionTile(
+  //               title: Text(
+  //                 'Default Values',
+  //                 style: TextStyle(color: Colors.white),
+  //               ),
+  //               initiallyExpanded: false,
+  //               children: [
+  //                 Padding(
+  //                   padding: const EdgeInsets.all(4.0),
+  //                   child: build_slider_for_characteristic("Algox_Current"),
+  //                 ),
+  //                 SizedBox(height: size.height * 0.01),
+  //                 // Padding(
+  //                 //   padding: const EdgeInsets.all(4.0),
+  //                 //   child: build_toggle_for_characteristic("Start_Charging"),
+  //                 // ),
+  //                 // SizedBox(height: size.height * 0.01),
+  //               ],
+  //             ),
+  //           ),
+  //           SizedBox(height: size.height * 0.02),
+  //           ElevatedButton(
+  //             style: ElevatedButton.styleFrom(
+  //                 backgroundColor: CustomColors.mainColor_1),
+  //             onPressed: () {
+  //               if (AlgoX_form_key.currentState!.validate()) {
+  //                 AlgoX_on_send_all_pressed();
+  //               }
+  //             },
+  //             child: Text(
+  //               "Save Configuration",
+  //               style: TextStyle(color: Colors.white),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+final AlgoX_form_key = GlobalKey<FormState>();
+int currentStep = 0;
+List<String> characteristics = [
+  "Algox_Cell_Nos",
+  "Algox_Current",
+  "Charging_type",
+  "Cell_Chemistry",
+  "Start_Charging"
+];
+
+  Map<String, int> cellChemistryMapping = {
+  'LiPo': 1,
+  'LiIon': 2,
+  'LiHv': 3,
+  'LiFe': 4,
+};
+
+Map<String, int> chargingTypeMapping = {
+  'Fast Charge': 1,
+  'Balance Charge': 2,
+  'Storage Charge': 3,
+};
+
+void showAlgoXConfigDialog() {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: Text("AlgoX Configuration"),
+            content: Form(
+              key: AlgoX_form_key,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildStepContent(characteristics[currentStep]),
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        if (currentStep > 0)
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                currentStep--;
+                              });
+                            },
+                            child: Text("Back"),
+                          ),
+                        ElevatedButton(
+                          onPressed: () {
+                            if (AlgoX_form_key.currentState!.validate()) {
+                              _sendCharacteristicValue(characteristics[currentStep]);
+                              if (currentStep < characteristics.length - 1) {
+                                setState(() {
+                                  currentStep++;
+                                });
+                              } else {
+                                Navigator.of(context).pop();
+                                // All configurations completed
+                                AlgoX_on_send_all_pressed();
+                              }
+                            }
+                          },
+                          child: Text(currentStep == characteristics.length - 1 ? "Finish" : "Next"),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                initiallyExpanded: false,
-                children: [
-                  // Padding(
-                  //   padding: const EdgeInsets.all(4.0),
-                  //   child: build_drop_down_for_characteristic("Charging_type"),
-                  // ),
-                  // SizedBox(height: size.height * 0.01),
-                  // Padding(
-                  //   padding: const EdgeInsets.all(4.0),
-                  //   child: build_drop_down_for_characteristic("Cell_Chemistry"),
-                  // ),
-                  // SizedBox(height: size.height * 0.01),
-                  Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: build_drop_down_for_characteristic("Algox_Cell_Nos"),
-                  ),
-                  SizedBox(height: size.height * 0.01),
-                ],
               ),
             ),
-            SizedBox(height: size.height * 0.02),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(size.height * 0.01),
-                color: CustomColors.mainColor_1,
-              ),
-              child: ExpansionTile(
-                title: Text(
-                  'Default Values',
-                  style: TextStyle(color: Colors.white),
-                ),
-                initiallyExpanded: false,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: build_slider_for_characteristic("Algox_Current"),
-                  ),
-                  SizedBox(height: size.height * 0.01),
-                  // Padding(
-                  //   padding: const EdgeInsets.all(4.0),
-                  //   child: build_toggle_for_characteristic("Start_Charging"),
-                  // ),
-                  // SizedBox(height: size.height * 0.01),
-                ],
-              ),
-            ),
-            SizedBox(height: size.height * 0.02),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: CustomColors.mainColor_1),
-              onPressed: () {
-                if (AlgoX_form_key.currentState!.validate()) {
-                  AlgoX_on_send_all_pressed();
-                }
-              },
-              child: Text(
-                "Save Configuration",
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+          );
+        },
+      );
+    },
+  );
+}
+
+  void _sendCharacteristicValue(String characteristic) async {
+  String value = '';
+
+  switch (characteristic) {
+    case "Algox_Cell_Nos":
+      value = BMS_write_controller[characteristic]?.text ?? '';
+      break;
+    case "Algox_Current":
+      value = BMS_write_controller[characteristic]?.text ?? '';
+      break;
+    case "Charging_type":
+      String selectedType = BMS_write_controller[characteristic]?.text ?? '';
+      value = chargingTypeMapping[selectedType]?.toString() ?? '';
+      break;
+    case "Cell_Chemistry":
+      String selectedChemistry = BMS_write_controller[characteristic]?.text ?? '';
+      value = cellChemistryMapping[selectedChemistry]?.toString() ?? '';
+      break;
+    case "Start_Charging":
+      value = BMS_write_controller[characteristic]?.text ?? '';
+      break;
+    default:
+      print("Unknown characteristic: $characteristic");
+      return;
   }
+
+  // Call the on_write_pressed function
+  await on_write_pressed(characteristic);
+
+  print("Sent value '$value' for $characteristic");
+}
+
+Widget _buildStepContent(String characteristic) {
+  switch (characteristic) {
+    case "Algox_Cell_Nos":
+      return build_drop_down_for_characteristic(characteristic);
+    case "Algox_Current":
+      return build_slider_for_characteristic(characteristic);
+    case "Charging_type":
+      return build_drop_down_for_characteristic(characteristic);
+    case "Cell_Chemistry":
+      return build_drop_down_for_characteristic(characteristic);
+    case "Start_Charging":
+      return build_toggle_for_characteristic(characteristic);
+    default:
+      return Container();
+  }
+}
 
   Widget build_text_field_for_characteristic(String key,
       {bool is_required = false}) {
@@ -817,64 +968,64 @@ class _DeviceScreenState extends State<DeviceScreen> {
     );
   }
 
-  Widget build_drop_down_for_characteristic(String key) {
-    final Size size = MediaQuery.of(context).size;
+ Widget build_drop_down_for_characteristic(String key) {
+  final Size size = MediaQuery.of(context).size;
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(size.height * 0.01),
-        color: CustomColors.mainColor_3,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            Expanded(
-              child: DropdownButtonFormField<String>(
-                value: BMS_write_controller[key]?.text.isEmpty == true
-                    ? null
-                    : BMS_write_controller[key]?.text,
-                onChanged: (new_value) {
-                  setState(() {
-                    BMS_write_controller[key]?.text = new_value!;
-                  });
-                },
-                items: drop_down_items[key]?.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(
-                      value,
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  );
-                }).toList(),
-                decoration: InputDecoration(
-                  labelText: key.replaceAll('_', ' '),
-                  labelStyle: TextStyle(color: Colors.white),
-                  border: InputBorder.none,
-                ),
-                iconEnabledColor: Colors.white,
-                dropdownColor: CustomColors.mainColor_3,
-                style: TextStyle(color: Colors.white),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select $key';
-                  }
-                  return null;
-                },
+  return Container(
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(size.height * 0.01),
+      color: CustomColors.mainColor_3,
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: DropdownButtonFormField<String>(
+              value: BMS_write_controller[key]?.text.isEmpty == true
+                  ? null
+                  : BMS_write_controller[key]?.text,
+              onChanged: (new_value) {
+                setState(() {
+                  BMS_write_controller[key]?.text = new_value!;
+                });
+              },
+              items: drop_down_items[key]?.map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(
+                    value,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                );
+              }).toList(),
+              decoration: InputDecoration(
+                labelText: key.replaceAll('_', ' '),
+                labelStyle: TextStyle(color: Colors.white),
+                border: InputBorder.none,
               ),
+              iconEnabledColor: Colors.white,
+              dropdownColor: CustomColors.mainColor_3,
+              style: TextStyle(color: Colors.white),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select $key';
+                }
+                return null;
+              },
             ),
-            // SizedBox(width: 8),
-            // IconButton(
-            //   color: Colors.white,
-            //   onPressed: () => on_write_pressed(key),
-            //   icon: Icon(Icons.save),
-            // ),
-          ],
-        ),
+          ),
+          // SizedBox(width: 8),
+          // IconButton(
+          //   color: Colors.white,
+          //   onPressed: () => on_write_pressed(key),
+          //   icon: Icon(Icons.save),
+          // ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget build_slider_for_characteristic(String key) {
     final Size size = MediaQuery.of(context).size;
@@ -1359,44 +1510,45 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   })),
         );
       default:
-        return Container(
-          height: size.height * 0.05,
-          color: Colors.blue,
-          child: Padding(
-              padding: const EdgeInsets.all(4),
-              child: TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0.0, end: 1.0),
-                  duration: Duration(seconds: 2),
-                  builder: (context, value, child) {
-                    return Opacity(
-                      opacity: value,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: size.width * 0.01,
-                          ),
-                          Icon(Icons.power_off),
-                          SizedBox(
-                            width: size.width * 0.01,
-                          ),
-                          Text(
-                            "MODE",
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          Spacer(),
-                          Text(
-                            "Device",
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          SizedBox(
-                            width: size.width * 0.01,
-                          ),
-                        ],
-                      ),
-                    );
-                  })),
-        );
+        return SizedBox.shrink();
+      // return Container(
+      //   height: size.height * 0.05,
+      //   color: Colors.blue,
+      //   child: Padding(
+      //       padding: const EdgeInsets.all(4),
+      //       child: TweenAnimationBuilder<double>(
+      //           tween: Tween<double>(begin: 0.0, end: 1.0),
+      //           duration: Duration(seconds: 2),
+      //           builder: (context, value, child) {
+      //             return Opacity(
+      //               opacity: value,
+      //               child: Row(
+      //                 mainAxisAlignment: MainAxisAlignment.center,
+      //                 children: [
+      //                   SizedBox(
+      //                     width: size.width * 0.01,
+      //                   ),
+      //                   Icon(Icons.power_off),
+      //                   SizedBox(
+      //                     width: size.width * 0.01,
+      //                   ),
+      //                   Text(
+      //                     "MODE",
+      //                     style: TextStyle(fontSize: 20),
+      //                   ),
+      //                   Spacer(),
+      //                   Text(
+      //                     "Device",
+      //                     style: TextStyle(fontSize: 20),
+      //                   ),
+      //                   SizedBox(
+      //                     width: size.width * 0.01,
+      //                   ),
+      //                 ],
+      //               ),
+      //             );
+      //           })),
+      // );
     }
   }
 
@@ -3806,7 +3958,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
     final Size size = MediaQuery.of(context).size;
     final List<Widget> read_write_screens = [
       AlgoX_charging_widget(),
-      AlgoX_write_screen()
+      // AlgoX_write_screen()
     ];
 
     return Scaffold(
@@ -3861,37 +4013,37 @@ class _DeviceScreenState extends State<DeviceScreen> {
                               SizedBox(
                                 width: size.width * 0.01,
                               ),
-                              Container(
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(
-                                        size.height * 0.01),
-                                    color: Colors.greenAccent),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                      width: size.width * 0.01,
-                                    ),
-                                    Text("OFF: "),
-                                    Switch(
-                                      value: _isOn,
-                                      onChanged: (bool value) {
-                                        setState(() {
-                                          _isOn = value;
-                                        });
-                                        _sendPowerState(value);
-                                      },
-                                    ),
-                                    Text(" :ON"),
-                                    SizedBox(
-                                      width: size.width * 0.01,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                width: size.width * 0.01,
-                              ),
+                              // Container(
+                              //   decoration: BoxDecoration(
+                              //       borderRadius: BorderRadius.circular(
+                              //           size.height * 0.01),
+                              //       color: Colors.greenAccent),
+                              //   child: Row(
+                              //     mainAxisAlignment: MainAxisAlignment.center,
+                              //     children: [
+                              //       SizedBox(
+                              //         width: size.width * 0.01,
+                              //       ),
+                              //       Text("OFF: "),
+                              //       Switch(
+                              //         value: _isOn,
+                              //         onChanged: (bool value) {
+                              //           setState(() {
+                              //             _isOn = value;
+                              //           });
+                              //           _sendPowerState(value);
+                              //         },
+                              //       ),
+                              //       Text(" :ON"),
+                              //       SizedBox(
+                              //         width: size.width * 0.01,
+                              //       ),
+                              //     ],
+                              //   ),
+                              // ),
+                              // SizedBox(
+                              //   width: size.width * 0.01,
+                              // ),
                             ],
                           ),
                         );
@@ -3912,18 +4064,24 @@ class _DeviceScreenState extends State<DeviceScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: AnimatedContainer(
-        duration: Duration(milliseconds: 300),
-        height: _isOn ? 0 : size.height * 0.075,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: AlgoX_bottom_navigation_bar(),
-        ),
+      // bottomNavigationBar: AnimatedContainer(
+      //   duration: Duration(milliseconds: 300),
+      //   height: _isOn ? 0 : size.height * 0.075,
+      //   child: Padding(
+      //     padding: const EdgeInsets.all(8.0),
+      //     child: AlgoX_bottom_navigation_bar(),
+      //   ),
+      // ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showAlgoXConfigDialog();
+        },
+        child: Text("Edit"),
       ),
     );
   }
 
-  bool _isOn = false;
+  // bool _isOn = false;
   Future<void> _sendPowerState(bool isOn) async {
     final String characteristicUuid = '9027cc8b-da21-4c8a-95c2-44fc448834f4';
     final String value = isOn ? '1' : '0';
