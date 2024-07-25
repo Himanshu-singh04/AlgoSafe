@@ -275,10 +275,28 @@ class _DeviceScreenState extends State<DeviceScreen> {
         break;
 
       default:
-        temp = BMS_idle_widget();
+        temp = loading();
         break;
     }
     return temp;
+  }
+
+  Widget loading() {
+    return Dialog(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text("Loading Data...."),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget AlgoPAD_state_display() {
@@ -1243,44 +1261,45 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   })),
         );
       default:
-        return Container(
-          height: size.height * 0.05,
-          color: Colors.blue,
-          child: Padding(
-              padding: const EdgeInsets.all(4),
-              child: TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0.0, end: 1.0),
-                  duration: Duration(seconds: 2),
-                  builder: (context, value, child) {
-                    return Opacity(
-                      opacity: value,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: size.width * 0.01,
-                          ),
-                          Icon(Icons.power_off),
-                          SizedBox(
-                            width: size.width * 0.01,
-                          ),
-                          Text(
-                            "MODE",
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          Spacer(),
-                          Text(
-                            "Device",
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          SizedBox(
-                            width: size.width * 0.01,
-                          ),
-                        ],
-                      ),
-                    );
-                  })),
-        );
+        return SizedBox.shrink();
+        // return Container(
+        //   height: size.height * 0.05,
+        //   color: Colors.blue,
+        //   child: Padding(
+        //       padding: const EdgeInsets.all(4),
+        //       child: TweenAnimationBuilder<double>(
+        //           tween: Tween<double>(begin: 0.0, end: 1.0),
+        //           duration: Duration(seconds: 2),
+        //           builder: (context, value, child) {
+        //             return Opacity(
+        //               opacity: value,
+        //               child: Row(
+        //                 mainAxisAlignment: MainAxisAlignment.center,
+        //                 children: [
+        //                   SizedBox(
+        //                     width: size.width * 0.01,
+        //                   ),
+        //                   Icon(Icons.power_off),
+        //                   SizedBox(
+        //                     width: size.width * 0.01,
+        //                   ),
+        //                   Text(
+        //                     "MODE",
+        //                     style: TextStyle(fontSize: 20),
+        //                   ),
+        //                   Spacer(),
+        //                   Text(
+        //                     "Device",
+        //                     style: TextStyle(fontSize: 20),
+        //                   ),
+        //                   SizedBox(
+        //                     width: size.width * 0.01,
+        //                   ),
+        //                 ],
+        //               ),
+        //             );
+        //           })),
+        // );
     }
   }
 
