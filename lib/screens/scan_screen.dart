@@ -2,10 +2,9 @@ import 'dart:async';
 
 import 'package:algo_safe/utils/colors.dart';
 import 'package:algo_safe/utils/snack_bar.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:lottie/lottie.dart';
 
 import 'device_screen.dart';
 import '../widgets/system_device_tile.dart';
@@ -110,7 +109,6 @@ class _ScanScreenState extends State<ScanScreen> {
   }
 
   Widget build_scan_button(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
 
     if (FlutterBluePlus.isScanningNow) {
       return Container(
@@ -119,12 +117,12 @@ class _ScanScreenState extends State<ScanScreen> {
           borderRadius:
               BorderRadius.circular(20), // Adjust the radius as needed
         ),
-        child: InkWell(
-          child: SizedBox(
-            height: size.height * 0.05,
-            child: Lottie.asset("assets/gifs/stop_scan.json"),
+        child: FloatingActionButton.extended(
+          backgroundColor: CustomColors.mainColor_1,
+          label: SizedBox(
+            child: Text("Stop Scanning",style: TextStyle(color: Colors.white),),
           ),
-          onTap: on_stop_pressed,
+          onPressed: on_stop_pressed,
         ),
       );
     } else {
@@ -134,11 +132,12 @@ class _ScanScreenState extends State<ScanScreen> {
           borderRadius:
               BorderRadius.circular(20), // Adjust the radius as needed
         ),
-        child: InkWell(
-          child: SizedBox(
-              height: size.height * 0.05,
-              child: Lottie.asset("assets/gifs/scan.json")),
-          onTap: on_scan_pressed,
+        child: FloatingActionButton.extended(
+          backgroundColor: CustomColors.mainColor_1,
+          label: SizedBox(
+              child: Text("Scan for Devices",style: TextStyle(color: Colors.white),),
+              ),
+          onPressed: on_scan_pressed,
         ),
       );
     }
@@ -185,12 +184,12 @@ class _ScanScreenState extends State<ScanScreen> {
             alignment: Alignment.topCenter,
             child: Text(
               "Hi, Drone Operator",
-              style: TextStyle(fontSize: size.width * 0.05),
+              style: TextStyle(fontSize: size.width * 0.075),
             )),
         Align(
             alignment: Alignment.topCenter,
             child: Text("Connect to AlgoFET Devices",
-                style: TextStyle(fontSize: size.width * 0.025))),
+                style: TextStyle(fontSize: size.width * 0.04))),
       ],
     );
   }
@@ -207,11 +206,11 @@ class _ScanScreenState extends State<ScanScreen> {
           Align(
               alignment: Alignment.topCenter,
               child: Text("Hi, Drone Operator",
-                  style: TextStyle(fontSize: size.width * 0.05))),
+                  style: TextStyle(fontSize: size.width * 0.075))),
           Align(
               alignment: Alignment.topCenter,
               child: Text("Connect to AlgoFET Devices",
-                  style: TextStyle(fontSize: size.width * 0.025))),
+                  style: TextStyle(fontSize: size.width * 0.04))),
           Expanded(
             child: ListView(
               children: <Widget>[
@@ -225,146 +224,141 @@ class _ScanScreenState extends State<ScanScreen> {
     );
   }
 
+  double x_offset = 0;
+  double y_offset = 0;
+  double scale_factor = 1;
+  bool is_drawer_open = false;
+
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
+
     return ScaffoldMessenger(
       key: Snackbar.snackBarKeyB,
-      child: Scaffold(
-          backgroundColor: Colors.white,
-          appBar: AppBar(
-              backgroundColor: Colors.white,
-              toolbarHeight: size.height * 0.05,
-              flexibleSpace: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 28, 0, 0),
-                child: Container(
-                  color: CustomColors.mainColor_1,
-                ),
-              ),
-              title: Image.asset(
-                "assets/images/Algofet primary subtext_white_copy.png",
-                width: size.width * 0.40,
-              ),
-              actions: [
-                InkWell(
-                  child: Lottie.asset("assets/gifs/back.json", width: 50),
-                  onTap: () {
-                    setState(() {
-                      main_screen = 0;
-                      on_stop_pressed();
-                    });
-                  },
-                ),
-                SizedBox(
-                  width: size.width * 0.02,
-                )
-              ],
-              leading: Builder(
-                builder: (context) => InkWell(
-                    onTap: () {
-                      Scaffold.of(context).openDrawer();
-                    },
-                    child: Lottie.asset("assets/gifs/drawer.json", width: 50)),
-              )),
-          drawer: Drawer(
-            child: ListView(
-              children: [
-                DrawerHeader(
-                  child: Image.asset(
-                      "assets/images/Algofet secondary subtext.png"),
-                  padding: EdgeInsets.all(size.width * 0.02),
-                ),
-                const ListTile(
-                  leading: Icon(Icons.home),
-                  title: Text("Home"),
-                ),
-                const Divider(),
-                const ExpansionTile(
-                  leading: Icon(Icons.shopping_bag_rounded),
-                  title: Text("Products"),
+      child: AnimatedContainer(
+        transform: Matrix4.translationValues(x_offset, y_offset, 0)
+          ..scale(scale_factor),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(is_drawer_open ? 40 : 0),
+          color: Colors.white,
+        ),
+        duration: Duration(milliseconds: 250),
+        child: Container(
+          child: Column(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                    color: CustomColors.mainColor_1,
+                    borderRadius:
+                        BorderRadius.only(bottomLeft: Radius.circular(70))),
+                child: Column(
                   children: [
-                    ListTile(
-                      title: Text("AlgoDOCK"),
+                    SizedBox(
+                      height: size.height * 0.05,
                     ),
-                    ListTile(
-                      title: Text("AlgoBMS"),
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: size.width * 0.05,
+                        ),
+                        is_drawer_open
+                            ? IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    x_offset = 0;
+                                    y_offset = 0;
+                                    scale_factor = 1;
+                                    is_drawer_open = false;
+                                  });
+                                },
+                                icon: Icon(
+                                  Icons.arrow_back_ios_new,
+                                  color: Colors.white,
+                                ))
+                            : IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    x_offset = size.height * 0.25;
+                                    y_offset = size.width * 0.57;
+                                    scale_factor = 0.55;
+                                    is_drawer_open = true;
+                                  });
+                                },
+                                icon: Icon(
+                                  Icons.menu,
+                                  color: Colors.white,
+                                )),
+                        Spacer(),
+                        IconButton(
+                            onPressed: () {
+                              setState(() {
+                                main_screen = 0;
+                                on_stop_pressed();
+                              });
+                            },
+                            icon: Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                            )),
+                        SizedBox(
+                          width: size.width * 0.01,
+                        ),
+                      ],
                     ),
-                    ListTile(
-                      title: Text("AlgoX"),
-                    ),
-                    ListTile(
-                      title: Text("AlgoPACK"),
-                    ),
-                    ListTile(
-                      title: Text("AlgoSAFE"),
-                    ),
-                    ListTile(
-                      title: Text("AlgoCOM"),
+                    SizedBox(
+                      height: size.height * 0.025,
                     ),
                   ],
                 ),
-                const Divider(),
-                const ListTile(
-                  leading: Icon(Icons.person_3),
-                  title: Text("Application"),
+              ),
+              Expanded(
+                child: (main_screen != 1)
+                    ? main_screen_display()
+                    : scan_screen_display(),
+              ),
+              build_scan_button(context),
+              SizedBox(height: size.height * 0.01,),
+              Stack(children: [
+                Container(
+                  color: Colors.white,
+                  height: size.height * 0.1,
                 ),
-                const Divider(),
-                const ListTile(
-                  leading: Icon(Icons.call),
-                  title: Text("Contact Us"),
-                ),
-                const Divider(),
-                const ListTile(
-                  leading: Icon(Icons.work),
-                  title: Text("Company"),
-                ),
-                const Divider(),
-                const ExpansionTile(
-                  leading: Icon(Icons.more),
-                  title: Text("More"),
-                  children: [
-                    ListTile(
-                      title: Text("NEWS"),
+                Container(
+                  height: size.height * 0.1,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(70),
                     ),
-                    ListTile(
-                      title: Text("Partners"),
-                    ),
-                    ListTile(
-                      title: Text("FAQs"),
-                    )
-                  ],
+                    color: CustomColors.mainColor_1,
+                  ),
                 ),
-                const Divider()
-              ],
-            ),
+              ])
+            ],
           ),
-          body: (main_screen != 1)
-              ? main_screen_display()
-              : scan_screen_display(),
-          floatingActionButton: build_scan_button(context),
-          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-          bottomNavigationBar: CurvedNavigationBar(
-              height: 60,
-              color: CustomColors.mainColor_1,
-              backgroundColor: Colors.white,
-              items: [
-                Icon(
-                  Icons.search,
-                  color: Colors.white,
-                ),
-                Icon(
-                  Icons.person,
-                  color: Colors.white,
-                ),
-                Icon(
-                  Icons.lightbulb,
-                  color: Colors.white,
-                ),
-                Icon(
-                  Icons.settings,
-                  color: Colors.white,
-                )
-              ])),
+        ),
+      ),
+      //     bottomNavigationBar: CurvedNavigationBar(
+      //         height: 60,
+      //         color: CustomColors.mainColor_1,
+      //         backgroundColor: Colors.white,
+      //         items: [
+      //           Icon(
+      //             Icons.search,
+      //             color: Colors.white,
+      //           ),
+      //           Icon(
+      //             Icons.person,
+      //             color: Colors.white,
+      //           ),
+      //           Icon(
+      //             Icons.lightbulb,
+      //             color: Colors.white,
+      //           ),
+      //           Icon(
+      //             Icons.settings,
+      //             color: Colors.white,
+      //           )
+      //         ])),
     );
   }
 }

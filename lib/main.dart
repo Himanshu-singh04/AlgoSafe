@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:algo_safe/screens/permission_screen.dart';
-import 'package:algo_safe/screens/scan_screen.dart';
+import 'package:algo_safe/screens/scan_drawer_screen.dart';
 import 'package:algo_safe/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -50,7 +50,7 @@ class _home_pageState extends State<home_page> {
   @override
   Widget build(BuildContext context) {
     Widget screen = adapter_state == BluetoothAdapterState.on
-        ? ScanScreen()
+        ? scan_drawer()
         : BluetoothOffScreen(adapter_state: adapter_state);
 
     return MaterialApp(
