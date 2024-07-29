@@ -13,90 +13,112 @@ class splash_screen extends StatefulWidget {
 
 // ignore: camel_case_types
 class _splash_screenState extends State<splash_screen> {
-  // double progress = 0.0;
 
   @override
   void initState() {
     super.initState();
-    _navigatetoHome();
-    // _simulateProgress();
+    navigate_to_home();
   }
 
-  // void _simulateProgress() {
-  //   Future.delayed(Duration(milliseconds: 70), () {
-  //     setState(() {
-  //       progress += 0.02;
-  //       if (progress < 1.0) {
-  //         _simulateProgress();
-  //       }
-  //     });
-  //   });
-  // }
 
-  _navigatetoHome() async {
+  navigate_to_home() async {
     await Future.delayed(const Duration(milliseconds: 4000), () {});
     // ignore: use_build_context_synchronously
-    Navigator.of(context).pushReplacement(_createRoute());
+    Navigator.of(context).pushReplacement(create_route());
   }
 
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-          backgroundColor: Colors.white,
-          body: Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                    begin: Alignment.topRight,
-                    end: Alignment.bottomRight,
-                    colors: [CustomColors.gold, CustomColors.mainColor_1])),
-            child: Center(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Center(
-                      child: Image.asset(
-                          "assets/images/Algofet primary subtext.png",
-                          height: size.height * 0.6,
-                          width: size.width * 0.8)),
-                  SizedBox(
-                      height: size.height * 0.25,
-                      width: size.width * 0.5,
-                      child: Lottie.asset("assets/gifs/drone_flying.json")),
-                  // Padding(
-                  //   padding: const EdgeInsets.all(8.0),
-                  //   child: Container(
-                  //     decoration: BoxDecoration(
-                  //       borderRadius: BorderRadius.circular(size.height * 0.01),
-                  //       color: CustomColors.mainColor_1,
-                  //     ),
-                  //     width: size.width * 0.9,
-                  //     height: size.height * 0.01,
-                  //     child: LinearProgressIndicator(
-                  //       value: progress,
-                  //     ),
-                  //   ),
-                  // ),
-                  Center(
-                      child: Text(
-                    "AlgoSAFE",
-                    style: TextStyle(fontSize: size.height * 0.05),
+    return Material(
+      child: Container(
+        width: size.width,
+        height: size.height,
+        child: Stack(children: [
+          Stack(
+            children: [
+              Container(
+                width: size.width,
+                height: size.height * 0.875,
+                decoration: BoxDecoration(color: CustomColors.mainColor_1),
+              ),
+              Container(
+                  width: size.width,
+                  height: size.height * 0.875,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius:
+                          BorderRadius.only(bottomRight: Radius.circular(70))),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: size.height * 0.1,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(32),
+                        child: Center(
+                          child: Image.asset(
+                            "assets/images/Algofet primary subtext.png",
+                            scale: 0.8,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        "Experience the Fully Automated Drone operations",
+                        style: TextStyle(
+                            color: Colors.black, fontWeight: FontWeight.w400),
+                      ),
+                      Spacer(),
+                      SizedBox(
+                          height: size.height * 0.25,
+                          width: size.width * 0.5,
+                          child: Lottie.asset("assets/gifs/drone_flying.json")),
+                    ],
                   )),
-                ],
+            ],
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              width: size.width,
+              height: size.height * 0.1251,
+              decoration: BoxDecoration(color: Colors.white),
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              width: size.width,
+              height: size.height * 0.1251,
+              decoration: BoxDecoration(
+                  color: CustomColors.mainColor_1,
+                  borderRadius:
+                      BorderRadius.only(topLeft: Radius.circular(70))),
+              child: Center(
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: size.width * 0.1,
+                    ),
+                    Text(
+                      "AlgoSAFE",
+                      style: TextStyle(fontSize: size.height * 0.04, color: Colors.white),
+                    ),
+                    Spacer(),
+                    Lottie.asset("assets/gifs/loading.json"),
+                  ],
+                ),
               ),
             ),
-          )),
+          )
+        ]),
+      ),
     );
   }
 }
 
-Route _createRoute() {
+Route create_route() {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => const home_page(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {

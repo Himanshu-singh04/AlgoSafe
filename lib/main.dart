@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:algo_safe/screens/permission_off_screen.dart';
+import 'package:algo_safe/screens/permission_screen.dart';
 import 'package:algo_safe/screens/scan_screen.dart';
 import 'package:algo_safe/screens/splash_screen.dart';
-import 'package:algo_safe/utils/theme_service.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
@@ -11,11 +10,8 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 void main() async {
   FlutterBluePlus.setLogLevel(LogLevel.verbose, color: true);
   WidgetsFlutterBinding.ensureInitialized();
-  final themeService = await ThemeService.instance;
-  var initTheme = themeService.initial;
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    theme: initTheme,
     home: const splash_screen(),
   ));
 }
@@ -30,15 +26,15 @@ class home_page extends StatefulWidget {
 
 // ignore: camel_case_types
 class _home_pageState extends State<home_page> {
-  BluetoothAdapterState _adapterState = BluetoothAdapterState.unknown;
+  BluetoothAdapterState adapter_state = BluetoothAdapterState.unknown;
 
-  late StreamSubscription<BluetoothAdapterState> _adapterStateStateSubscription;
+  late StreamSubscription<BluetoothAdapterState> adapter_state_state_subscription;
 
   @override
   void initState() {
     super.initState();
-    _adapterStateStateSubscription = FlutterBluePlus.adapterState.listen((state) {
-      _adapterState = state;
+    adapter_state_state_subscription = FlutterBluePlus.adapterState.listen((state) {
+      adapter_state = state;
       if (mounted) {
         setState(() {});
       }
@@ -47,18 +43,17 @@ class _home_pageState extends State<home_page> {
 
   @override
   void dispose() {
-    _adapterStateStateSubscription.cancel();
+    adapter_state_state_subscription.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget screen = _adapterState == BluetoothAdapterState.on
+    Widget screen = adapter_state == BluetoothAdapterState.on
         ? ScanScreen()
-        : BluetoothOffScreen(adapterState: _adapterState);
+        : BluetoothOffScreen(adapter_state: adapter_state);
 
     return MaterialApp(
-      color: Colors.lightBlue,
       home: screen,
       navigatorObservers: [BluetoothAdapterStateObserver()],
     );

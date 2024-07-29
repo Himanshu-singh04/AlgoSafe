@@ -21,19 +21,19 @@ class ScanScreen extends StatefulWidget {
 }
 
 class _ScanScreenState extends State<ScanScreen> {
-  List<BluetoothDevice> _systemDevices = [];
-  List<ScanResult> _scanResults = [];
-  bool _isScanning = false;
-  late StreamSubscription<List<ScanResult>> _scanResultsSubscription;
-  late StreamSubscription<bool> _isScanningSubscription;
-  int mainScreen = 0;
+  List<BluetoothDevice> system_devices = [];
+  List<ScanResult> scan_results = [];
+  bool is_scanning = false;
+  late StreamSubscription<List<ScanResult>> scan_results_subscription;
+  late StreamSubscription<bool> is_scanning_subscription;
+  int main_screen = 0;
 
   @override
   void initState() {
     super.initState();
 
-    _scanResultsSubscription = FlutterBluePlus.scanResults.listen((results) {
-      _scanResults = results;
+    scan_results_subscription = FlutterBluePlus.scanResults.listen((results) {
+      scan_results = results;
       if (mounted) {
         setState(() {});
       }
@@ -41,8 +41,8 @@ class _ScanScreenState extends State<ScanScreen> {
       Snackbar.show(ABC.b, pretty_exception("Scan Error:", e), success: false);
     });
 
-    _isScanningSubscription = FlutterBluePlus.isScanning.listen((state) {
-      _isScanning = state;
+    is_scanning_subscription = FlutterBluePlus.isScanning.listen((state) {
+      is_scanning = state;
       if (mounted) {
         setState(() {});
       }
@@ -51,14 +51,14 @@ class _ScanScreenState extends State<ScanScreen> {
 
   @override
   void dispose() {
-    _scanResultsSubscription.cancel();
-    _isScanningSubscription.cancel();
+    scan_results_subscription.cancel();
+    is_scanning_subscription.cancel();
     super.dispose();
   }
 
-  Future onScanPressed() async {
+  Future on_scan_pressed() async {
     try {
-      _systemDevices = await FlutterBluePlus.systemDevices;
+      system_devices = await FlutterBluePlus.systemDevices;
     } catch (e) {
       Snackbar.show(ABC.b, pretty_exception("System Devices Error:", e),
           success: false);
@@ -71,12 +71,12 @@ class _ScanScreenState extends State<ScanScreen> {
     }
     if (mounted) {
       setState(() {
-        mainScreen = 1;
+        main_screen = 1;
       });
     }
   }
 
-  Future onStopPressed() async {
+  Future on_stop_pressed() async {
     try {
       FlutterBluePlus.stopScan();
     } catch (e) {
@@ -85,9 +85,9 @@ class _ScanScreenState extends State<ScanScreen> {
     }
   }
 
-  void onConnectPressed(BluetoothDevice device) {
+  void on_connect_pressed(BluetoothDevice device) {
     setState(() {
-      onStopPressed();
+      on_stop_pressed();
     });
     device.connect_and_update_stream().catchError((e) {
       Snackbar.show(ABC.c, pretty_exception("Connect Error:", e),
@@ -99,8 +99,8 @@ class _ScanScreenState extends State<ScanScreen> {
     Navigator.of(context).push(route);
   }
 
-  Future onRefresh() {
-    if (_isScanning == false) {
+  Future on_refresh() {
+    if (is_scanning == false) {
       FlutterBluePlus.startScan(timeout: const Duration(seconds: 15));
     }
     if (mounted) {
@@ -109,7 +109,7 @@ class _ScanScreenState extends State<ScanScreen> {
     return Future.delayed(const Duration(milliseconds: 500));
   }
 
-  Widget buildScanButton(BuildContext context) {
+  Widget build_scan_button(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
 
     if (FlutterBluePlus.isScanningNow) {
@@ -124,7 +124,7 @@ class _ScanScreenState extends State<ScanScreen> {
             height: size.height * 0.05,
             child: Lottie.asset("assets/gifs/stop_scan.json"),
           ),
-          onTap: onStopPressed,
+          onTap: on_stop_pressed,
         ),
       );
     } else {
@@ -138,14 +138,14 @@ class _ScanScreenState extends State<ScanScreen> {
           child: SizedBox(
               height: size.height * 0.05,
               child: Lottie.asset("assets/gifs/scan.json")),
-          onTap: onScanPressed,
+          onTap: on_scan_pressed,
         ),
       );
     }
   }
 
   List<Widget> _buildSystemDeviceTiles(BuildContext context) {
-    return _systemDevices
+    return system_devices
         .map(
           (d) => SystemDeviceTile(
             device: d,
@@ -155,26 +155,25 @@ class _ScanScreenState extends State<ScanScreen> {
                 settings: const RouteSettings(name: '/DeviceScreen'),
               ),
             ),
-            onConnect: () => onConnectPressed(d),
+            onConnect: () => on_connect_pressed(d),
           ),
         )
         .toList();
   }
 
   List<Widget> _buildScanResultTiles(BuildContext context) {
-    return _scanResults
+    return scan_results
         .where((r) => r.device.name.startsWith("Algo"))
         .map(
           (r) => ScanResultTile(
             result: r,
-            onTap: () => onConnectPressed(r.device),
+            onTap: () => on_connect_pressed(r.device),
           ),
         )
         .toList();
   }
 
-//------------------------------------------------------------------------------------------------------------------------//
-  Widget mainScreenDisplay() {
+  Widget main_screen_display() {
     final Size size = MediaQuery.of(context).size;
 
     return Column(
@@ -182,24 +181,37 @@ class _ScanScreenState extends State<ScanScreen> {
         SizedBox(
           height: size.height * 0.05,
         ),
-        Align(alignment: Alignment.topCenter,child: Text("Hi, Drone Operator",style: TextStyle(fontSize: size.width * 0.05),)),
-        Align(alignment: Alignment.topCenter,child: Text("Connect to AlgoFET Devices", style: TextStyle(fontSize: size.width * 0.025))),
+        Align(
+            alignment: Alignment.topCenter,
+            child: Text(
+              "Hi, Drone Operator",
+              style: TextStyle(fontSize: size.width * 0.05),
+            )),
+        Align(
+            alignment: Alignment.topCenter,
+            child: Text("Connect to AlgoFET Devices",
+                style: TextStyle(fontSize: size.width * 0.025))),
       ],
     );
   }
-//------------------------------------------------------------------------------------------------------------------------//
 
-  Widget scanScreenDisplay() {
+  Widget scan_screen_display() {
     final Size size = MediaQuery.of(context).size;
     return RefreshIndicator(
-      onRefresh: onRefresh,
+      onRefresh: on_refresh,
       child: Column(
         children: [
           SizedBox(
-          height: size.height * 0.05,
-        ),
-          Align(alignment: Alignment.topCenter,child: Text("Hi, Drone Operator", style: TextStyle(fontSize: size.width * 0.05))),
-          Align(alignment: Alignment.topCenter,child: Text("Connect to AlgoFET Devices", style: TextStyle(fontSize: size.width * 0.025))),
+            height: size.height * 0.05,
+          ),
+          Align(
+              alignment: Alignment.topCenter,
+              child: Text("Hi, Drone Operator",
+                  style: TextStyle(fontSize: size.width * 0.05))),
+          Align(
+              alignment: Alignment.topCenter,
+              child: Text("Connect to AlgoFET Devices",
+                  style: TextStyle(fontSize: size.width * 0.025))),
           Expanded(
             child: ListView(
               children: <Widget>[
@@ -221,7 +233,7 @@ class _ScanScreenState extends State<ScanScreen> {
       child: Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
-            backgroundColor: Colors.white,
+              backgroundColor: Colors.white,
               toolbarHeight: size.height * 0.05,
               flexibleSpace: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 28, 0, 0),
@@ -235,20 +247,14 @@ class _ScanScreenState extends State<ScanScreen> {
               ),
               actions: [
                 InkWell(
-                  child: Lottie.asset("assets/gifs/back.json",width: 50),
-                  onTap: (){setState(() {
-                        mainScreen = 0;
-                        onStopPressed();
-                      });},
+                  child: Lottie.asset("assets/gifs/back.json", width: 50),
+                  onTap: () {
+                    setState(() {
+                      main_screen = 0;
+                      on_stop_pressed();
+                    });
+                  },
                 ),
-                // IconButton(
-                //     onPressed: () {
-                //       setState(() {
-                //         mainScreen = 0;
-                //         onStopPressed();
-                //       });
-                //     },
-                //     icon: const Icon(Icons.arrow_back)),
                 SizedBox(
                   width: size.width * 0.02,
                 )
@@ -258,7 +264,7 @@ class _ScanScreenState extends State<ScanScreen> {
                     onTap: () {
                       Scaffold.of(context).openDrawer();
                     },
-                    child: Lottie.asset("assets/gifs/drawer.json",width: 50)),
+                    child: Lottie.asset("assets/gifs/drawer.json", width: 50)),
               )),
           drawer: Drawer(
             child: ListView(
@@ -278,27 +284,21 @@ class _ScanScreenState extends State<ScanScreen> {
                   title: Text("Products"),
                   children: [
                     ListTile(
-                      // leading: Icon(Icons.home),
                       title: Text("AlgoDOCK"),
                     ),
                     ListTile(
-                      // leading: Icon(Icons.home),
                       title: Text("AlgoBMS"),
                     ),
                     ListTile(
-                      // leading: Icon(Icons.home),
                       title: Text("AlgoX"),
                     ),
                     ListTile(
-                      // leading: Icon(Icons.home),
                       title: Text("AlgoPACK"),
                     ),
                     ListTile(
-                      // leading: Icon(Icons.home),
                       title: Text("AlgoSAFE"),
                     ),
                     ListTile(
-                      // leading: Icon(Icons.home),
                       title: Text("AlgoCOM"),
                     ),
                   ],
@@ -324,15 +324,12 @@ class _ScanScreenState extends State<ScanScreen> {
                   title: Text("More"),
                   children: [
                     ListTile(
-                      // leading: Icon(Icons.home),
                       title: Text("NEWS"),
                     ),
                     ListTile(
-                      // leading: Icon(Icons.home),
                       title: Text("Partners"),
                     ),
                     ListTile(
-                      // leading: Icon(Icons.home),
                       title: Text("FAQs"),
                     )
                   ],
@@ -340,25 +337,11 @@ class _ScanScreenState extends State<ScanScreen> {
                 const Divider()
               ],
             ),
-            // child: Column(
-
-            // children: [
-            // SizedBox(height: size.height*0.05,),
-            // Container(child: Image.asset("assets/images/Algofet secondary subtext.png"),padding: EdgeInsets.all(size.width*0.075),)
-            // ],
-            // ),
           ),
-          body: (mainScreen != 1) ? mainScreenDisplay() : scanScreenDisplay(),
-          // body: RefreshIndicator(
-          //   onRefresh: onRefresh,
-          //   child: ListView(
-          //     children: <Widget>[
-          //       ..._buildSystemDeviceTiles(context),
-          //       ..._buildScanResultTiles(context),
-          //     ],
-          //   ),
-          // ),
-          floatingActionButton: buildScanButton(context),
+          body: (main_screen != 1)
+              ? main_screen_display()
+              : scan_screen_display(),
+          floatingActionButton: build_scan_button(context),
           floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
           bottomNavigationBar: CurvedNavigationBar(
               height: 60,
