@@ -53,6 +53,8 @@ dependencies:
   lottie: ^3.1.2
   curved_navigation_bar: ^1.0.6
   smooth_page_indicator: ^1.2.0+3
+  flutter_expandable_fab: ^2.2.0
+  sliding_up_panel: ^2.0.0+1
 
 dev_dependencies:
   flutter_test:

@@ -11,7 +11,6 @@ import '../widgets/system_device_tile.dart';
 import '../widgets/scan_result_tile.dart';
 import '../utils/extra.dart';
 
-// ignore: must_be_immutable
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
 
@@ -26,6 +25,12 @@ class _ScanScreenState extends State<ScanScreen> {
   late StreamSubscription<List<ScanResult>> scan_results_subscription;
   late StreamSubscription<bool> is_scanning_subscription;
   int main_screen = 0;
+  int _selectedIndex = 0;
+
+  double x_offset = 0;
+  double y_offset = 0;
+  double scale_factor = 1;
+  bool is_drawer_open = false;
 
   @override
   void initState() {
@@ -109,18 +114,19 @@ class _ScanScreenState extends State<ScanScreen> {
   }
 
   Widget build_scan_button(BuildContext context) {
-
     if (FlutterBluePlus.isScanningNow) {
       return Container(
         decoration: BoxDecoration(
           color: CustomColors.mainColor_1,
-          borderRadius:
-              BorderRadius.circular(20), // Adjust the radius as needed
+          borderRadius: BorderRadius.circular(20),
         ),
         child: FloatingActionButton.extended(
           backgroundColor: CustomColors.mainColor_1,
           label: SizedBox(
-            child: Text("Stop Scanning",style: TextStyle(color: Colors.white),),
+            child: Text(
+              "Stop Scanning",
+              style: TextStyle(color: Colors.white),
+            ),
           ),
           onPressed: on_stop_pressed,
         ),
@@ -129,14 +135,16 @@ class _ScanScreenState extends State<ScanScreen> {
       return Container(
         decoration: BoxDecoration(
           color: CustomColors.mainColor_1,
-          borderRadius:
-              BorderRadius.circular(20), // Adjust the radius as needed
+          borderRadius: BorderRadius.circular(20),
         ),
         child: FloatingActionButton.extended(
           backgroundColor: CustomColors.mainColor_1,
           label: SizedBox(
-              child: Text("Scan for Devices",style: TextStyle(color: Colors.white),),
-              ),
+            child: Text(
+              "Scan for Devices",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
           onPressed: on_scan_pressed,
         ),
       );
@@ -224,10 +232,11 @@ class _ScanScreenState extends State<ScanScreen> {
     );
   }
 
-  double x_offset = 0;
-  double y_offset = 0;
-  double scale_factor = 1;
-  bool is_drawer_open = false;
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -248,9 +257,8 @@ class _ScanScreenState extends State<ScanScreen> {
             children: [
               Container(
                 decoration: BoxDecoration(
-                    color: CustomColors.mainColor_1,
-                    borderRadius:
-                        BorderRadius.only(bottomLeft: Radius.circular(70))),
+                  color: CustomColors.mainColor_1,
+                ),
                 child: Column(
                   children: [
                     SizedBox(
@@ -306,7 +314,7 @@ class _ScanScreenState extends State<ScanScreen> {
                       ],
                     ),
                     SizedBox(
-                      height: size.height * 0.025,
+                      height: size.height * 0.01,
                     ),
                   ],
                 ),
@@ -317,13 +325,56 @@ class _ScanScreenState extends State<ScanScreen> {
                     : scan_screen_display(),
               ),
               build_scan_button(context),
-              SizedBox(height: size.height * 0.01,),
+              SizedBox(
+                height: size.height * 0.01,
+              ),
               Stack(children: [
                 Container(
                   color: Colors.white,
                   height: size.height * 0.1,
                 ),
                 Container(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: CustomColors.mainColor_3,
+                        borderRadius: BorderRadius.only(topRight: Radius.circular(70))
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: size.width * 0.9,
+                            child: BottomNavigationBar(
+                              elevation: 0,
+                              items: const <BottomNavigationBarItem>[
+                                BottomNavigationBarItem(
+                                  icon: Icon(Icons.search),
+                                  label: 'Search',
+                                ),
+                                BottomNavigationBarItem(
+                                  icon: Icon(Icons.person),
+                                  label: 'Profile',
+                                ),
+                                BottomNavigationBarItem(
+                                  icon: Icon(Icons.settings),
+                                  label: 'Setting',
+                                ),
+                              ],
+                              currentIndex: _selectedIndex,
+                              selectedItemColor: Colors.black,
+                              unselectedItemColor: Colors.white,
+                              onTap: _onItemTapped,
+                              backgroundColor: Colors.transparent,
+                              type: BottomNavigationBarType.fixed,
+                              showSelectedLabels: true,
+                              showUnselectedLabels: false,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                   height: size.height * 0.1,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.only(
@@ -337,28 +388,6 @@ class _ScanScreenState extends State<ScanScreen> {
           ),
         ),
       ),
-      //     bottomNavigationBar: CurvedNavigationBar(
-      //         height: 60,
-      //         color: CustomColors.mainColor_1,
-      //         backgroundColor: Colors.white,
-      //         items: [
-      //           Icon(
-      //             Icons.search,
-      //             color: Colors.white,
-      //           ),
-      //           Icon(
-      //             Icons.person,
-      //             color: Colors.white,
-      //           ),
-      //           Icon(
-      //             Icons.lightbulb,
-      //             color: Colors.white,
-      //           ),
-      //           Icon(
-      //             Icons.settings,
-      //             color: Colors.white,
-      //           )
-      //         ])),
     );
   }
 }

@@ -63,6 +63,8 @@ class _ScanResultTileState extends State<ScanResultTile> {
   }
 
   Widget _buildTitle(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+
     if (widget.result.device.platformName.isNotEmpty) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -71,10 +73,14 @@ class _ScanResultTileState extends State<ScanResultTile> {
           Text(
             widget.result.device.platformName,
             overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: size.height * 0.02,
+              fontWeight: FontWeight.w400
+            ),
           ),
           Text(
             widget.result.device.remoteId.str,
-            style: Theme.of(context).textTheme.bodySmall,
+            style: TextStyle(fontSize: size.height * 0.0125),
           )
         ],
       );
@@ -123,7 +129,7 @@ class _ScanResultTileState extends State<ScanResultTile> {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    var adv = widget.result.advertisementData;
+    // var adv = widget.result.advertisementData;
     return Card(
       margin: EdgeInsets.all(size.height * 0.01),
       shape: RoundedRectangleBorder(
@@ -131,28 +137,43 @@ class _ScanResultTileState extends State<ScanResultTile> {
       ),
       elevation: 5.0,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(4.0),
         child: Row(
           children: [
-            Container(
-              color: Colors.red,
-              height: size.height * 0.1,
-              width: size.width * 0.42,
+            SizedBox(
+              width: size.width * 0.05,
             ),
-            Spacer(),
             Container(
-              color: Colors.pink,
+              alignment: Alignment.centerLeft,
+              // color: Colors.red,
               height: size.height * 0.1,
-              width: size.width * 0.42,
-            )
+              width: size.width * 0.25,
+              child: Column(
+                children: [
+                  SizedBox(height: size.height * 0.025,),
+                  _buildTitle(context),
+                ],
+              ),
+            ),
+            Container(
+              // color: Colors.pink,
+              height: size.height * 0.1,
+              width: size.width * 0.3,
+              child: Image.asset("assets/images/esp32.png"),
+            ),
+            Container(
+              // color: Colors.pink,
+              height: size.height * 0.1,
+              width: size.width * 0.3,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildConnectButton(context),
+                ],
+              ),
+            ),
           ],
         ),
-        // child: Row(
-        //   children: [
-        //     Column(
-        //       mainAxisSize: MainAxisSize.min,
-        //       crossAxisAlignment: CrossAxisAlignment.start,
-        //       children: [
         //         _buildTitle(context),
         //         const SizedBox(height: 8.0),
         //         _buildConnectButton(context),
@@ -162,11 +183,6 @@ class _ScanResultTileState extends State<ScanResultTile> {
         //         if (adv.msd.isNotEmpty) _buildAdvRow(context, 'Manufacturer Data', getNiceManufacturerData(adv.msd)),
         //         if (adv.serviceUuids.isNotEmpty) _buildAdvRow(context, 'Service UUIDs', getNiceServiceUuids(adv.serviceUuids)),
         //         if (adv.serviceData.isNotEmpty) _buildAdvRow(context, 'Service Data', getNiceServiceData(adv.serviceData)),
-        //       ],
-        //     ),
-        //     Image.asset("assets/images/esp32.jpg")
-        //   ],
-        // ),
       ),
     );
   }
