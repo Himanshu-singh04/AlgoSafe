@@ -20,13 +20,15 @@ class _splash_screenState extends State<splash_screen> {
     navigate_to_home();
   }
 
-
+  // routes the app to the home page ie. the scan screen  
   navigate_to_home() async {
+    // delayed function with 4 sec delay
     await Future.delayed(const Duration(milliseconds: 4000), () {});
     // ignore: use_build_context_synchronously
     Navigator.of(context).pushReplacement(create_route());
   }
 
+  // actual splash screen page activities
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -118,6 +120,7 @@ class _splash_screenState extends State<splash_screen> {
   }
 }
 
+// automatically routes the page to the next screen with a sliding animation 
 Route create_route() {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => const home_page(),
@@ -128,6 +131,7 @@ Route create_route() {
 
       var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
+      // sliding animation for page change
       return SlideTransition(
         position: animation.drive(tween),
         child: child,

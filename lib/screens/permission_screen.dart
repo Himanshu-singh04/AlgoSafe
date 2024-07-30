@@ -9,10 +9,12 @@ import 'package:lottie/lottie.dart';
 
 // ignore: must_be_immutable
 class BluetoothOffScreen extends StatelessWidget {
+  // takes as input the state whether bluetooth is on/off
   BluetoothOffScreen({super.key, this.adapter_state});
 
   final BluetoothAdapterState? adapter_state;
 
+  // Widget to show Bluetooth off animation from Lotties
   Widget build_bluetooth_off_icon(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
 
@@ -25,9 +27,10 @@ class BluetoothOffScreen extends StatelessWidget {
       ],
     );
   }
-
+  // instance creation for checking location permissions
   Location location = Location();
 
+  // Written message regarding Bluetooth activation 
   Widget build_title(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     return Text(
@@ -39,6 +42,7 @@ class BluetoothOffScreen extends StatelessWidget {
     );
   }
 
+  // button to enable the bluetooth permission 
   Widget build_turn_on_button(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(20.0),
@@ -51,6 +55,7 @@ class BluetoothOffScreen extends StatelessWidget {
         ),
         onPressed: () async {
           try {
+            // checks and confirms about the android platform
             if (Platform.isAndroid) {
               await FlutterBluePlus.turnOn();
               // toggle_location();
@@ -64,6 +69,7 @@ class BluetoothOffScreen extends StatelessWidget {
     );
   }
 
+  // permission page activities 
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;

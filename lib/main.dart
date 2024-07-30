@@ -12,7 +12,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: const splash_screen(),
+    home: splash_screen(),
   ));
 }
 
@@ -26,10 +26,12 @@ class home_page extends StatefulWidget {
 
 // ignore: camel_case_types
 class _home_pageState extends State<home_page> {
+  // status of the bluetooth permission and its state of on/off
   BluetoothAdapterState adapter_state = BluetoothAdapterState.unknown;
 
   late StreamSubscription<BluetoothAdapterState> adapter_state_state_subscription;
 
+  // gets the current bluetooth state  
   @override
   void initState() {
     super.initState();
@@ -47,6 +49,8 @@ class _home_pageState extends State<home_page> {
     super.dispose();
   }
 
+  // building the main.dart activities
+  // based on the adapter state it selects between scan+drawer and BluetoothoffScreen
   @override
   Widget build(BuildContext context) {
     Widget screen = adapter_state == BluetoothAdapterState.on
@@ -63,6 +67,7 @@ class _home_pageState extends State<home_page> {
 class BluetoothAdapterStateObserver extends NavigatorObserver {
   StreamSubscription<BluetoothAdapterState>? _adapterStateSubscription;
 
+  // Navigation and routes with a back sign/icon
   @override
   void didPush(Route route, Route? previousRoute) {
     super.didPush(route, previousRoute);
@@ -75,6 +80,7 @@ class BluetoothAdapterStateObserver extends NavigatorObserver {
     }
   }
 
+  // Navigation and routes without a back sign/icon
   @override
   void didPop(Route route, Route? previousRoute) {
     super.didPop(route, previousRoute);

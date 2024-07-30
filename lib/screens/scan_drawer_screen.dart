@@ -10,8 +10,9 @@ class scan_drawer extends StatefulWidget {
 }
 
 class _scan_drawerState extends State<scan_drawer> {
-  @override
 
+  // scan + drawer screen activities
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(

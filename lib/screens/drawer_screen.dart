@@ -9,6 +9,8 @@ class drawer_screen extends StatefulWidget {
 }
 
 class _drawer_screenState extends State<drawer_screen> {
+
+  // drawer screen activities
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
