@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:lottie/lottie.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 import '../widgets/service_tile.dart';
 import '../widgets/characteristic_tile.dart';
 import '../widgets/descriptor_tile.dart';
@@ -343,12 +344,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
     // Validate input values
     if (value.isEmpty || characteristic_uuid == null) {
-      // Snackbar.show(
-      //   ABC.c,
-      //   "$characteristic_name Write: No value provided or invalid UUID",
-      //   success: false,
-      // );
-      return; // Skip if no value is provided or UUID is invalid
+      return;
     }
 
     List<BluetoothCharacteristic> target_characteristics = [];
@@ -411,7 +407,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
     // "Charging_type": ["1", "2", "3"],
     // "Cell_Chemistry": ["1", "2", "3", "4"],
     "Algox_Cell_Nos": ["2", "4", "6", "8", "10", "12", "14", "16"],
-    "Battery_cell_nos":["2", "4", "6", "8", "10", "12", "14", "16"]
+    "Battery_cell_nos": ["2", "4", "6", "8", "10", "12", "14", "16"]
   };
 
   final Map<String, double> slider_values = {
@@ -427,13 +423,13 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
   Map<String, List<double>> slider_min_max = {
     "Algox_Current": [0.0, 100.0],
-    "Battery_capacity": [0.0,100.0],
+    "Battery_capacity": [0.0, 100.0],
     "Battery_constant_current": [0.0, 180.0],
     "Battery_peak_current": [0.0, 180.0],
     "Battery_max_voltage": [0.0, 4350.0],
     "Battery_min_voltage": [0.0, 2500.0],
     "Battery_operating_temperature": [0.0, 80.0],
-    "SOC":[0.0, 100.0]
+    "SOC": [0.0, 100.0]
   };
 
   Map<String, int> slider_divisions = {
@@ -455,137 +451,131 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
   final BMS_form_key = GlobalKey<FormState>();
 
- Widget BMS_write_screen() {
-  final Size size = MediaQuery.of(context).size;
-  return Expanded(
-    child: Form(
-      key: BMS_form_key,
-      child: ListView(
-        children: [
-          Column(
+  Widget BMS_write_screen() {
+    final Size size = MediaQuery.of(context).size;
+    return Container(
+      color: CustomColors.mainColor_1,
+      child: Expanded(
+        child: Form(
+          key: BMS_form_key,
+          child: ListView(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: build_drop_down_for_characteristic("Battery_cell_nos"),
-              ),
-              SizedBox(height: size.height * 0.01),
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: build_text_field_for_characteristic("Battery_id*"),
-              ),
-              SizedBox(height: size.height * 0.01),
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: build_text_field_for_characteristic("BMS_id*"),
-              ),
-              SizedBox(height: size.height * 0.01),
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: build_slider_for_characteristic("Battery_capacity"),
-              ),
-              SizedBox(height: size.height * 0.01),
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: build_slider_for_characteristic("Battery_constant_current"),
-              ),
-              SizedBox(height: size.height * 0.01),
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: build_slider_for_characteristic("Battery_peak_current"),
-              ),
-              SizedBox(height: size.height * 0.01),
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: build_slider_for_characteristic("Battery_max_voltage"),
-              ),
-              SizedBox(height: size.height * 0.01),
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: build_slider_for_characteristic("Battery_min_voltage"),
-              ),
-              SizedBox(height: size.height * 0.01),
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: build_slider_for_characteristic("Battery_operating_temperature"),
-              ),
-              SizedBox(height: size.height * 0.01),
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: build_toggle_for_characteristic("Battery_DSG_C"),
-              ),
-              if (toggle_values["Battery_DSG_C"] == true)
-                ExpansionTile(
-                  title: Text('Battery Discharge Settings'),
-                  initiallyExpanded: true,
-                  children: [
-                    SizedBox(height: size.height * 0.01),
-                    Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: build_toggle_for_characteristic("DSG_OverCurrent"),
+              Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: build_drop_down_for_characteristic("Battery_cell_nos"),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: build_text_field_for_characteristic("Battery_id*"),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: build_text_field_for_characteristic("BMS_id*"),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: build_slider_for_characteristic("Battery_capacity"),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: build_slider_for_characteristic(
+                        "Battery_constant_current"),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child:
+                        build_slider_for_characteristic("Battery_peak_current"),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: build_slider_for_characteristic("Battery_max_voltage"),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: build_slider_for_characteristic("Battery_min_voltage"),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: build_slider_for_characteristic(
+                        "Battery_operating_temperature"),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: build_toggle_for_characteristic("Battery_DSG_C"),
+                  ),
+                  if (toggle_values["Battery_DSG_C"] == true)
+                    ExpansionTile(
+                      title: Text('Battery Discharge Settings'),
+                      initiallyExpanded: true,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child:
+                              build_toggle_for_characteristic("DSG_OverCurrent"),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child:
+                              build_toggle_for_characteristic("CHG_OverVoltage"),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: build_toggle_for_characteristic(
+                              "DSG_OverTemperature"),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: build_toggle_for_characteristic(
+                              "CHG_OverTemperature"),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child:
+                              build_toggle_for_characteristic("DSG_UnderVoltage"),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: size.height * 0.01),
-                    Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: build_toggle_for_characteristic("CHG_OverVoltage"),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: build_toggle_for_characteristic("Battery_CHG_C"),
+                  ),
+                  if (toggle_values["Battery_CHG_C"] == true)
+                    ExpansionTile(
+                      title: Text('Battery Charge Settings'),
+                      initiallyExpanded: true,
+                      children: [
+                        SizedBox(height: size.height * 0.01),
+                        Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: build_slider_for_characteristic("SOC"),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: size.height * 0.01),
-                    Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: build_toggle_for_characteristic("DSG_OverTemperature"),
-                    ),
-                    SizedBox(height: size.height * 0.01),
-                    Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: build_toggle_for_characteristic("CHG_OverTemperature"),
-                    ),
-                    SizedBox(height: size.height * 0.01),
-                    Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: build_toggle_for_characteristic("DSG_UnderVoltage"),
-                    ),
-                  ],
+                ],
+              ),
+              SizedBox(height: size.height * 0.02),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: CustomColors.mainColor_1,
                 ),
-              SizedBox(height: size.height * 0.01),
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: build_toggle_for_characteristic("Battery_CHG_C"),
-              ),
-              if (toggle_values["Battery_CHG_C"] == true)
-                ExpansionTile(
-                  title: Text('Battery Charge Settings'),
-                  initiallyExpanded: true,
-                  children: [
-                    SizedBox(height: size.height * 0.01),
-                    Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: build_slider_for_characteristic("SOC"),
-                    ),
-                  ],
+                onPressed: () {
+                  if (BMS_form_key.currentState!.validate()) {
+                    BMS_on_send_all_pressed();
+                  }
+                },
+                child: Text(
+                  "Save Configuration",
+                  style: TextStyle(color: Colors.white),
                 ),
+              ),
             ],
           ),
-          SizedBox(height: size.height * 0.02),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: CustomColors.mainColor_1,
-            ),
-            onPressed: () {
-              if (BMS_form_key.currentState!.validate()) {
-                BMS_on_send_all_pressed();
-              }
-            },
-            child: Text(
-              "Save Configuration",
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        ],
+        ),
       ),
-    ),
-  );
-}
-
-
+    );
+  }
 
   final AlgoX_form_key = GlobalKey<FormState>();
   List<String> characteristics = [
@@ -1010,51 +1000,53 @@ class _DeviceScreenState extends State<DeviceScreen> {
     }
   }
 
-  Widget build_text_field_for_characteristic(String key, {bool is_required = false}) {
-  final Size size = MediaQuery.of(context).size;
-  bool isCompulsory = key.endsWith('*');
-  String displayKey = isCompulsory ? key.substring(0, key.length - 1) : key;
+  Widget build_text_field_for_characteristic(String key,
+      {bool is_required = false}) {
+    final Size size = MediaQuery.of(context).size;
+    bool isCompulsory = key.endsWith('*');
+    String displayKey = isCompulsory ? key.substring(0, key.length - 1) : key;
 
-  // Convert the key to a user-friendly label
-  String formattedKey = displayKey.replaceAll('_', ' ').split(' ').map((word) => word[0].toUpperCase() + word.substring(1)).join(' ');
+    // Convert the key to a user-friendly label
+    String formattedKey = displayKey
+        .replaceAll('_', ' ')
+        .split(' ')
+        .map((word) => word[0].toUpperCase() + word.substring(1))
+        .join(' ');
 
-  return Container(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(size.height * 0.01),
-      color: CustomColors.mainColor_3,
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextFormField(
-              keyboardType: TextInputType.number,
-              style: TextStyle(color: Colors.white),
-              controller: BMS_write_controller[displayKey],
-              decoration: InputDecoration(
-                labelText: isCompulsory
-                    ? "$formattedKey *"
-                    : formattedKey,
-                labelStyle: TextStyle(color: Colors.white),
-                border: InputBorder.none,
-              ),
-              validator: isCompulsory
-                  ? (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter $formattedKey';
-                      }
-                      return null;
-                    }
-                  : null,
-            ),
-          ),
-        ],
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(size.height * 0.01),
+        color: CustomColors.mainColor_3,
       ),
-    ),
-  );
-}
-
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                keyboardType: TextInputType.number,
+                style: TextStyle(color: Colors.white),
+                controller: BMS_write_controller[displayKey],
+                decoration: InputDecoration(
+                  labelText: isCompulsory ? "$formattedKey *" : formattedKey,
+                  labelStyle: TextStyle(color: Colors.white),
+                  border: InputBorder.none,
+                ),
+                validator: isCompulsory
+                    ? (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter $formattedKey';
+                        }
+                        return null;
+                      }
+                    : null,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget build_drop_down_for_characteristic(String key) {
     final Size size = MediaQuery.of(context).size;
@@ -1103,12 +1095,6 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 },
               ),
             ),
-            // SizedBox(width: 8),
-            // IconButton(
-            //   color: Colors.white,
-            //   onPressed: () => on_write_pressed(key),
-            //   icon: Icon(Icons.save),
-            // ),
           ],
         ),
       ),
@@ -1116,196 +1102,204 @@ class _DeviceScreenState extends State<DeviceScreen> {
   }
 
   Widget build_slider_for_characteristic(String key) {
-  final Size size = MediaQuery.of(context).size;
+    final Size size = MediaQuery.of(context).size;
 
-  // Convert the key to a user-friendly label
-  String formattedKey = key.replaceAll('_', ' ').split(' ').map((word) => word[0].toUpperCase() + word.substring(1)).join(' ');
+    // Convert the key to a user-friendly label
+    String formattedKey = key
+        .replaceAll('_', ' ')
+        .split(' ')
+        .map((word) => word[0].toUpperCase() + word.substring(1))
+        .join(' ');
 
-  return Container(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(size.height * 0.01),
-      color: CustomColors.mainColor_3,
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '$formattedKey: ${slider_values[key]?.toStringAsFixed(1)}',
-                  style: TextStyle(color: Colors.white),
-                ),
-                Row(
-                  children: [
-                    IconButton(
-                      color: Colors.white,
-                      icon: Icon(Icons.remove),
-                      onPressed: () {
-                        setState(() {
-                          double new_value = (slider_values[key] ?? 0) - 1;
-                          if (new_value >= (slider_min_max[key]?[0] ?? 0)) {
-                            slider_values[key] = new_value;
-                            BMS_write_controller[key]?.text =
-                                new_value.toStringAsFixed(1);
-                          }
-                        });
-                      },
-                    ),
-                    Spacer(),
-                    Container(
-                      width: size.width * 0.4,
-                      child: Slider(
-                        activeColor: Colors.blueAccent,
-                        value: slider_values[key] ?? 0.0,
-                        min: slider_min_max[key]?.first ?? 0.0,
-                        max: slider_min_max[key]?.last ?? 100.0,
-                        divisions: slider_divisions[key] ?? 10,
-                        label:
-                            (slider_values[key]?.toStringAsFixed(1) ?? '0.0'),
-                        onChanged: (new_value) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(size.height * 0.01),
+        color: CustomColors.mainColor_3,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$formattedKey: ${slider_values[key]?.toStringAsFixed(1)}',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        color: Colors.white,
+                        icon: Icon(Icons.remove),
+                        onPressed: () {
                           setState(() {
-                            slider_values[key] = new_value;
-                            BMS_write_controller[key]?.text =
-                                new_value.toStringAsFixed(1);
+                            double new_value = (slider_values[key] ?? 0) - 1;
+                            if (new_value >= (slider_min_max[key]?[0] ?? 0)) {
+                              slider_values[key] = new_value;
+                              BMS_write_controller[key]?.text =
+                                  new_value.toStringAsFixed(1);
+                            }
                           });
                         },
                       ),
-                    ),
-                    Spacer(),
-                    IconButton(
-                      color: Colors.white,
-                      icon: Icon(Icons.add),
-                      onPressed: () {
-                        setState(() {
-                          double new_value = (slider_values[key] ?? 0) + 1;
-                          if (new_value <= (slider_min_max[key]?[1] ?? 100)) {
-                            slider_values[key] = new_value;
-                            BMS_write_controller[key]?.text =
-                                new_value.toStringAsFixed(1);
-                          }
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ],
+                      Spacer(),
+                      Container(
+                        width: size.width * 0.4,
+                        child: Slider(
+                          activeColor: Colors.blueAccent,
+                          value: slider_values[key] ?? 0.0,
+                          min: slider_min_max[key]?.first ?? 0.0,
+                          max: slider_min_max[key]?.last ?? 100.0,
+                          divisions: slider_divisions[key] ?? 10,
+                          label:
+                              (slider_values[key]?.toStringAsFixed(1) ?? '0.0'),
+                          onChanged: (new_value) {
+                            setState(() {
+                              slider_values[key] = new_value;
+                              BMS_write_controller[key]?.text =
+                                  new_value.toStringAsFixed(1);
+                            });
+                          },
+                        ),
+                      ),
+                      Spacer(),
+                      IconButton(
+                        color: Colors.white,
+                        icon: Icon(Icons.add),
+                        onPressed: () {
+                          setState(() {
+                            double new_value = (slider_values[key] ?? 0) + 1;
+                            if (new_value <= (slider_min_max[key]?[1] ?? 100)) {
+                              slider_values[key] = new_value;
+                              BMS_write_controller[key]?.text =
+                                  new_value.toStringAsFixed(1);
+                            }
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Widget build_toggle_for_characteristic(String key) {
-  final Size size = MediaQuery.of(context).size;
+    final Size size = MediaQuery.of(context).size;
 
-  return Container(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(size.height * 0.01),
-      color: CustomColors.mainColor_3,
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: Row(
-              children: [
-                Text(
-                  key.replaceAll('_', ' '),
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
-                Spacer(),
-                Switch(
-                  activeColor: Colors.grey,
-                  value: toggle_values[key] ?? false,
-                  onChanged: (bool new_value) {
-                    setState(() {
-                      toggle_values[key] = new_value;
-                      BMS_write_controller[key]?.text = new_value ? '1' : '0';
-                    });
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(size.height * 0.01),
+        color: CustomColors.mainColor_3,
       ),
-    ),
-  );
-}
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  Text(
+                    key.replaceAll('_', ' '),
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                  Spacer(),
+                  Switch(
+                    activeColor: Colors.grey,
+                    value: toggle_values[key] ?? false,
+                    onChanged: (bool new_value) {
+                      setState(() {
+                        toggle_values[key] = new_value;
+                        BMS_write_controller[key]?.text = new_value ? '1' : '0';
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Map<String, String> BMS_last_sent_values = {};
 
   Future<void> BMS_on_send_all_pressed() async {
-  bool all_success = true;
-  String summary_message = '';
+    bool all_success = true;
+    String summary_message = '';
 
-  for (String characteristic_name in uuid_algoBMS_write.keys) {
-    String? characteristic_uuid = uuid_algoBMS_write[characteristic_name];
-    String value = BMS_write_controller[characteristic_name]?.text ?? '';
+    for (String characteristic_name in uuid_algoBMS_write.keys) {
+      String? characteristic_uuid = uuid_algoBMS_write[characteristic_name];
+      String value = BMS_write_controller[characteristic_name]?.text ?? '';
 
-    print('Processing characteristic: $characteristic_name');
-    print('Characteristic UUID: $characteristic_uuid');
-    print('Value: $value');
+      print('Processing characteristic: $characteristic_name');
+      print('Characteristic UUID: $characteristic_uuid');
+      print('Value: $value');
 
-    if (value.isEmpty || characteristic_uuid == null) {
-      summary_message += '$characteristic_name Write: No value provided or invalid UUID\n';
-      all_success = false;
-      continue;
-    }
-
-    if (BMS_last_sent_values[characteristic_name] == value) {
-      summary_message += '$characteristic_name Write: Value unchanged, not sending\n';
-      continue;
-    }
-
-    BluetoothCharacteristic? target_characteristic;
-
-    for (var service in services) {
-      for (var characteristic in service.characteristics) {
-        print('Checking characteristic UUID: ${characteristic.uuid}');
-        if (characteristic.uuid.toString() == characteristic_uuid) {
-          target_characteristic = characteristic;
-          break;
-        }
+      if (value.isEmpty || characteristic_uuid == null) {
+        summary_message +=
+            '$characteristic_name Write: No value provided or invalid UUID\n';
+        all_success = false;
+        continue;
       }
-      if (target_characteristic != null) break;
-    }
 
-    if (target_characteristic != null) {
-      try {
-        print('Writing value to characteristic: $characteristic_name');
-        if (target_characteristic.properties.writeWithoutResponse) {
-          await target_characteristic.write(value.codeUnits, withoutResponse: true);
-          summary_message += '$characteristic_name Write: Success\n';
-        } else if (target_characteristic.properties.write) {
-          await target_characteristic.write(value.codeUnits, withoutResponse: false);
-          summary_message += '$characteristic_name Write: Success\n';
-        } else {
-          summary_message += '$characteristic_name Write: Characteristic not writable\n';
+      if (BMS_last_sent_values[characteristic_name] == value) {
+        summary_message +=
+            '$characteristic_name Write: Value unchanged, not sending\n';
+        continue;
+      }
+
+      BluetoothCharacteristic? target_characteristic;
+
+      for (var service in services) {
+        for (var characteristic in service.characteristics) {
+          print('Checking characteristic UUID: ${characteristic.uuid}');
+          if (characteristic.uuid.toString() == characteristic_uuid) {
+            target_characteristic = characteristic;
+            break;
+          }
+        }
+        if (target_characteristic != null) break;
+      }
+
+      if (target_characteristic != null) {
+        try {
+          print('Writing value to characteristic: $characteristic_name');
+          if (target_characteristic.properties.writeWithoutResponse) {
+            await target_characteristic.write(value.codeUnits,
+                withoutResponse: true);
+            summary_message += '$characteristic_name Write: Success\n';
+          } else if (target_characteristic.properties.write) {
+            await target_characteristic.write(value.codeUnits,
+                withoutResponse: false);
+            summary_message += '$characteristic_name Write: Success\n';
+          } else {
+            summary_message +=
+                '$characteristic_name Write: Characteristic not writable\n';
+            all_success = false;
+          }
+          BMS_last_sent_values[characteristic_name] = value;
+        } catch (e) {
+          summary_message += '$characteristic_name Write: Error - $e\n';
           all_success = false;
         }
-        BMS_last_sent_values[characteristic_name] = value;
-      } catch (e) {
-        summary_message += '$characteristic_name Write: Error - $e\n';
+      } else {
+        summary_message +=
+            '$characteristic_name Write: Characteristic not found\n';
         all_success = false;
       }
-    } else {
-      summary_message += '$characteristic_name Write: Characteristic not found\n';
-      all_success = false;
     }
+
+    print(summary_message); // Print the summary message for debugging
+    Snackbar.show(ABC.c, summary_message, success: all_success);
   }
-
-  print(summary_message); // Print the summary message for debugging
-  Snackbar.show(ABC.c, summary_message, success: all_success);
-}
-
 
   Map<String, String> AlgoX_last_sent_values = {};
 
@@ -1374,94 +1368,6 @@ class _DeviceScreenState extends State<DeviceScreen> {
     Snackbar.show(ABC.c, summary_message, success: all_success);
   }
 
-  // Map<String, String> lastSentValues = {};
-
-  // Future<void> onSendAllPressed() async {
-  //   bool allSuccess = true;
-  //   String summaryMessage = '';
-  //   List<String> compulsoryItems = [
-  //     // "Battery_id",
-  //     // "Battery_DSG_C",
-  //     // "Battery_CHG_C"
-  //   ];
-
-  //   // Check if all compulsory items are set
-  //   for (String item in compulsoryItems) {
-  //     String value = _controllers[item]?.text ?? '';
-  //     if (value.isEmpty) {
-  //       summaryMessage += '$item Write: Compulsory item not set\n';
-  //       allSuccess = false;
-  //     }
-  //   }
-
-  //   // If any compulsory item is not set, show a message and return
-  //   if (!allSuccess) {
-  //     Snackbar.show(ABC.c, summaryMessage, success: false);
-  //     return;
-  //   }
-
-  //   // Proceed with the write operations
-  //   for (String characteristicName in uuid_algoBMS_write.keys) {
-  //     String? characteristicUuid = uuid_algoBMS_write[characteristicName];
-  //     String value = _controllers[characteristicName]?.text ?? '';
-
-  //     if (value.isEmpty || characteristicUuid == null) {
-  //       summaryMessage +=
-  //           '$characteristicName Write: No value provided or invalid UUID\n';
-  //       allSuccess = false;
-  //       continue;
-  //     }
-
-  //     // Check if the value has changed since the last send
-  //     if (lastSentValues[characteristicName] == value) {
-  //       summaryMessage +=
-  //           '$characteristicName Write: Value unchanged, not sending\n';
-  //       continue;
-  //     }
-
-  //     BluetoothCharacteristic? targetCharacteristic;
-
-  //     for (var service in services) {
-  //       for (var characteristic in service.characteristics) {
-  //         if (characteristic.uuid.toString() == characteristicUuid) {
-  //           targetCharacteristic = characteristic;
-  //           break;
-  //         }
-  //       }
-  //       if (targetCharacteristic != null) break;
-  //     }
-
-  //     if (targetCharacteristic != null) {
-  //       try {
-  //         if (targetCharacteristic.properties.writeWithoutResponse) {
-  //           await targetCharacteristic.write(value.codeUnits,
-  //               withoutResponse: true);
-  //           summaryMessage += '$characteristicName Write: Success\n';
-  //         } else if (targetCharacteristic.properties.write) {
-  //           await targetCharacteristic.write(value.codeUnits,
-  //               withoutResponse: false);
-  //           summaryMessage += '$characteristicName Write: Success\n';
-  //         } else {
-  //           summaryMessage +=
-  //               '$characteristicName Write: Characteristic not writable\n';
-  //           allSuccess = false;
-  //         }
-  //         // Update the last sent value after a successful send
-  //         lastSentValues[characteristicName] = value;
-  //       } catch (e) {
-  //         summaryMessage += '$characteristicName Write: Error - $e\n';
-  //         allSuccess = false;
-  //       }
-  //     } else {
-  //       summaryMessage +=
-  //           '$characteristicName Write: Characteristic not found\n';
-  //       allSuccess = false;
-  //     }
-  //   }
-
-  //   Snackbar.show(ABC.c, summaryMessage, success: allSuccess);
-  // }
-
   Widget BMS_state_show() {
     final Size size = MediaQuery.of(context).size;
     var state_value = data_fetched["BMS_state"];
@@ -1478,18 +1384,20 @@ class _DeviceScreenState extends State<DeviceScreen> {
       case 1:
       case 2:
       case 5: // Idle Mode
-        return Container(
-          height: size.height * 0.05,
-          color: Colors.blue,
-          child: Padding(
-              padding: const EdgeInsets.all(4),
-              child: TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0.0, end: 1.0),
-                  duration: Duration(seconds: 2),
-                  builder: (context, value, child) {
-                    return Opacity(
-                      opacity: value,
-                      child: Row(
+        return Padding(
+          padding: EdgeInsets.all(4),
+          child: TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0.0, end: 1.0),
+              duration: Duration(seconds: 2),
+              builder: (context, value, child) {
+                return Opacity(
+                  opacity: value,
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: size.height * 0.04,
+                      ),
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.power_off),
@@ -1510,125 +1418,90 @@ class _DeviceScreenState extends State<DeviceScreen> {
                           ),
                         ],
                       ),
-                    );
-                  })),
+                    ],
+                  ),
+                );
+              }),
         );
 
       case 4: // Charging Mode
-        return Container(
-          height: size.height * 0.05,
-          color: Colors.green,
-          child: Padding(
-              padding: const EdgeInsets.all(4),
-              child: TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0.0, end: 1.0),
-                  duration: Duration(seconds: 2),
-                  builder: (context, value, child) {
-                    return Opacity(
-                      opacity: value,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Lottie.asset("assets/gifs/charging.json"),
-                          SizedBox(
-                            width: size.width * 0.01,
-                          ),
-                          Text(
-                            "CHARGE MODE",
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          Spacer(),
-                          Text(
-                            "AlgoBMS",
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          SizedBox(
-                            width: size.width * 0.01,
-                          ),
-                        ],
+        return Padding(
+          padding: EdgeInsets.all(4),
+          child: TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0.0, end: 1.0),
+              duration: Duration(seconds: 2),
+              builder: (context, value, child) {
+                return Opacity(
+                  opacity: value,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                          width: size.width * 0.1,
+                          height: size.height * 0.1,
+                          child: Lottie.asset("assets/gifs/charging.json")),
+                      SizedBox(
+                        width: size.width * 0.01,
                       ),
-                    );
-                  })),
+                      Text(
+                        "CHARGE MODE",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      Spacer(),
+                      Text(
+                        "AlgoBMS",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      SizedBox(
+                        width: size.width * 0.01,
+                      ),
+                    ],
+                  ),
+                );
+              }),
         );
 
       case 3: // Discharging Mode
-        return Container(
-          height: size.height * 0.05,
-          color: Colors.red,
-          child: Padding(
-              padding: const EdgeInsets.all(4),
-              child: TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0.0, end: 1.0),
-                  duration: Duration(seconds: 2),
-                  builder: (context, value, child) {
-                    return Opacity(
-                      opacity: value,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // Icon(Icons.battery_alert_sharp),
-                          Lottie.asset("assets/gifs/charging.json",
-                              reverse: true),
-                          SizedBox(
-                            width: size.width * 0.01,
-                          ),
-                          Text(
-                            "DISCHARGE MODE",
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          Spacer(),
-                          Text(
-                            "AlgoBMS",
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          SizedBox(
-                            width: size.width * 0.01,
-                          ),
-                        ],
+        return Padding(
+          padding: EdgeInsets.all(4),
+          child: TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0.0, end: 1.0),
+              duration: Duration(seconds: 2),
+              builder: (context, value, child) {
+                return Opacity(
+                  opacity: value,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Icon(Icons.battery_alert_sharp),
+                      SizedBox(
+                        width: size.width * 0.1,
+                        height: size.height * 0.1,
+                        child: Lottie.asset("assets/gifs/charging.json",
+                            reverse: true),
                       ),
-                    );
-                  })),
+                      SizedBox(
+                        width: size.width * 0.01,
+                      ),
+                      Text(
+                        "DISCHARGE MODE",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      Spacer(),
+                      Text(
+                        "AlgoBMS",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      SizedBox(
+                        width: size.width * 0.01,
+                      ),
+                    ],
+                  ),
+                );
+              }),
         );
       default:
         return SizedBox.shrink();
-      // return Container(
-      //   height: size.height * 0.05,
-      //   color: Colors.blue,
-      //   child: Padding(
-      //       padding: const EdgeInsets.all(4),
-      //       child: TweenAnimationBuilder<double>(
-      //           tween: Tween<double>(begin: 0.0, end: 1.0),
-      //           duration: Duration(seconds: 2),
-      //           builder: (context, value, child) {
-      //             return Opacity(
-      //               opacity: value,
-      //               child: Row(
-      //                 mainAxisAlignment: MainAxisAlignment.center,
-      //                 children: [
-      //                   SizedBox(
-      //                     width: size.width * 0.01,
-      //                   ),
-      //                   Icon(Icons.power_off),
-      //                   SizedBox(
-      //                     width: size.width * 0.01,
-      //                   ),
-      //                   Text(
-      //                     "MODE",
-      //                     style: TextStyle(fontSize: 20),
-      //                   ),
-      //                   Spacer(),
-      //                   Text(
-      //                     "Device",
-      //                     style: TextStyle(fontSize: 20),
-      //                   ),
-      //                   SizedBox(
-      //                     width: size.width * 0.01,
-      //                   ),
-      //                 ],
-      //               ),
-      //             );
-      //           })),
-      // );
     }
   }
 
@@ -1937,130 +1810,136 @@ class _DeviceScreenState extends State<DeviceScreen> {
     return Expanded(
       child: RefreshIndicator(
         onRefresh: refresh_data,
-        child: ListView(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Battery Voltage',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+        child: Container(
+          color: CustomColors.mainColor_1,
+          child: ListView(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Battery Voltage',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (batteryVoltage * 0.001).toStringAsFixed(3) + ' V',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (batteryVoltage * 0.001).toStringAsFixed(3) + ' V',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Battery Temperature',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Battery Temperature',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (batteryTemperature * 0.01).toStringAsFixed(2) + ' °C',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (batteryTemperature * 0.01).toStringAsFixed(2) + ' °C',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Battery Health Status',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Battery Health Status',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (batteryHealthStatus * 0.001).toStringAsFixed(3) + ' %',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (batteryHealthStatus * 0.001).toStringAsFixed(3) + ' %',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Package Total Capacity',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Package Total Capacity',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (packageTotalCapacity * 1).toStringAsFixed(0) + ' mAh',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (packageTotalCapacity * 1).toStringAsFixed(0) + ' mAh',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Battery Cycle Count',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Battery Cycle Count',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text((batteryCycleCount * 1).toStringAsFixed(0) + ' ',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text((batteryCycleCount * 1).toStringAsFixed(0) + ' ',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'BMS Fault',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'BMS Fault',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text((bmsFault * 1).toStringAsFixed(0) + ' ',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text((bmsFault * 1).toStringAsFixed(0) + ' ',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -3224,542 +3103,548 @@ class _DeviceScreenState extends State<DeviceScreen> {
     return Expanded(
       child: RefreshIndicator(
         onRefresh: refresh_data,
-        child: ListView(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Battery Voltage',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+        child: Container(
+          color: CustomColors.mainColor_1,
+          child: ListView(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Battery Voltage',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (batteryVoltage * 0.001).toStringAsFixed(3) + ' V',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (batteryVoltage * 0.001).toStringAsFixed(3) + ' V',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Battery Current',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Battery Current',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (batteryCurrent * 0.01).toStringAsFixed(2) + ' A',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (batteryCurrent * 0.01).toStringAsFixed(2) + ' A',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Battery Temperature',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Battery Temperature',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (batteryTemperature * 0.01).toStringAsFixed(2) + ' °C',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (batteryTemperature * 0.01).toStringAsFixed(2) + ' °C',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Battery Health Status',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Battery Health Status',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (batteryHealthStatus * 0.001).toStringAsFixed(2) + ' %',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (batteryHealthStatus * 0.001).toStringAsFixed(2) + ' %',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Package Total Capacity',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Package Total Capacity',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (packageTotalCapacity * 1).toStringAsFixed(0) + ' mAh',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (packageTotalCapacity * 1).toStringAsFixed(0) + ' mAh',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Package Remaining Capacity',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Package Remaining Capacity',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (packageRemainingCapacity * 1).toStringAsFixed(0) + ' mAh',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (packageRemainingCapacity * 1).toStringAsFixed(0) + ' mAh',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Battery Full Charge',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Battery Full Charge',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (batteryFullCharge * 0.01).toStringAsFixed(2) + ' mins',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (batteryFullCharge * 0.01).toStringAsFixed(2) + ' mins',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Charging Porfile CV',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Charging Porfile CV',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (chargingPorfileCV * 0.001).toStringAsFixed(3) + ' V',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (chargingPorfileCV * 0.001).toStringAsFixed(3) + ' V',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Charging Porfile CC',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Charging Porfile CC',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (chargingPorfileCC * 0.001).toStringAsFixed(3) + ' A',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (chargingPorfileCC * 0.001).toStringAsFixed(3) + ' A',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Cell1 Voltage',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Cell1 Voltage',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text((cell1Voltage * 0.001).toStringAsFixed(3) + ' V',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text((cell1Voltage * 0.001).toStringAsFixed(3) + ' V',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Cell2 Voltage',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Cell2 Voltage',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text((cell2Voltage * 0.001).toStringAsFixed(3) + ' V',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text((cell2Voltage * 0.001).toStringAsFixed(3) + ' V',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Cell3 Voltage',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Cell3 Voltage',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text((cell3Voltage * 0.001).toStringAsFixed(3) + ' V',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text((cell3Voltage * 0.001).toStringAsFixed(3) + ' V',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Cell4 Voltage',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Cell4 Voltage',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text((cell4Voltage * 0.001).toStringAsFixed(3) + ' V',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text((cell4Voltage * 0.001).toStringAsFixed(3) + ' V',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Cell5 Voltage',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Cell5 Voltage',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text((cell5Voltage * 0.001).toStringAsFixed(3) + ' V',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text((cell5Voltage * 0.001).toStringAsFixed(3) + ' V',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Cell6 Voltage',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Cell6 Voltage',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text((cell6Voltage * 0.001).toStringAsFixed(3) + ' V',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text((cell6Voltage * 0.001).toStringAsFixed(3) + ' V',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Cell7 Voltage',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Cell7 Voltage',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text((cell7Voltage * 0.001).toStringAsFixed(3) + ' V',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text((cell7Voltage * 0.001).toStringAsFixed(3) + ' V',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Cell8 Voltage',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Cell8 Voltage',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text((cell8Voltage * 0.001).toStringAsFixed(3) + ' V',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text((cell8Voltage * 0.001).toStringAsFixed(3) + ' V',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Cell9 Voltage',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Cell9 Voltage',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text((cell9Voltage * 0.001).toStringAsFixed(3) + ' V',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text((cell9Voltage * 0.001).toStringAsFixed(3) + ' V',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Cell10 Voltage',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Cell10 Voltage',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (cell10Voltage * 0.001).toStringAsFixed(3) + ' V',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (cell10Voltage * 0.001).toStringAsFixed(3) + ' V',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Cell11 Voltage',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Cell11 Voltage',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (cell11Voltage * 0.001).toStringAsFixed(3) + ' V',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (cell11Voltage * 0.001).toStringAsFixed(3) + ' V',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Cell12 Voltage',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Cell12 Voltage',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (cell12Voltage * 0.001).toStringAsFixed(3) + ' V',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (cell12Voltage * 0.001).toStringAsFixed(3) + ' V',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Cell13 Voltage',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Cell13 Voltage',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (cell13Voltage * 0.001).toStringAsFixed(3) + ' V',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (cell13Voltage * 0.001).toStringAsFixed(3) + ' V',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Cell14 Voltage',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Cell14 Voltage',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (cell14Voltage * 0.001).toStringAsFixed(3) + ' V',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (cell14Voltage * 0.001).toStringAsFixed(3) + ' V',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Cell15 Voltage',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Cell15 Voltage',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (cell15Voltage * 0.001).toStringAsFixed(3) + ' V',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (cell15Voltage * 0.001).toStringAsFixed(3) + ' V',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Cell16 Voltage',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Cell16 Voltage',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (cell16Voltage * 0.001).toStringAsFixed(3) + ' V',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (cell16Voltage * 0.001).toStringAsFixed(3) + ' V',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'BMS Fault',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'BMS Fault',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text((bmsFault * 1).toStringAsFixed(0) + ' ',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text((bmsFault * 1).toStringAsFixed(0) + ' ',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -3810,173 +3695,185 @@ class _DeviceScreenState extends State<DeviceScreen> {
     return Expanded(
       child: RefreshIndicator(
         onRefresh: refresh_data,
-        child: ListView(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Battery Voltage',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+        child: Container(
+          decoration: BoxDecoration(
+            color: CustomColors.mainColor_1,
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(10),
+              bottomRight: Radius.circular(10)
+            )
+          ),
+          child: ListView(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Battery Voltage',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (batteryVoltage * 0.001).toStringAsFixed(2) + ' V',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (batteryVoltage * 0.001).toStringAsFixed(2) + ' V',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Battery Current',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Battery Current',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (batteryCurrent * 0.01).toStringAsFixed(2) + ' A',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (batteryCurrent * 0.01).toStringAsFixed(2) + ' A',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Battery Temperature',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Battery Temperature',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (batteryTemperature * 0.01).toStringAsFixed(2) + ' °C',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (batteryTemperature * 0.01).toStringAsFixed(2) + ' °C',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Battery Health Status',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Battery Health Status',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (batteryHealthStatus * 0.001).toStringAsFixed(3) + ' %',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (batteryHealthStatus * 0.001).toStringAsFixed(3) + ' %',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Package Total Capacity',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Package Total Capacity',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (packageTotalCapacity * 1).toStringAsFixed(0) + ' mAh',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (packageTotalCapacity * 1).toStringAsFixed(0) + ' mAh',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Package Remaining Capacity',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Package Remaining Capacity',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (packageRemainingCapacity * 1).toStringAsFixed(0) + ' mAh',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (packageRemainingCapacity * 1).toStringAsFixed(0) + ' mAh',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'Battery Discharge',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Battery Discharge',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (batteryDischarge * 0.01).toStringAsFixed(2) + ' mins',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text(
-                    (batteryDischarge * 0.01).toStringAsFixed(2) + ' mins',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(size.height * 0.01),
-                  color: CustomColors.mainColor_3),
-              child: ListTile(
-                title: const Text(
-                  'BMS Fault',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'BMS Fault',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text((bmsFault * 1).toStringAsFixed(0) + ' ',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
                 ),
-                trailing: Text((bmsFault * 1).toStringAsFixed(0) + ' ',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: size.height * 0.018)),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -3989,13 +3886,23 @@ class _DeviceScreenState extends State<DeviceScreen> {
       BMS_write_screen()
     ];
 
+    double batteryHealthStatus = data_fetched["Battery_health_status"] != null
+        ? double.parse(data_fetched["Battery_health_status"]!)
+        : 0.0;
+
+    int stateOfCharge = (batteryHealthStatus / 100).floor();
+    int stateOfHealth = (batteryHealthStatus % 100).round();
+
+    double _stateOfCharge = stateOfCharge / 100;
+    double _stateOfHealth = stateOfHealth / 100;
+
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: Colors.white,
-        toolbarHeight: size.height * 0.05,
+        toolbarHeight: size.height * 0.075,
         flexibleSpace: Padding(
-          padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: Container(
             color: CustomColors.mainColor_1,
           ),
@@ -4006,26 +3913,111 @@ class _DeviceScreenState extends State<DeviceScreen> {
         ),
         actions: [build_connect_button(context)],
       ),
-      body: Padding(
-        padding: EdgeInsets.all(size.height * 0.01),
-        child: Column(
-          children: [
-            SizedBox(height: size.height * 0.01),
-            BMS_state_show(),
-            Container(
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: [Colors.white, Colors.grey.shade500],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter)),
+      body: Column(
+        children: [
+          Stack(
+            children: [
+              Column(
+                children: [
+                  Container(
+                    height: size.height * 0.2,
+                    color: Colors.white,
+                    child: BMS_state_show(),
+                    alignment: Alignment.topCenter,
+                  ),
+                  Container(
+                    height: size.height * 0.1,
+                    decoration: BoxDecoration(
+                        color: CustomColors.mainColor_1,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            topRight: Radius.circular(10))),
+                  ),
+                ],
+              ),
+              Column(
+                children: [
+                  SizedBox(
+                    height: size.height * 0.1,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment
+                        .spaceEvenly,
+                    children: [
+                      SizedBox(
+                        height: size.height * 0.2,
+                        width: size.width * 0.45, 
+                        child: Card(
+                          margin: EdgeInsets.all(size.height * 0.01),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              children: [
+                                Text(
+                                  "State of Charge",
+                                  style: TextStyle(color: Colors.black,fontSize: size.height * 0.02),
+                                ),
+                                Spacer(),
+                                CircularPercentIndicator(
+                                  radius: size.height * 0.05,
+                                  percent: _stateOfCharge,
+                                  lineWidth: 10,
+                                  progressColor: Colors.amber,
+                                  center: Text((_stateOfCharge * 100).toStringAsFixed(1) + '%'),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: size.height * 0.2,
+                        width: size.width * 0.45, 
+                        child: Card(
+                          margin: EdgeInsets.all(size.height * 0.01),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('State of Health',
+                                    style: TextStyle(color: Colors.black,fontSize: size.height * 0.02)),
+                                Spacer(),
+                                CircularPercentIndicator(
+                                  radius: size.height * 0.05,
+                                  percent: _stateOfHealth,
+                                  lineWidth: 10,
+                                  progressColor: Colors.pink,
+                                  center: Text((_stateOfHealth * 100).toStringAsFixed(1) + '%'),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.white, Colors.grey.shade500],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
             ),
-            SizedBox(height: size.height * 0.01),
-            SizedBox(
-              height: size.height * 0.01,
-            ),
-            read_write_screens[BMS_read_write_selector]
-          ],
-        ),
+          ),
+          read_write_screens[BMS_read_write_selector],
+        ],
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -4093,37 +4085,6 @@ class _DeviceScreenState extends State<DeviceScreen> {
                               SizedBox(
                                 width: size.width * 0.01,
                               ),
-                              // Container(
-                              //   decoration: BoxDecoration(
-                              //       borderRadius: BorderRadius.circular(
-                              //           size.height * 0.01),
-                              //       color: Colors.greenAccent),
-                              //   child: Row(
-                              //     mainAxisAlignment: MainAxisAlignment.center,
-                              //     children: [
-                              //       SizedBox(
-                              //         width: size.width * 0.01,
-                              //       ),
-                              //       Text("OFF: "),
-                              //       Switch(
-                              //         value: _isOn,
-                              //         onChanged: (bool value) {
-                              //           setState(() {
-                              //             _isOn = value;
-                              //           });
-                              //           _sendPowerState(value);
-                              //         },
-                              //       ),
-                              //       Text(" :ON"),
-                              //       SizedBox(
-                              //         width: size.width * 0.01,
-                              //       ),
-                              //     ],
-                              //   ),
-                              // ),
-                              // SizedBox(
-                              //   width: size.width * 0.01,
-                              // ),
                             ],
                           ),
                         );
@@ -4144,14 +4105,6 @@ class _DeviceScreenState extends State<DeviceScreen> {
           ],
         ),
       ),
-      // bottomNavigationBar: AnimatedContainer(
-      //   duration: Duration(milliseconds: 300),
-      //   height: _isOn ? 0 : size.height * 0.075,
-      //   child: Padding(
-      //     padding: const EdgeInsets.all(8.0),
-      //     child: AlgoX_bottom_navigation_bar(),
-      //   ),
-      // ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           showAlgoXConfigDialog();
