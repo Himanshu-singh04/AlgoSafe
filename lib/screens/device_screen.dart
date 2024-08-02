@@ -453,110 +453,109 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
   Widget BMS_write_screen() {
     final Size size = MediaQuery.of(context).size;
-    return Container(
-      color: CustomColors.mainColor_1,
-      child: Expanded(
-        child: Form(
-          key: BMS_form_key,
-          child: ListView(
-            children: [
-              Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: build_drop_down_for_characteristic("Battery_cell_nos"),
+    return Expanded(
+      child: Form(
+        key: BMS_form_key,
+        child: ListView(
+          children: [
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: build_drop_down_for_characteristic("Battery_cell_nos"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: build_text_field_for_characteristic("Battery_id*"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: build_text_field_for_characteristic("BMS_id*"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: build_slider_for_characteristic("Battery_capacity"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: build_slider_for_characteristic(
+                      "Battery_constant_current"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child:
+                      build_slider_for_characteristic("Battery_peak_current"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: build_slider_for_characteristic("Battery_max_voltage"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: build_slider_for_characteristic("Battery_min_voltage"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: build_slider_for_characteristic(
+                      "Battery_operating_temperature"),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: build_toggle_for_characteristic("Battery_DSG_C"),
+                ),
+                if (toggle_values["Battery_DSG_C"] == true)
+                  ExpansionTile(
+                    title: Text('Battery Discharge Settings'),
+                    initiallyExpanded: true,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(6.0),
+                        child:
+                            build_toggle_for_characteristic("DSG_OverCurrent"),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(6.0),
+                        child:
+                            build_toggle_for_characteristic("CHG_OverVoltage"),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(6.0),
+                        child: build_toggle_for_characteristic(
+                            "DSG_OverTemperature"),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(6.0),
+                        child: build_toggle_for_characteristic(
+                            "CHG_OverTemperature"),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(6.0),
+                        child:
+                            build_toggle_for_characteristic("DSG_UnderVoltage"),
+                      ),
+                    ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: build_text_field_for_characteristic("Battery_id*"),
+                Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: build_toggle_for_characteristic("Battery_CHG_C"),
+                ),
+                if (toggle_values["Battery_CHG_C"] == true)
+                  ExpansionTile(
+                    title: Text('Battery Charge Settings'),
+                    initiallyExpanded: true,
+                    children: [
+                      SizedBox(height: size.height * 0.01),
+                      Padding(
+                        padding: const EdgeInsets.all(6.0),
+                        child: build_slider_for_characteristic("SOC"),
+                      ),
+                    ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: build_text_field_for_characteristic("BMS_id*"),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: build_slider_for_characteristic("Battery_capacity"),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: build_slider_for_characteristic(
-                        "Battery_constant_current"),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child:
-                        build_slider_for_characteristic("Battery_peak_current"),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: build_slider_for_characteristic("Battery_max_voltage"),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: build_slider_for_characteristic("Battery_min_voltage"),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: build_slider_for_characteristic(
-                        "Battery_operating_temperature"),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: build_toggle_for_characteristic("Battery_DSG_C"),
-                  ),
-                  if (toggle_values["Battery_DSG_C"] == true)
-                    ExpansionTile(
-                      title: Text('Battery Discharge Settings'),
-                      initiallyExpanded: true,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child:
-                              build_toggle_for_characteristic("DSG_OverCurrent"),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child:
-                              build_toggle_for_characteristic("CHG_OverVoltage"),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: build_toggle_for_characteristic(
-                              "DSG_OverTemperature"),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: build_toggle_for_characteristic(
-                              "CHG_OverTemperature"),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child:
-                              build_toggle_for_characteristic("DSG_UnderVoltage"),
-                        ),
-                      ],
-                    ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: build_toggle_for_characteristic("Battery_CHG_C"),
-                  ),
-                  if (toggle_values["Battery_CHG_C"] == true)
-                    ExpansionTile(
-                      title: Text('Battery Charge Settings'),
-                      initiallyExpanded: true,
-                      children: [
-                        SizedBox(height: size.height * 0.01),
-                        Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: build_slider_for_characteristic("SOC"),
-                        ),
-                      ],
-                    ),
-                ],
-              ),
-              SizedBox(height: size.height * 0.02),
-              ElevatedButton(
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: CustomColors.mainColor_1,
                 ),
@@ -570,8 +569,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   style: TextStyle(color: Colors.white),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -1385,120 +1384,130 @@ class _DeviceScreenState extends State<DeviceScreen> {
       case 2:
       case 5: // Idle Mode
         return Padding(
-          padding: EdgeInsets.all(4),
-          child: TweenAnimationBuilder<double>(
-              tween: Tween<double>(begin: 0.0, end: 1.0),
-              duration: Duration(seconds: 2),
-              builder: (context, value, child) {
-                return Opacity(
-                  opacity: value,
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: size.height * 0.04,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.power_off),
-                          SizedBox(
-                            width: size.width * 0.01,
-                          ),
-                          Text(
-                            "IDLE MODE",
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          Spacer(),
-                          Text(
-                            "AlgoBMS",
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          SizedBox(
-                            width: size.width * 0.01,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              }),
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            height: size.height * 0.075,
+            decoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.all(Radius.circular(10))),
+            child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: 0.0, end: 1.0),
+                    duration: Duration(seconds: 2),
+                    builder: (context, value, child) {
+                      return Opacity(
+                        opacity: value,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.power_off),
+                            SizedBox(
+                              width: size.width * 0.01,
+                            ),
+                            Text(
+                              "IDLE MODE",
+                              style: TextStyle(fontSize: 20),
+                            ),
+                            Spacer(),
+                            Text(
+                              "AlgoBMS",
+                              style: TextStyle(fontSize: 20),
+                            ),
+                            SizedBox(
+                              width: size.width * 0.01,
+                            ),
+                          ],
+                        ),
+                      );
+                    })),
+          ),
         );
 
       case 4: // Charging Mode
         return Padding(
-          padding: EdgeInsets.all(4),
-          child: TweenAnimationBuilder<double>(
-              tween: Tween<double>(begin: 0.0, end: 1.0),
-              duration: Duration(seconds: 2),
-              builder: (context, value, child) {
-                return Opacity(
-                  opacity: value,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                          width: size.width * 0.1,
-                          height: size.height * 0.1,
-                          child: Lottie.asset("assets/gifs/charging.json")),
-                      SizedBox(
-                        width: size.width * 0.01,
-                      ),
-                      Text(
-                        "CHARGE MODE",
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      Spacer(),
-                      Text(
-                        "AlgoBMS",
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      SizedBox(
-                        width: size.width * 0.01,
-                      ),
-                    ],
-                  ),
-                );
-              }),
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            height: size.height * 0.075,
+            decoration: BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.all(Radius.circular(10))),
+            child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: 0.0, end: 1.0),
+                    duration: Duration(seconds: 2),
+                    builder: (context, value, child) {
+                      return Opacity(
+                        opacity: value,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Lottie.asset("assets/gifs/charging.json"),
+                            SizedBox(
+                              width: size.width * 0.01,
+                            ),
+                            Text(
+                              "CHARGE MODE",
+                              style: TextStyle(fontSize: 20),
+                            ),
+                            Spacer(),
+                            Text(
+                              "AlgoBMS",
+                              style: TextStyle(fontSize: 20),
+                            ),
+                            SizedBox(
+                              width: size.width * 0.01,
+                            ),
+                          ],
+                        ),
+                      );
+                    })),
+          ),
         );
 
       case 3: // Discharging Mode
         return Padding(
-          padding: EdgeInsets.all(4),
-          child: TweenAnimationBuilder<double>(
-              tween: Tween<double>(begin: 0.0, end: 1.0),
-              duration: Duration(seconds: 2),
-              builder: (context, value, child) {
-                return Opacity(
-                  opacity: value,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Icon(Icons.battery_alert_sharp),
-                      SizedBox(
-                        width: size.width * 0.1,
-                        height: size.height * 0.1,
-                        child: Lottie.asset("assets/gifs/charging.json",
-                            reverse: true),
-                      ),
-                      SizedBox(
-                        width: size.width * 0.01,
-                      ),
-                      Text(
-                        "DISCHARGE MODE",
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      Spacer(),
-                      Text(
-                        "AlgoBMS",
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      SizedBox(
-                        width: size.width * 0.01,
-                      ),
-                    ],
-                  ),
-                );
-              }),
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            height: size.height * 0.075,
+            decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.all(Radius.circular(10))),
+            child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: 0.0, end: 1.0),
+                    duration: Duration(seconds: 2),
+                    builder: (context, value, child) {
+                      return Opacity(
+                        opacity: value,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Icon(Icons.battery_alert_sharp),
+                            Lottie.asset("assets/gifs/charging.json",
+                                reverse: true),
+                            SizedBox(
+                              width: size.width * 0.01,
+                            ),
+                            Text(
+                              "DISCHARGE MODE",
+                              style: TextStyle(fontSize: 20),
+                            ),
+                            Spacer(),
+                            Text(
+                              "AlgoBMS",
+                              style: TextStyle(fontSize: 20),
+                            ),
+                            SizedBox(
+                              width: size.width * 0.01,
+                            ),
+                          ],
+                        ),
+                      );
+                    })),
+          ),
         );
       default:
         return SizedBox.shrink();
@@ -1801,6 +1810,12 @@ class _DeviceScreenState extends State<DeviceScreen> {
         ? double.parse(data_fetched["BMS_fault"]!)
         : 0.0;
 
+    int stateOfCharge = (batteryHealthStatus / 100).floor();
+    int stateOfHealth = (batteryHealthStatus % 100).round();
+
+    double _stateOfCharge = stateOfCharge / 100;
+    double _stateOfHealth = stateOfHealth / 100;
+
     Future<void> refresh_data() async {
       setState(() {
         on_refresh_pressed();
@@ -1818,6 +1833,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -1839,6 +1865,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -1860,6 +1897,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -1881,6 +1929,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -1902,6 +1961,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -1910,7 +1980,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
-                    trailing: Text((batteryCycleCount * 1).toStringAsFixed(0) + ' ',
+                    trailing: Text(
+                        (batteryCycleCount * 1).toStringAsFixed(0) + ' ',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -1922,6 +1993,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -1938,6 +2020,117 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   ),
                 ),
               ),
+              if (BMS_read_write_selector == 0)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    color: CustomColors.mainColor_1,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        SizedBox(
+                          height: size.height * 0.2,
+                          width: size.width * 0.45,
+                          child: Card(
+                            margin: EdgeInsets.all(size.height * 0.01),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    "State of Charge",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: size.height * 0.02),
+                                  ),
+                                  Spacer(),
+                                  TweenAnimationBuilder<double>(
+                                    tween: Tween<double>(
+                                        begin: 0, end: _stateOfCharge),
+                                    duration: Duration(seconds: 2),
+                                    builder: (context, value, child) {
+                                      Color color;
+                                      if (value < 0.25) {
+                                        color = Colors.red;
+                                      } else if (value >= 0.25 &&
+                                          value <= 0.75) {
+                                        color = Colors.amber;
+                                      } else {
+                                        color = Colors.green;
+                                      }
+                                      return CircularPercentIndicator(
+                                        radius: size.height * 0.05,
+                                        percent: value,
+                                        lineWidth: 10,
+                                        progressColor: color,
+                                        center: Text(
+                                          (value * 100).toStringAsFixed(1) +
+                                              '%',
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: size.height * 0.2,
+                          width: size.width * 0.45,
+                          child: Card(
+                            margin: EdgeInsets.all(size.height * 0.01),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text('State of Health',
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: size.height * 0.02)),
+                                  Spacer(),
+                                  TweenAnimationBuilder<double>(
+                                    tween: Tween<double>(
+                                        begin: 0, end: _stateOfHealth),
+                                    duration: Duration(seconds: 2),
+                                    builder: (context, value, child) {
+                                      Color color;
+                                      if (value < 0.25) {
+                                        color = Colors.red;
+                                      } else if (value >= 0.25 &&
+                                          value <= 0.75) {
+                                        color = Colors.amber;
+                                      } else {
+                                        color = Colors.green;
+                                      }
+                                      return CircularPercentIndicator(
+                                        radius: size.height * 0.05,
+                                        percent: value,
+                                        lineWidth: 10,
+                                        progressColor: color,
+                                        center: Text(
+                                          (value * 100).toStringAsFixed(1) +
+                                              '%',
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -3094,6 +3287,12 @@ class _DeviceScreenState extends State<DeviceScreen> {
         ? double.parse(data_fetched["BMS_fault"]!)
         : 0.0;
 
+    int stateOfCharge = (batteryHealthStatus / 100).floor();
+    int stateOfHealth = (batteryHealthStatus % 100).round();
+
+    double _stateOfCharge = stateOfCharge / 100;
+    double _stateOfHealth = stateOfHealth / 100;
+
     Future<void> refresh_data() async {
       setState(() {
         on_refresh_pressed();
@@ -3111,6 +3310,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3132,6 +3342,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3153,6 +3374,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3170,31 +3402,132 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Battery Health Status',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
+              if (BMS_read_write_selector == 0)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    color: CustomColors.mainColor_1,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        SizedBox(
+                          height: size.height * 0.2,
+                          width: size.width * 0.45,
+                          child: Card(
+                            margin: EdgeInsets.all(size.height * 0.01),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    "State of Charge",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: size.height * 0.02),
+                                  ),
+                                  Spacer(),
+                                  TweenAnimationBuilder<double>(
+                                    tween: Tween<double>(
+                                        begin: 0, end: _stateOfCharge),
+                                    duration: Duration(seconds: 2),
+                                    builder: (context, value, child) {
+                                      Color color;
+                                      if (value < 0.25) {
+                                        color = Colors.red;
+                                      } else if (value >= 0.25 &&
+                                          value <= 0.75) {
+                                        color = Colors.amber;
+                                      } else {
+                                        color = Colors.green;
+                                      }
+                                      return CircularPercentIndicator(
+                                        radius: size.height * 0.05,
+                                        percent: value,
+                                        lineWidth: 10,
+                                        progressColor: color,
+                                        center: Text(
+                                          (value * 100).toStringAsFixed(1) +
+                                              '%',
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: size.height * 0.2,
+                          width: size.width * 0.45,
+                          child: Card(
+                            margin: EdgeInsets.all(size.height * 0.01),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text('State of Health',
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: size.height * 0.02)),
+                                  Spacer(),
+                                  TweenAnimationBuilder<double>(
+                                    tween: Tween<double>(
+                                        begin: 0, end: _stateOfHealth),
+                                    duration: Duration(seconds: 2),
+                                    builder: (context, value, child) {
+                                      Color color;
+                                      if (value < 0.25) {
+                                        color = Colors.red;
+                                      } else if (value >= 0.25 &&
+                                          value <= 0.75) {
+                                        color = Colors.amber;
+                                      } else {
+                                        color = Colors.green;
+                                      }
+                                      return CircularPercentIndicator(
+                                        radius: size.height * 0.05,
+                                        percent: value,
+                                        lineWidth: 10,
+                                        progressColor: color,
+                                        center: Text(
+                                          (value * 100).toStringAsFixed(1) +
+                                              '%',
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    trailing: Text(
-                        (batteryHealthStatus * 0.001).toStringAsFixed(2) + ' %',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
                   ),
                 ),
-              ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3216,6 +3549,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3225,7 +3569,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                     trailing: Text(
-                        (packageRemainingCapacity * 1).toStringAsFixed(0) + ' mAh',
+                        (packageRemainingCapacity * 1).toStringAsFixed(0) +
+                            ' mAh',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -3237,6 +3582,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3258,6 +3614,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3279,6 +3646,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3300,6 +3678,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3308,7 +3697,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
-                    trailing: Text((cell1Voltage * 0.001).toStringAsFixed(3) + ' V',
+                    trailing: Text(
+                        (cell1Voltage * 0.001).toStringAsFixed(3) + ' V',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -3320,6 +3710,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3328,7 +3729,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
-                    trailing: Text((cell2Voltage * 0.001).toStringAsFixed(3) + ' V',
+                    trailing: Text(
+                        (cell2Voltage * 0.001).toStringAsFixed(3) + ' V',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -3340,6 +3742,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3348,7 +3761,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
-                    trailing: Text((cell3Voltage * 0.001).toStringAsFixed(3) + ' V',
+                    trailing: Text(
+                        (cell3Voltage * 0.001).toStringAsFixed(3) + ' V',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -3360,6 +3774,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3368,7 +3793,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
-                    trailing: Text((cell4Voltage * 0.001).toStringAsFixed(3) + ' V',
+                    trailing: Text(
+                        (cell4Voltage * 0.001).toStringAsFixed(3) + ' V',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -3380,6 +3806,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3388,7 +3825,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
-                    trailing: Text((cell5Voltage * 0.001).toStringAsFixed(3) + ' V',
+                    trailing: Text(
+                        (cell5Voltage * 0.001).toStringAsFixed(3) + ' V',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -3400,6 +3838,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3408,7 +3857,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
-                    trailing: Text((cell6Voltage * 0.001).toStringAsFixed(3) + ' V',
+                    trailing: Text(
+                        (cell6Voltage * 0.001).toStringAsFixed(3) + ' V',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -3420,6 +3870,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3428,7 +3889,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
-                    trailing: Text((cell7Voltage * 0.001).toStringAsFixed(3) + ' V',
+                    trailing: Text(
+                        (cell7Voltage * 0.001).toStringAsFixed(3) + ' V',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -3440,6 +3902,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3448,7 +3921,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
-                    trailing: Text((cell8Voltage * 0.001).toStringAsFixed(3) + ' V',
+                    trailing: Text(
+                        (cell8Voltage * 0.001).toStringAsFixed(3) + ' V',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -3460,6 +3934,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3468,7 +3953,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
-                    trailing: Text((cell9Voltage * 0.001).toStringAsFixed(3) + ' V',
+                    trailing: Text(
+                        (cell9Voltage * 0.001).toStringAsFixed(3) + ' V',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -3480,6 +3966,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3501,6 +3998,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3522,6 +4030,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3543,6 +4062,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3564,6 +4094,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3585,6 +4126,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3606,6 +4158,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3627,6 +4190,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3686,6 +4260,12 @@ class _DeviceScreenState extends State<DeviceScreen> {
         ? double.parse(data_fetched["BMS_fault"]!)
         : 0.0;
 
+    int stateOfCharge = (batteryHealthStatus / 100).floor();
+    int stateOfHealth = (batteryHealthStatus % 100).round();
+
+    double _stateOfCharge = stateOfCharge / 100;
+    double _stateOfHealth = stateOfHealth / 100;
+
     Future<void> refresh_data() async {
       setState(() {
         on_refresh_pressed();
@@ -3697,18 +4277,27 @@ class _DeviceScreenState extends State<DeviceScreen> {
         onRefresh: refresh_data,
         child: Container(
           decoration: BoxDecoration(
-            color: CustomColors.mainColor_1,
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(10),
-              bottomRight: Radius.circular(10)
-            )
-          ),
+              color: CustomColors.mainColor_1,
+              borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(10),
+                  bottomRight: Radius.circular(10))),
           child: ListView(
             children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3730,6 +4319,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3751,6 +4351,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3768,31 +4379,132 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Battery Health Status',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
+              if (BMS_read_write_selector == 0)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    color: CustomColors.mainColor_1,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        SizedBox(
+                          height: size.height * 0.2,
+                          width: size.width * 0.45,
+                          child: Card(
+                            margin: EdgeInsets.all(size.height * 0.01),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    "State of Charge",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: size.height * 0.02),
+                                  ),
+                                  Spacer(),
+                                  TweenAnimationBuilder<double>(
+                                    tween: Tween<double>(
+                                        begin: 0, end: _stateOfCharge),
+                                    duration: Duration(seconds: 2),
+                                    builder: (context, value, child) {
+                                      Color color;
+                                      if (value < 0.25) {
+                                        color = Colors.red;
+                                      } else if (value >= 0.25 &&
+                                          value <= 0.75) {
+                                        color = Colors.amber;
+                                      } else {
+                                        color = Colors.green;
+                                      }
+                                      return CircularPercentIndicator(
+                                        radius: size.height * 0.05,
+                                        percent: value,
+                                        lineWidth: 10,
+                                        progressColor: color,
+                                        center: Text(
+                                          (value * 100).toStringAsFixed(1) +
+                                              '%',
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: size.height * 0.2,
+                          width: size.width * 0.45,
+                          child: Card(
+                            margin: EdgeInsets.all(size.height * 0.01),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text('State of Health',
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: size.height * 0.02)),
+                                  Spacer(),
+                                  TweenAnimationBuilder<double>(
+                                    tween: Tween<double>(
+                                        begin: 0, end: _stateOfHealth),
+                                    duration: Duration(seconds: 2),
+                                    builder: (context, value, child) {
+                                      Color color;
+                                      if (value < 0.25) {
+                                        color = Colors.red;
+                                      } else if (value >= 0.25 &&
+                                          value <= 0.75) {
+                                        color = Colors.amber;
+                                      } else {
+                                        color = Colors.green;
+                                      }
+                                      return CircularPercentIndicator(
+                                        radius: size.height * 0.05,
+                                        percent: value,
+                                        lineWidth: 10,
+                                        progressColor: color,
+                                        center: Text(
+                                          (value * 100).toStringAsFixed(1) +
+                                              '%',
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    trailing: Text(
-                        (batteryHealthStatus * 0.001).toStringAsFixed(3) + ' %',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
                   ),
                 ),
-              ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3814,6 +4526,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3823,7 +4546,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                     trailing: Text(
-                        (packageRemainingCapacity * 1).toStringAsFixed(0) + ' mAh',
+                        (packageRemainingCapacity * 1).toStringAsFixed(0) +
+                            ' mAh',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -3835,6 +4559,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3856,6 +4591,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
                       borderRadius: BorderRadius.circular(size.height * 0.01),
                       color: CustomColors.mainColor_3),
                   child: ListTile(
@@ -3886,16 +4632,6 @@ class _DeviceScreenState extends State<DeviceScreen> {
       BMS_write_screen()
     ];
 
-    double batteryHealthStatus = data_fetched["Battery_health_status"] != null
-        ? double.parse(data_fetched["Battery_health_status"]!)
-        : 0.0;
-
-    int stateOfCharge = (batteryHealthStatus / 100).floor();
-    int stateOfHealth = (batteryHealthStatus % 100).round();
-
-    double _stateOfCharge = stateOfCharge / 100;
-    double _stateOfHealth = stateOfHealth / 100;
-
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.white),
@@ -3917,93 +4653,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
         children: [
           Stack(
             children: [
-              Column(
-                children: [
-                  Container(
-                    height: size.height * 0.2,
-                    color: Colors.white,
-                    child: BMS_state_show(),
-                    alignment: Alignment.topCenter,
-                  ),
-                  Container(
-                    height: size.height * 0.1,
-                    decoration: BoxDecoration(
-                        color: CustomColors.mainColor_1,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(10),
-                            topRight: Radius.circular(10))),
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  SizedBox(
-                    height: size.height * 0.1,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment
-                        .spaceEvenly,
-                    children: [
-                      SizedBox(
-                        height: size.height * 0.2,
-                        width: size.width * 0.45, 
-                        child: Card(
-                          margin: EdgeInsets.all(size.height * 0.01),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              children: [
-                                Text(
-                                  "State of Charge",
-                                  style: TextStyle(color: Colors.black,fontSize: size.height * 0.02),
-                                ),
-                                Spacer(),
-                                CircularPercentIndicator(
-                                  radius: size.height * 0.05,
-                                  percent: _stateOfCharge,
-                                  lineWidth: 10,
-                                  progressColor: Colors.amber,
-                                  center: Text((_stateOfCharge * 100).toStringAsFixed(1) + '%'),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: size.height * 0.2,
-                        width: size.width * 0.45, 
-                        child: Card(
-                          margin: EdgeInsets.all(size.height * 0.01),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text('State of Health',
-                                    style: TextStyle(color: Colors.black,fontSize: size.height * 0.02)),
-                                Spacer(),
-                                CircularPercentIndicator(
-                                  radius: size.height * 0.05,
-                                  percent: _stateOfHealth,
-                                  lineWidth: 10,
-                                  progressColor: Colors.pink,
-                                  center: Text((_stateOfHealth * 100).toStringAsFixed(1) + '%'),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+              Container(
+                height: size.height * 0.1,
+                color: Colors.white,
+                child: Center(child: BMS_state_show()),
+                alignment: Alignment.topCenter,
               ),
             ],
           ),
