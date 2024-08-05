@@ -2394,7 +2394,7 @@ String _formatCharacteristicName(String characteristic) {
                       color: CustomColors.mainColor_3),
                   child: ListTile(
                     title: const Text(
-                      'Battery Voltage',
+                      'Voltage',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
@@ -2426,7 +2426,7 @@ String _formatCharacteristicName(String characteristic) {
                       color: CustomColors.mainColor_3),
                   child: ListTile(
                     title: const Text(
-                      'Battery Current',
+                      'Current',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
@@ -2458,7 +2458,7 @@ String _formatCharacteristicName(String characteristic) {
                       color: CustomColors.mainColor_3),
                   child: ListTile(
                     title: const Text(
-                      'Battery Temperature',
+                      'Temperature',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
