@@ -155,12 +155,13 @@ class _ScanResultTileState extends State<ScanResultTile> {
                 ],
               ),
             ),
-            Container(
-              // color: Colors.pink,
-              height: size.height * 0.1,
-              width: size.width * 0.3,
-              child: Image.asset("assets/images/esp32.png"),
-            ),
+            Spacer(),
+            // Container(
+            //   // color: Colors.pink,
+            //   height: size.height * 0.1,
+            //   width: size.width * 0.3,
+            //   child: Image.asset("assets/images/esp32.png"),
+            // ),
             Container(
               // color: Colors.pink,
               height: size.height * 0.1,

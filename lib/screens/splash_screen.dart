@@ -73,8 +73,8 @@ class _splash_screenState extends State<splash_screen> {
                       ),
                       Spacer(),
                       SizedBox(
-                          height: size.height * 0.25,
-                          width: size.width * 0.5,
+                          height: size.height * 0.15,
+                          width: size.width * 0.35,
                           child: Lottie.asset("assets/gifs/drone_flying.json")),
                     ],
                   )),
