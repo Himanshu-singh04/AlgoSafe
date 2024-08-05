@@ -1816,6 +1816,10 @@ class _DeviceScreenState extends State<DeviceScreen> {
         ? double.parse(data_fetched["Battery_current"]!)
         : 0.0;
 
+    double batteryTemperature = data_fetched["Battery_temperature"] != null
+        ? double.parse(data_fetched["Battery_temperature"]!)
+        : 0.0;
+
     // double cell1Voltage = data_fetched["cell1_voltage"] != null
     //     ? double.parse(data_fetched["cell1_voltage"]!)
     //     : 0.0;
@@ -1933,23 +1937,23 @@ class _DeviceScreenState extends State<DeviceScreen> {
             SizedBox(
               height: size.height * 0.01,
             ),
-            // Container(
-            //   decoration: BoxDecoration(
-            //       borderRadius: BorderRadius.circular(size.height * 0.01),
-            //       color: CustomColors.mainColor_3),
-            //   child: ListTile(
-            //     title: const Text(
-            //       'Cell1 Voltage',
-            //       style: TextStyle(
-            //           fontWeight: FontWeight.bold, color: Colors.white),
-            //     ),
-            //     trailing: Text((cell1Voltage * 0.001).toStringAsFixed(3) + ' V',
-            //         style: TextStyle(
-            //             fontWeight: FontWeight.bold,
-            //             color: Colors.white,
-            //             fontSize: size.height * 0.018)),
-            //   ),
-            // ),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size.height * 0.01),
+                  color: CustomColors.mainColor_3),
+              child: ListTile(
+                title: const Text(
+                  'Battery Temperature',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                trailing: Text((batteryTemperature * 0.01).toStringAsFixed(2) + ' °C',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: size.height * 0.018)),
+              ),
+            ),
             // SizedBox(
             //   height: size.height * 0.01,
             // ),
