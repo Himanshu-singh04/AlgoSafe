@@ -9,7 +9,6 @@ class drawer_screen extends StatefulWidget {
 }
 
 class _drawer_screenState extends State<drawer_screen> {
-
   // drawer screen activities
   @override
   Widget build(BuildContext context) {
@@ -166,6 +165,8 @@ class _drawer_screenState extends State<drawer_screen> {
               ],
             ),
           ),
+
+          // stack to overlap the screens
           Stack(children: [
             Container(
               width: size.width,
@@ -190,7 +191,6 @@ class _drawer_screenState extends State<drawer_screen> {
                     borderRadius: BorderRadius.circular(30),
                     color: CustomColors.mainColor_1,
                   ),
-                  
                 ),
               ),
             ),
