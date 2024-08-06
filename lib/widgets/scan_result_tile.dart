@@ -70,6 +70,9 @@ class _ScanResultTileState extends State<ScanResultTile> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          SizedBox(
+            height: size.height * 0.0125,
+          ),
           Text(
             widget.result.device.platformName,
             overflow: TextOverflow.ellipsis,
@@ -78,10 +81,10 @@ class _ScanResultTileState extends State<ScanResultTile> {
               fontWeight: FontWeight.w400
             ),
           ),
-          Text(
-            widget.result.device.remoteId.str,
-            style: TextStyle(fontSize: size.height * 0.0125),
-          )
+          // Text(
+          //   widget.result.device.remoteId.str,
+          //   style: TextStyle(fontSize: size.height * 0.0125),
+          // )
         ],
       );
     } else {
