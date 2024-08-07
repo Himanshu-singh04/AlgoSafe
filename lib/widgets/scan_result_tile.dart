@@ -78,10 +78,10 @@ class _ScanResultTileState extends State<ScanResultTile> {
               fontWeight: FontWeight.w400
             ),
           ),
-          Text(
-            widget.result.device.remoteId.str,
-            style: TextStyle(fontSize: size.height * 0.0125),
-          )
+          // Text(
+          //   widget.result.device.remoteId.str,
+          //   style: TextStyle(fontSize: size.height * 0.0125),
+          // )
         ],
       );
     } else {
@@ -150,18 +150,18 @@ class _ScanResultTileState extends State<ScanResultTile> {
               width: size.width * 0.25,
               child: Column(
                 children: [
-                  SizedBox(height: size.height * 0.025,),
-                  _buildTitle(context),
+                  SizedBox(height: size.height * 0.035,),
+                  Center(child: _buildTitle(context)),
                 ],
               ),
             ),
             Spacer(),
-            // Container(
-            //   // color: Colors.pink,
-            //   height: size.height * 0.1,
-            //   width: size.width * 0.3,
-            //   child: Image.asset("assets/images/esp32.png"),
-            // ),
+            Container(
+              // color: Colors.pink,
+              height: size.height * 0.1,
+              width: size.width * 0.3,
+              child: Image.asset("assets/images/esp32.png"),
+            ),
             Container(
               // color: Colors.pink,
               height: size.height * 0.1,

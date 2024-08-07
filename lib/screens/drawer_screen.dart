@@ -185,15 +185,15 @@ class _drawer_screenState extends State<drawer_screen> {
                   ),
                   color: Colors.white,
                 ),
-                // child: Padding(
-                //   padding: const EdgeInsets.all(12.0),
-                //   child: Container(
-                //     decoration: BoxDecoration(
-                //       borderRadius: BorderRadius.circular(30),
-                //       color: CustomColors.mainColor_1,
-                //     ),
-                //   ),
-                // ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30),
+                      color: CustomColors.mainColor_1,
+                    ),
+                  ),
+                ),
               ),
             ])
           ],
