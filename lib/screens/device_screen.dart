@@ -1842,9 +1842,9 @@ String _formatCharacteristicName(String characteristic) {
         ? double.parse(data_fetched["Battery_voltage"]!)
         : 0.0;
 
-    // double batteryTemperature = data_fetched["Battery_temperature"] != null
-    //     ? double.parse(data_fetched["Battery_temperature"]!)
-    //     : 0.0;
+    double batteryTemperature = data_fetched["Battery_temperature"] != null
+        ? double.parse(data_fetched["Battery_temperature"]!)
+        : 0.0;
 
     // double batteryHealthStatus = data_fetched["Battery_health_status"] != null
     //     ? double.parse(data_fetched["Battery_health_status"]!)
@@ -1932,60 +1932,19 @@ String _formatCharacteristicName(String characteristic) {
                       color: CustomColors.mainColor_3),
                   child: ListTile(
                     title: const Text(
-                      'Charger Health',
+                      'Temperature',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
-                    trailing: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        borderRadius: BorderRadius.all(Radius.circular(10))
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                            "  Good  ",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                fontSize: size.height * 0.018)),
-                      ),
-                    ),
+                    trailing: Text(
+                        (batteryTemperature * 0.01).toStringAsFixed(2) + ' °C',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
                   ),
                 ),
               ),
-              // Padding(
-              //   padding: const EdgeInsets.all(8.0),
-              //   child: Container(
-              //     decoration: BoxDecoration(
-              //         gradient: LinearGradient(
-              //             begin: Alignment.centerLeft,
-              //             end: Alignment.centerRight,
-              //             colors: [
-              //               CustomColors.mainColor_3,
-              //               CustomColors.mainColor_3,
-              //               CustomColors.mainColor_3,
-              //               CustomColors.mainColor_3,
-              //               CustomColors.mainColor_2,
-              //               CustomColors.mainColor_2
-              //             ]),
-              //         borderRadius: BorderRadius.circular(size.height * 0.01),
-              //         color: CustomColors.mainColor_3),
-              //     child: ListTile(
-              //       title: const Text(
-              //         'Temperature',
-              //         style: TextStyle(
-              //             fontWeight: FontWeight.bold, color: Colors.white),
-              //       ),
-              //       trailing: Text(
-              //           (batteryTemperature * 0.01).toStringAsFixed(2) + ' °C',
-              //           style: TextStyle(
-              //               fontWeight: FontWeight.bold,
-              //               color: Colors.white,
-              //               fontSize: size.height * 0.018)),
-              //     ),
-              //   ),
-              // ),
               // Padding(
               //   padding: const EdgeInsets.all(8.0),
               //   child: Container(
@@ -3768,9 +3727,9 @@ String _formatCharacteristicName(String characteristic) {
         ? double.parse(data_fetched["Battery_current"]!)
         : 0.0;
 
-    // double batteryTemperature = data_fetched["Battery_temperature"] != null
-    //     ? double.parse(data_fetched["Battery_temperature"]!)
-    //     : 0.0;
+    double batteryTemperature = data_fetched["Battery_temperature"] != null
+        ? double.parse(data_fetched["Battery_temperature"]!)
+        : 0.0;
 
     // double batteryHealthStatus = data_fetched["Battery_health_status"] != null
     //     ? double.parse(data_fetched["Battery_health_status"]!)
@@ -3797,37 +3756,37 @@ String _formatCharacteristicName(String characteristic) {
     //     ? double.parse(data_fetched["Charging_Porfile_cc"]!)
     //     : 0.0;
 
-    double cell1Voltage = data_fetched["cell1_voltage"] != null
-        ? double.parse(data_fetched["cell1_voltage"]!)
-        : 0.0;
+    // double cell1Voltage = data_fetched["cell1_voltage"] != null
+    //     ? double.parse(data_fetched["cell1_voltage"]!)
+    //     : 0.0;
 
-    double cell2Voltage = data_fetched["cell2_voltage"] != null
-        ? double.parse(data_fetched["cell2_voltage"]!)
-        : 0.0;
+    // double cell2Voltage = data_fetched["cell2_voltage"] != null
+    //     ? double.parse(data_fetched["cell2_voltage"]!)
+    //     : 0.0;
 
-    double cell3Voltage = data_fetched["cell3_voltage"] != null
-        ? double.parse(data_fetched["cell3_voltage"]!)
-        : 0.0;
+    // double cell3Voltage = data_fetched["cell3_voltage"] != null
+    //     ? double.parse(data_fetched["cell3_voltage"]!)
+    //     : 0.0;
 
-    double cell4Voltage = data_fetched["cell4_voltage"] != null
-        ? double.parse(data_fetched["cell4_voltage"]!)
-        : 0.0;
+    // double cell4Voltage = data_fetched["cell4_voltage"] != null
+    //     ? double.parse(data_fetched["cell4_voltage"]!)
+    //     : 0.0;
 
-    double cell5Voltage = data_fetched["cell5_voltage"] != null
-        ? double.parse(data_fetched["cell5_voltage"]!)
-        : 0.0;
+    // double cell5Voltage = data_fetched["cell5_voltage"] != null
+    //     ? double.parse(data_fetched["cell5_voltage"]!)
+    //     : 0.0;
 
-    double cell6Voltage = data_fetched["cell6_voltage"] != null
-        ? double.parse(data_fetched["cell6_voltage"]!)
-        : 0.0;
+    // double cell6Voltage = data_fetched["cell6_voltage"] != null
+    //     ? double.parse(data_fetched["cell6_voltage"]!)
+    //     : 0.0;
 
-    double cell7Voltage = data_fetched["cell7_voltage"] != null
-        ? double.parse(data_fetched["cell7_voltage"]!)
-        : 0.0;
+    // double cell7Voltage = data_fetched["cell7_voltage"] != null
+    //     ? double.parse(data_fetched["cell7_voltage"]!)
+    //     : 0.0;
 
-    double cell8Voltage = data_fetched["cell8_voltage"] != null
-        ? double.parse(data_fetched["cell8_voltage"]!)
-        : 0.0;
+    // double cell8Voltage = data_fetched["cell8_voltage"] != null
+    //     ? double.parse(data_fetched["cell8_voltage"]!)
+    //     : 0.0;
 
     // double cell9Voltage = data_fetched["cell9_voltage"] != null
     //     ? double.parse(data_fetched["cell9_voltage"]!)
@@ -3948,38 +3907,38 @@ String _formatCharacteristicName(String characteristic) {
                   ),
                 ),
               ),
-              // Padding(
-              //   padding: const EdgeInsets.all(8.0),
-              //   child: Container(
-              //     decoration: BoxDecoration(
-              //         gradient: LinearGradient(
-              //             begin: Alignment.centerLeft,
-              //             end: Alignment.centerRight,
-              //             colors: [
-              //               CustomColors.mainColor_3,
-              //               CustomColors.mainColor_3,
-              //               CustomColors.mainColor_3,
-              //               CustomColors.mainColor_3,
-              //               CustomColors.mainColor_2,
-              //               CustomColors.mainColor_2
-              //             ]),
-              //         borderRadius: BorderRadius.circular(size.height * 0.01),
-              //         color: CustomColors.mainColor_3),
-              //     child: ListTile(
-              //       title: const Text(
-              //         'Temperature',
-              //         style: TextStyle(
-              //             fontWeight: FontWeight.bold, color: Colors.white),
-              //       ),
-              //       trailing: Text(
-              //           (batteryTemperature * 0.01).toStringAsFixed(2) + ' °C',
-              //           style: TextStyle(
-              //               fontWeight: FontWeight.bold,
-              //               color: Colors.white,
-              //               fontSize: size.height * 0.018)),
-              //     ),
-              //   ),
-              // ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_3,
+                            CustomColors.mainColor_2,
+                            CustomColors.mainColor_2
+                          ]),
+                      borderRadius: BorderRadius.circular(size.height * 0.01),
+                      color: CustomColors.mainColor_3),
+                  child: ListTile(
+                    title: const Text(
+                      'Temperature',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    trailing: Text(
+                        (batteryTemperature * 0.01).toStringAsFixed(2) + ' °C',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: size.height * 0.018)),
+                  ),
+                ),
+              ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
@@ -4293,262 +4252,262 @@ String _formatCharacteristicName(String characteristic) {
               //     ),
               //   ),
               // ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_2,
-                            CustomColors.mainColor_2
-                          ]),
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Cell1 Voltage',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    trailing: Text(
-                        (cell1Voltage * 0.001).toStringAsFixed(3) + ' V',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_2,
-                            CustomColors.mainColor_2
-                          ]),
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Cell2 Voltage',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    trailing: Text(
-                        (cell2Voltage * 0.001).toStringAsFixed(3) + ' V',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_2,
-                            CustomColors.mainColor_2
-                          ]),
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Cell3 Voltage',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    trailing: Text(
-                        (cell3Voltage * 0.001).toStringAsFixed(3) + ' V',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_2,
-                            CustomColors.mainColor_2
-                          ]),
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Cell4 Voltage',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    trailing: Text(
-                        (cell4Voltage * 0.001).toStringAsFixed(3) + ' V',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_2,
-                            CustomColors.mainColor_2
-                          ]),
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Cell5 Voltage',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    trailing: Text(
-                        (cell5Voltage * 0.001).toStringAsFixed(3) + ' V',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_2,
-                            CustomColors.mainColor_2
-                          ]),
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Cell6 Voltage',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    trailing: Text(
-                        (cell6Voltage * 0.001).toStringAsFixed(3) + ' V',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_2,
-                            CustomColors.mainColor_2
-                          ]),
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Cell7 Voltage',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    trailing: Text(
-                        (cell7Voltage * 0.001).toStringAsFixed(3) + ' V',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_2,
-                            CustomColors.mainColor_2
-                          ]),
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Cell8 Voltage',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    trailing: Text(
-                        (cell8Voltage * 0.001).toStringAsFixed(3) + ' V',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
-                  ),
-                ),
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: Container(
+              //     decoration: BoxDecoration(
+              //         gradient: LinearGradient(
+              //             begin: Alignment.centerLeft,
+              //             end: Alignment.centerRight,
+              //             colors: [
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_2,
+              //               CustomColors.mainColor_2
+              //             ]),
+              //         borderRadius: BorderRadius.circular(size.height * 0.01),
+              //         color: CustomColors.mainColor_3),
+              //     child: ListTile(
+              //       title: const Text(
+              //         'Cell1 Voltage',
+              //         style: TextStyle(
+              //             fontWeight: FontWeight.bold, color: Colors.white),
+              //       ),
+              //       trailing: Text(
+              //           (cell1Voltage * 0.001).toStringAsFixed(3) + ' V',
+              //           style: TextStyle(
+              //               fontWeight: FontWeight.bold,
+              //               color: Colors.white,
+              //               fontSize: size.height * 0.018)),
+              //     ),
+              //   ),
+              // ),
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: Container(
+              //     decoration: BoxDecoration(
+              //         gradient: LinearGradient(
+              //             begin: Alignment.centerLeft,
+              //             end: Alignment.centerRight,
+              //             colors: [
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_2,
+              //               CustomColors.mainColor_2
+              //             ]),
+              //         borderRadius: BorderRadius.circular(size.height * 0.01),
+              //         color: CustomColors.mainColor_3),
+              //     child: ListTile(
+              //       title: const Text(
+              //         'Cell2 Voltage',
+              //         style: TextStyle(
+              //             fontWeight: FontWeight.bold, color: Colors.white),
+              //       ),
+              //       trailing: Text(
+              //           (cell2Voltage * 0.001).toStringAsFixed(3) + ' V',
+              //           style: TextStyle(
+              //               fontWeight: FontWeight.bold,
+              //               color: Colors.white,
+              //               fontSize: size.height * 0.018)),
+              //     ),
+              //   ),
+              // ),
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: Container(
+              //     decoration: BoxDecoration(
+              //         gradient: LinearGradient(
+              //             begin: Alignment.centerLeft,
+              //             end: Alignment.centerRight,
+              //             colors: [
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_2,
+              //               CustomColors.mainColor_2
+              //             ]),
+              //         borderRadius: BorderRadius.circular(size.height * 0.01),
+              //         color: CustomColors.mainColor_3),
+              //     child: ListTile(
+              //       title: const Text(
+              //         'Cell3 Voltage',
+              //         style: TextStyle(
+              //             fontWeight: FontWeight.bold, color: Colors.white),
+              //       ),
+              //       trailing: Text(
+              //           (cell3Voltage * 0.001).toStringAsFixed(3) + ' V',
+              //           style: TextStyle(
+              //               fontWeight: FontWeight.bold,
+              //               color: Colors.white,
+              //               fontSize: size.height * 0.018)),
+              //     ),
+              //   ),
+              // ),
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: Container(
+              //     decoration: BoxDecoration(
+              //         gradient: LinearGradient(
+              //             begin: Alignment.centerLeft,
+              //             end: Alignment.centerRight,
+              //             colors: [
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_2,
+              //               CustomColors.mainColor_2
+              //             ]),
+              //         borderRadius: BorderRadius.circular(size.height * 0.01),
+              //         color: CustomColors.mainColor_3),
+              //     child: ListTile(
+              //       title: const Text(
+              //         'Cell4 Voltage',
+              //         style: TextStyle(
+              //             fontWeight: FontWeight.bold, color: Colors.white),
+              //       ),
+              //       trailing: Text(
+              //           (cell4Voltage * 0.001).toStringAsFixed(3) + ' V',
+              //           style: TextStyle(
+              //               fontWeight: FontWeight.bold,
+              //               color: Colors.white,
+              //               fontSize: size.height * 0.018)),
+              //     ),
+              //   ),
+              // ),
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: Container(
+              //     decoration: BoxDecoration(
+              //         gradient: LinearGradient(
+              //             begin: Alignment.centerLeft,
+              //             end: Alignment.centerRight,
+              //             colors: [
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_2,
+              //               CustomColors.mainColor_2
+              //             ]),
+              //         borderRadius: BorderRadius.circular(size.height * 0.01),
+              //         color: CustomColors.mainColor_3),
+              //     child: ListTile(
+              //       title: const Text(
+              //         'Cell5 Voltage',
+              //         style: TextStyle(
+              //             fontWeight: FontWeight.bold, color: Colors.white),
+              //       ),
+              //       trailing: Text(
+              //           (cell5Voltage * 0.001).toStringAsFixed(3) + ' V',
+              //           style: TextStyle(
+              //               fontWeight: FontWeight.bold,
+              //               color: Colors.white,
+              //               fontSize: size.height * 0.018)),
+              //     ),
+              //   ),
+              // ),
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: Container(
+              //     decoration: BoxDecoration(
+              //         gradient: LinearGradient(
+              //             begin: Alignment.centerLeft,
+              //             end: Alignment.centerRight,
+              //             colors: [
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_2,
+              //               CustomColors.mainColor_2
+              //             ]),
+              //         borderRadius: BorderRadius.circular(size.height * 0.01),
+              //         color: CustomColors.mainColor_3),
+              //     child: ListTile(
+              //       title: const Text(
+              //         'Cell6 Voltage',
+              //         style: TextStyle(
+              //             fontWeight: FontWeight.bold, color: Colors.white),
+              //       ),
+              //       trailing: Text(
+              //           (cell6Voltage * 0.001).toStringAsFixed(3) + ' V',
+              //           style: TextStyle(
+              //               fontWeight: FontWeight.bold,
+              //               color: Colors.white,
+              //               fontSize: size.height * 0.018)),
+              //     ),
+              //   ),
+              // ),
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: Container(
+              //     decoration: BoxDecoration(
+              //         gradient: LinearGradient(
+              //             begin: Alignment.centerLeft,
+              //             end: Alignment.centerRight,
+              //             colors: [
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_2,
+              //               CustomColors.mainColor_2
+              //             ]),
+              //         borderRadius: BorderRadius.circular(size.height * 0.01),
+              //         color: CustomColors.mainColor_3),
+              //     child: ListTile(
+              //       title: const Text(
+              //         'Cell7 Voltage',
+              //         style: TextStyle(
+              //             fontWeight: FontWeight.bold, color: Colors.white),
+              //       ),
+              //       trailing: Text(
+              //           (cell7Voltage * 0.001).toStringAsFixed(3) + ' V',
+              //           style: TextStyle(
+              //               fontWeight: FontWeight.bold,
+              //               color: Colors.white,
+              //               fontSize: size.height * 0.018)),
+              //     ),
+              //   ),
+              // ),
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: Container(
+              //     decoration: BoxDecoration(
+              //         gradient: LinearGradient(
+              //             begin: Alignment.centerLeft,
+              //             end: Alignment.centerRight,
+              //             colors: [
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_2,
+              //               CustomColors.mainColor_2
+              //             ]),
+              //         borderRadius: BorderRadius.circular(size.height * 0.01),
+              //         color: CustomColors.mainColor_3),
+              //     child: ListTile(
+              //       title: const Text(
+              //         'Cell8 Voltage',
+              //         style: TextStyle(
+              //             fontWeight: FontWeight.bold, color: Colors.white),
+              //       ),
+              //       trailing: Text(
+              //           (cell8Voltage * 0.001).toStringAsFixed(3) + ' V',
+              //           style: TextStyle(
+              //               fontWeight: FontWeight.bold,
+              //               color: Colors.white,
+              //               fontSize: size.height * 0.018)),
+              //     ),
+              //   ),
+              // ),
               // Padding(
               //   padding: const EdgeInsets.all(8.0),
               //   child: Container(
