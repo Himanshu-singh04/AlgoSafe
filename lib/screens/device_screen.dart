@@ -520,6 +520,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       Padding(
                         padding: const EdgeInsets.all(6.0),
                         child:
+                            build_toggle_for_characteristic("CHG_OverCurrent", "Charge OverCurrent"),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(6.0),
+                        child:
                             build_toggle_for_characteristic("CHG_OverVoltage", "Charge OverVoltage"),
                       ),
                       Padding(

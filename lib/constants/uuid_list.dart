@@ -41,6 +41,10 @@ Map<String, String> uuids = {
   "cell16_voltage": "4c776ff8-7448-4ba0-b238-1010b4a62297", // charge algoX chargingPAD
   "Battery_discharge": "24688ee9-9c1d-45bf-ba47-2b36cb92ace5", // drive
 
+  "Cell_mismatch": "1ce397a4-2706-423e-a02f-7898bb435bc7", // algoX
+  "Battery_not_connected": "6e647982-b9a2-4d72-92b1-14e409ea7e84", // algoX
+  "Cell_connector_not_connected": "4a4d4eb9-a683-4956-b980-58495d45a960s", // algoX
+
   "Drone_status": "1efa6f0c-2ab4-44ca-8153-71b32678c4c3", // idlePAD
   "Charging_status": "cc32c0bb-218b-4b7f-808c-63dc94dd5c08", // idlePAD
 
@@ -53,13 +57,14 @@ Map<String, String> uuids = {
   "Battery_operating_temperature": "73e469a2-b1c2-4119-8be7-f325f75b8374", // BMSWrite
   "Battery_id": "2277ad1c-a8fd-48c3-9c1c-bddafa72922f", // BMSWrite
   "BMS_id": "d7e138fa-a4c2-482d-a8ee-f62429d4bdf4", // BMSWrite
-  "Battery_CHG_C": "435ddd69-c9c1-498c-9889-a63d97dea0ed", // BMSWrite
+  // "Battery_CHG_C": "435ddd69-c9c1-498c-9889-a63d97dea0ed", // BMSWrite
   "DSG_OverCurrent": "ed360ed8-8b14-4c3a-b39e-076ea97e782a", // BMSWrite
+  "CHG_OverCurrent": "4fa96911-6065-45a0-b0be-9d15827e06d5",
   "CHG_OverVoltage": "86435c8e-33b2-49f1-af7a-e54ef290a66e", // BMSWrite
   "DSG_OverTemperature": "38b4df1e-08c8-4b33-8d71-654660afede1", // BMSWrite
   "CHG_OverTemperature": "c00e4792-2ee8-4cd1-9bd6-803ac9fd113e", // BMSWrite
   "DSG_UnderVoltage": "f9e62d2c-82f6-4cb4-ae6c-4b5b19b4c918", // BMSWrite
-  "Battery_DSG_C": "6fc9cfaf-cbf9-4c28-866d-6ef4e4e5440a", // BMSWrite
+  // "Battery_DSG_C": "6fc9cfaf-cbf9-4c28-866d-6ef4e4e5440a", // BMSWrite
   "SOC": "14df897e-b1cc-4b16-8df0-d032bc92a875", // BMSWrite
 
   "Charging_type": "26b83d0d-4d66-45f2-8afb-32f1fed254aa", // AlgoXWrite
@@ -139,6 +144,7 @@ Map<String, String> uuid_algoBMS_write = {
   "BMS_id": "d7e138fa-a4c2-482d-a8ee-f62429d4bdf4", // compulsory
   "Battery_CHG_C": "435ddd69-c9c1-498c-9889-a63d97dea0ed", // default
   "DSG_OverCurrent": "ed360ed8-8b14-4c3a-b39e-076ea97e782a", // default
+  "CHG_OverCurrent": "4fa96911-6065-45a0-b0be-9d15827e06d5",
   "CHG_OverVoltage": "86435c8e-33b2-49f1-af7a-e54ef290a66e", // default
   "DSG_OverTemperature": "38b4df1e-08c8-4b33-8d71-654660afede1", // default
   "CHG_OverTemperature": "c00e4792-2ee8-4cd1-9bd6-803ac9fd113e", // default
