@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "602175561602",
+    "project_id": "algosafe-a29b6",
+    "storage_bucket": "algosafe-a29b6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:602175561602:android:fc31b1c6f0497d0997b99b",
+        "android_client_info": {
+          "package_name": "com.example.algo_safe"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCn9Cl_CIMMUvX_AtW1ySXIRzBtX6M_3Bc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

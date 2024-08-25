@@ -1,8 +1,11 @@
 import 'dart:async';
 
+import 'package:algo_safe/screens/login_screen.dart';
 import 'package:algo_safe/screens/permission_screen.dart';
 import 'package:algo_safe/screens/scan_drawer_screen.dart';
 import 'package:algo_safe/screens/splash_screen.dart';
+import 'package:algo_safe/screens/wrapper.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
@@ -10,33 +13,33 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 void main() async {
   FlutterBluePlus.setLogLevel(LogLevel.verbose, color: true);
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: splash_screen(),
+    // home: splash_screen(),
+    home: wrapper(),
+    routes: {
+      '/permissions': (context) => BluetoothOffScreen(),
+      '/login': (context) => LoginScreen(),
+      '/home': (context) => HomePage(),
+    },
   ));
 }
 
-// ignore: camel_case_types
-class home_page extends StatefulWidget {
-  const home_page({super.key});
-
+class HomePage extends StatefulWidget {
   @override
-  State<home_page> createState() => _home_pageState();
+  _HomePageState createState() => _HomePageState();
 }
 
-// ignore: camel_case_types
-class _home_pageState extends State<home_page> {
-  // status of the bluetooth permission and its state of on/off
-  BluetoothAdapterState adapter_state = BluetoothAdapterState.unknown;
+class _HomePageState extends State<HomePage> {
+  BluetoothAdapterState adapterState = BluetoothAdapterState.unknown;
+  late StreamSubscription<BluetoothAdapterState> adapterStateSubscription;
 
-  late StreamSubscription<BluetoothAdapterState> adapter_state_state_subscription;
-
-  // gets the current bluetooth state  
   @override
   void initState() {
     super.initState();
-    adapter_state_state_subscription = FlutterBluePlus.adapterState.listen((state) {
-      adapter_state = state;
+    adapterStateSubscription = FlutterBluePlus.adapterState.listen((state) {
+      adapterState = state;
       if (mounted) {
         setState(() {});
       }
@@ -45,17 +48,15 @@ class _home_pageState extends State<home_page> {
 
   @override
   void dispose() {
-    adapter_state_state_subscription.cancel();
+    adapterStateSubscription.cancel();
     super.dispose();
   }
 
-  // building the main.dart activities
-  // based on the adapter state it selects between scan+drawer and BluetoothoffScreen
   @override
   Widget build(BuildContext context) {
-    Widget screen = adapter_state == BluetoothAdapterState.on
+    Widget screen = adapterState == BluetoothAdapterState.on
         ? scan_drawer()
-        : BluetoothOffScreen(adapter_state: adapter_state);
+        : BluetoothOffScreen(adapter_state: adapterState);
 
     return MaterialApp(
       home: screen,
@@ -67,7 +68,6 @@ class _home_pageState extends State<home_page> {
 class BluetoothAdapterStateObserver extends NavigatorObserver {
   StreamSubscription<BluetoothAdapterState>? _adapterStateSubscription;
 
-  // Navigation and routes with a back sign/icon
   @override
   void didPush(Route route, Route? previousRoute) {
     super.didPush(route, previousRoute);
@@ -80,7 +80,6 @@ class BluetoothAdapterStateObserver extends NavigatorObserver {
     }
   }
 
-  // Navigation and routes without a back sign/icon
   @override
   void didPop(Route route, Route? previousRoute) {
     super.didPop(route, previousRoute);
@@ -88,4 +87,3 @@ class BluetoothAdapterStateObserver extends NavigatorObserver {
     _adapterStateSubscription = null;
   }
 }
-

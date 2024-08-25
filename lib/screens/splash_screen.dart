@@ -25,7 +25,8 @@ class _splash_screenState extends State<splash_screen> {
     // delayed function with 4 sec delay
     await Future.delayed(const Duration(milliseconds: 4000), () {});
     // ignore: use_build_context_synchronously
-    Navigator.of(context).pushReplacement(create_route());
+    // Navigator.of(context).pushReplacement(create_route());
+    Navigator.pushReplacementNamed(context, '/permissions');
   }
 
   // actual splash screen page activities
@@ -123,7 +124,8 @@ class _splash_screenState extends State<splash_screen> {
 // automatically routes the page to the next screen with a sliding animation 
 Route create_route() {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => const home_page(),
+    // pageBuilder: (context, animation, secondaryAnimation) => const home_page(),
+    pageBuilder: (context, animation, secondaryAnimation) => HomePage(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       const begin = Offset(0.0, 1.0);
       const end = Offset.zero;
