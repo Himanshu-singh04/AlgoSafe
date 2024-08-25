@@ -4,7 +4,7 @@ import 'package:algo_safe/utils/colors.dart';
 import 'package:algo_safe/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:location/location.dart';
+// import 'package:location/location.dart';
 import 'package:lottie/lottie.dart';
 
 // ignore: must_be_immutable
@@ -28,7 +28,7 @@ class BluetoothOffScreen extends StatelessWidget {
     );
   }
   // instance creation for checking location permissions
-  Location location = Location();
+  // Location location = Location();
 
   // Written message regarding Bluetooth activation 
   Widget build_title(BuildContext context) {
