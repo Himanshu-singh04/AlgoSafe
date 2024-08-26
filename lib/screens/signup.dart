@@ -1,29 +1,29 @@
-import 'package:algo_safe/screens/forgot.dart';
-import 'package:algo_safe/screens/signup.dart';
+import 'package:algo_safe/screens/wrapper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class loginpage extends StatefulWidget {
-  const loginpage({super.key});
+class signup extends StatefulWidget {
+  const signup({super.key});
 
   @override
-  State<loginpage> createState() => _loginpageState();
+  State<signup> createState() => _signupState();
 }
 
-class _loginpageState extends State<loginpage> {
+class _signupState extends State<signup> {
 
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
 
-  signin () async {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(email: email.text, password: password.text);
-  }
-  @override
+  signup() async {
+    await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email.text, password: password.text);
+    Get.offAll(wrapper());
+  } 
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("login"),
+      appBar: AppBar(title: Text("sign in"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -37,9 +37,7 @@ class _loginpageState extends State<loginpage> {
               controller: password,
               decoration: InputDecoration(hintText: "password"),
             ),
-            ElevatedButton(onPressed: () => signin(), child: Text("login")),
-            ElevatedButton(onPressed: () => Get.to(signup()), child: Text("register now")),
-            ElevatedButton(onPressed: () => Get.to(forgot(  )), child: Text("forgot password"))
+            ElevatedButton(onPressed: () => signup(), child: Text("reset password"))
           ],
         ),
       ),
