@@ -16,13 +16,27 @@ class _loginpageState extends State<loginpage> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
 
+  bool isloading = false;
+
   signin () async {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(email: email.text, password: password.text);
+    setState(() {
+      isloading = true;
+    });
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(email: email.text, password: password.text);
+    } on FirebaseAuthException catch(e){
+      Get.snackbar("error msg", e.code);
+    } catch(e){
+      Get.snackbar("error msg", e.toString());
+    }
+    setState(() {
+      isloading = false;
+    });
   }
   @override
 
   Widget build(BuildContext context) {
-    return Scaffold(
+    return isloading?Center(child: CircularProgressIndicator(),) :Scaffold(
       appBar: AppBar(title: Text("login"),
       ),
       body: Padding(
