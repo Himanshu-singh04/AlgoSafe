@@ -1,15 +1,16 @@
 import 'dart:async';
+
 import 'package:algo_safe/utils/colors.dart';
 import 'package:algo_safe/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
+// import 'package:flutter/services.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:google_nav_bar/google_nav_bar.dart';
+
 import 'device_screen.dart';
 import '../widgets/system_device_tile.dart';
 import '../widgets/scan_result_tile.dart';
 import '../utils/extra.dart';
 
-// ignore: must_be_immutable
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
 
@@ -18,70 +19,34 @@ class ScanScreen extends StatefulWidget {
 }
 
 class _ScanScreenState extends State<ScanScreen> {
-  List<BluetoothDevice> _systemDevices = [];
-  List<ScanResult> _scanResults = [];
-  bool _isScanning = false;
-  late StreamSubscription<List<ScanResult>> _scanResultsSubscription;
-  late StreamSubscription<bool> _isScanningSubscription;
-  int mainScreen = 0;
+  List<BluetoothDevice> system_devices = [];
+  List<ScanResult> scan_results = [];
+  bool is_scanning = false;
+  late StreamSubscription<List<ScanResult>> scan_results_subscription;
+  late StreamSubscription<bool> is_scanning_subscription;
+  int main_screen = 0;
+  int _selectedIndex = 0;
 
-  // late final BluetoothAdapterState? adapterState;
-  // Location location = Location();
-
-  // Future<void> _toggleLocation() async {
-  //   bool serviceEnabled = await location.serviceEnabled();
-  //   if (!serviceEnabled) {
-  //     serviceEnabled = await location.requestService();
-  //     if (!serviceEnabled) {
-  //       return;
-  //     }
-  //   }
-
-  //   var permissionGranted = await location.serviceEnabled();
-
-  //   if (permissionGranted == Permission.location.status.isDenied) {
-  //     permissionGranted = (await location.requestPermission()) as bool;
-  //     if (permissionGranted != Permission.location.status.isGranted) {
-  //       return;
-  //     }
-  //   }
-  // }
-
-  // Widget buildTurnOnButton(BuildContext context) {
-  //   return Padding(
-  //     padding: const EdgeInsets.all(20.0),
-  //     child: ElevatedButton(
-  //       child: const Text('TURN ON'),
-  //       onPressed: () async {
-  //         try {
-  //           if (Platform.isAndroid) {
-  //             await FlutterBluePlus.turnOn();
-  //             _toggleLocation();
-  //           }
-  //         } catch (e) {
-  //           Snackbar.show(ABC.a, prettyException("Error Turning On:", e),
-  //               success: false);
-  //         }
-  //       },
-  //     ),
-  //   );
-  // }
+  double x_offset = 0;
+  double y_offset = 0;
+  double scale_factor = 1;
+  bool is_drawer_open = false;
 
   @override
   void initState() {
     super.initState();
 
-    _scanResultsSubscription = FlutterBluePlus.scanResults.listen((results) {
-      _scanResults = results;
+    scan_results_subscription = FlutterBluePlus.scanResults.listen((results) {
+      scan_results = results;
       if (mounted) {
         setState(() {});
       }
     }, onError: (e) {
-      Snackbar.show(ABC.b, prettyException("Scan Error:", e), success: false);
+      Snackbar.show(ABC.b, pretty_exception("Scan Error:", e), success: false);
     });
 
-    _isScanningSubscription = FlutterBluePlus.isScanning.listen((state) {
-      _isScanning = state;
+    is_scanning_subscription = FlutterBluePlus.isScanning.listen((state) {
+      is_scanning = state;
       if (mounted) {
         setState(() {});
       }
@@ -90,95 +55,56 @@ class _ScanScreenState extends State<ScanScreen> {
 
   @override
   void dispose() {
-    _scanResultsSubscription.cancel();
-    _isScanningSubscription.cancel();
+    scan_results_subscription.cancel();
+    is_scanning_subscription.cancel();
     super.dispose();
   }
 
-  Future onScanPressed() async {
+  Future on_scan_pressed() async {
     try {
-      _systemDevices = await FlutterBluePlus.systemDevices;
+      system_devices = await FlutterBluePlus.systemDevices;
     } catch (e) {
-      Snackbar.show(ABC.b, prettyException("System Devices Error:", e),
+      Snackbar.show(ABC.b, pretty_exception("System Devices Error:", e),
           success: false);
     }
     try {
       await FlutterBluePlus.startScan(timeout: const Duration(seconds: 15));
     } catch (e) {
-      Snackbar.show(ABC.b, prettyException("Start Scan Error:", e),
+      Snackbar.show(ABC.b, pretty_exception("Start Scan Error:", e),
           success: false);
     }
     if (mounted) {
       setState(() {
-        mainScreen = 1;
+        main_screen = 1;
       });
     }
   }
 
-  Future onStopPressed() async {
+  Future on_stop_pressed() async {
     try {
       FlutterBluePlus.stopScan();
     } catch (e) {
-      Snackbar.show(ABC.b, prettyException("Stop Scan Error:", e),
+      Snackbar.show(ABC.b, pretty_exception("Stop Scan Error:", e),
           success: false);
     }
   }
 
-  // void onConnectPressed(BluetoothDevice device) {
-  //   setState(() {
-  //     onStopPressed();
-  //   });
-  //   device.connectAndUpdateStream().catchError((e) {
-  //     Snackbar.show(ABC.c, prettyException("Connect Error:", e),
-  //         success: false);
-  //   });
-  //   MaterialPageRoute route = MaterialPageRoute(
-  //       builder: (context) => DeviceScreen(device: device),
-  //       settings: const RouteSettings(name: '/DeviceScreen'));
-  //   Navigator.of(context).push(route);
-  // }
+  void on_connect_pressed(BluetoothDevice device) {
+    setState(() {
+      on_stop_pressed();
+    });
+    device.connect_and_update_stream().catchError((e) {
+      Snackbar.show(ABC.c, pretty_exception("Connect Error:", e),
+          success: false);
+    });
+    MaterialPageRoute route = MaterialPageRoute(
+        builder: (context) => DeviceScreen(device: device),
+        settings: const RouteSettings(name: '/DeviceScreen'));
+    Navigator.of(context).push(route);
+  }
 
-//   void onConnectPressed(BluetoothDevice device) {
-//   setState(() {
-//     onStopPressed();
-//   });
-//   device.connectAndUpdateStream().catchError((e) {
-//     Snackbar.show(ABC.c, prettyException("Connect Error:", e),
-//         success: false);
-//   });
-//   Navigator.of(context).pop();
-  
-//   MaterialPageRoute route = MaterialPageRoute(
-//     builder: (context) => DeviceScreen(device: device),
-//     settings: const RouteSettings(name: '/DeviceScreen'),
-//   );
-
-//   Navigator.of(context).pushAndRemoveUntil(route, (route) {
-//     // Define your scan screen's route name (e.g., '/ScanScreen')
-//     return route.settings.name == '/ScanScreen';
-//   });
-// }
-
-void onConnectPressed(BluetoothDevice device) {
-  setState(() {
-    onStopPressed();
-  });
-  device.connectAndUpdateStream().catchError((e) {
-    Snackbar.show(ABC.c, prettyException("Connect Error:", e),
-        success: false);
-  });
-  Navigator.of(context).pop();
-
-  MaterialPageRoute route = MaterialPageRoute(
-    builder: (context) => DeviceScreen(device: device),
-    settings: const RouteSettings(name: '/DeviceScreen'),
-  );
-
-  Navigator.of(context).push(route);
-}
-
-  Future onRefresh() {
-    if (_isScanning == false) {
+  Future on_refresh() {
+    if (is_scanning == false) {
       FlutterBluePlus.startScan(timeout: const Duration(seconds: 15));
     }
     if (mounted) {
@@ -187,247 +113,281 @@ void onConnectPressed(BluetoothDevice device) {
     return Future.delayed(const Duration(milliseconds: 500));
   }
 
-  Widget buildScanButton(BuildContext context) {
+  Widget build_scan_button(BuildContext context) {
     if (FlutterBluePlus.isScanningNow) {
-      return FloatingActionButton.extended(
-        label: const Icon(Icons.stop),
-        onPressed: onStopPressed,
-        backgroundColor: Colors.red,
+      return Container(
+        decoration: BoxDecoration(
+          color: CustomColors.mainColor_1,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: FloatingActionButton.extended(
+          backgroundColor: CustomColors.mainColor_1,
+          label: SizedBox(
+            child: Text(
+              "Stop Scanning",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          onPressed: on_stop_pressed,
+        ),
       );
     } else {
-      return FloatingActionButton.extended(
+      return Container(
+        decoration: BoxDecoration(
+          color: CustomColors.mainColor_1,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: FloatingActionButton.extended(
           backgroundColor: CustomColors.mainColor_1,
-          label: const Text(
-            "SCAN",
-            style: TextStyle(color: Colors.white),
+          label: SizedBox(
+            child: Text(
+              "Scan for Devices",
+              style: TextStyle(color: Colors.white),
+            ),
           ),
-          onPressed: onScanPressed);
+          onPressed: on_scan_pressed,
+        ),
+      );
     }
   }
 
-List<Widget> _buildSystemDeviceTiles(BuildContext context) {
-  return _systemDevices
-      .map(
-        (d) => SystemDeviceTile(
-          device: d,
-          onOpen: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => DeviceScreen(device: d),
-              settings: const RouteSettings(name: '/DeviceScreen'),
-            ),
-          ),
-          onConnect: () => onConnectPressed(d),
-        ),
-      )
-      .toList();
-}
-
-  List<Widget> _buildScanResultTiles(BuildContext context) {
-    return _scanResults
-    .where((r) => r.device.name.startsWith("A"))
+  List<Widget> _buildSystemDeviceTiles(BuildContext context) {
+    return system_devices
         .map(
-          (r) => ScanResultTile(
-            result: r,
-            onTap: () => onConnectPressed(r.device),
+          (d) => SystemDeviceTile(
+            device: d,
+            onOpen: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => DeviceScreen(device: d),
+                settings: const RouteSettings(name: '/DeviceScreen'),
+              ),
+            ),
+            onConnect: () => on_connect_pressed(d),
           ),
         )
         .toList();
   }
 
-//------------------------------------------------------------------------------------------------------------------------//
-  Widget mainScreenDisplay() {
-    return Container();
+  List<Widget> _buildScanResultTiles(BuildContext context) {
+    return scan_results
+        .where((r) => r.device.name.startsWith("Algo"))
+        .map(
+          (r) => ScanResultTile(
+            result: r,
+            onTap: () => on_connect_pressed(r.device),
+          ),
+        )
+        .toList();
   }
-//------------------------------------------------------------------------------------------------------------------------//
 
-  Widget scanScreenDisplay() {
+  Widget main_screen_display() {
+    final Size size = MediaQuery.of(context).size;
+
+    return Column(
+      children: [
+        SizedBox(
+          height: size.height * 0.05,
+        ),
+        Align(
+            alignment: Alignment.topCenter,
+            child: Text(
+              "Hi, Drone Operator",
+              style: TextStyle(fontSize: size.width * 0.075),
+            )),
+        Align(
+            alignment: Alignment.topCenter,
+            child: Text("Connect to AlgoFET Devices",
+                style: TextStyle(fontSize: size.width * 0.04))),
+      ],
+    );
+  }
+
+  Widget scan_screen_display() {
+    final Size size = MediaQuery.of(context).size;
     return RefreshIndicator(
-      onRefresh: onRefresh,
-      child: ListView(
-        children: <Widget>[
-          ..._buildSystemDeviceTiles(context),
-          ..._buildScanResultTiles(context),
+      onRefresh: on_refresh,
+      child: Column(
+        children: [
+          SizedBox(
+            height: size.height * 0.05,
+          ),
+          Align(
+              alignment: Alignment.topCenter,
+              child: Text("Hi, Drone Operator",
+                  style: TextStyle(fontSize: size.width * 0.075))),
+          Align(
+              alignment: Alignment.topCenter,
+              child: Text("Connect to AlgoFET Devices",
+                  style: TextStyle(fontSize: size.width * 0.04))),
+          Expanded(
+            child: ListView(
+              children: <Widget>[
+                ..._buildSystemDeviceTiles(context),
+                ..._buildScanResultTiles(context),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
+
     return ScaffoldMessenger(
       key: Snackbar.snackBarKeyB,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-          appBar: AppBar(
-            flexibleSpace: Container(
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: [ Colors.grey.shade500,Colors.white],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter)),
-            ),
-            title: Image.asset(
-              "assets/images/Algofet primary subtext name.png",
-              width: size.width * 0.40,
-            ),
-            actions: [
-              IconButton(
-                  onPressed: () {
-                    setState(() {
-                      mainScreen = 0;
-                      onStopPressed();
-                    });
-                  },
-                  icon: const Icon(Icons.arrow_back)),
+      child: AnimatedContainer(
+        transform: Matrix4.translationValues(x_offset, y_offset, 0)
+          ..scale(scale_factor),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(is_drawer_open ? 40 : 0),
+          color: Colors.white,
+        ),
+        duration: Duration(milliseconds: 250),
+        child: Container(
+          child: Column(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: CustomColors.mainColor_1,
+                ),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: size.height * 0.05,
+                    ),
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: size.width * 0.05,
+                        ),
+                        is_drawer_open
+                            ? IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    x_offset = 0;
+                                    y_offset = 0;
+                                    scale_factor = 1;
+                                    is_drawer_open = false;
+                                  });
+                                },
+                                icon: Icon(
+                                  Icons.arrow_back_ios_new,
+                                  color: Colors.white,
+                                ))
+                            : IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    x_offset = size.height * 0.25;
+                                    y_offset = size.width * 0.57;
+                                    scale_factor = 0.55;
+                                    is_drawer_open = true;
+                                  });
+                                },
+                                icon: Icon(
+                                  Icons.menu,
+                                  color: Colors.white,
+                                )),
+                        Spacer(),
+                        IconButton(
+                            onPressed: () {
+                              setState(() {
+                                main_screen = 0;
+                                on_stop_pressed();
+                              });
+                            },
+                            icon: Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                            )),
+                        SizedBox(
+                          width: size.width * 0.01,
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: size.height * 0.01,
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: (main_screen != 1)
+                    ? main_screen_display()
+                    : scan_screen_display(),
+              ),
+              build_scan_button(context),
               SizedBox(
-                width: size.width * 0.02,
-              )
+                height: size.height * 0.01,
+              ),
+              Stack(children: [
+                Container(
+                  color: Colors.white,
+                  height: size.height * 0.1,
+                ),
+                Container(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: CustomColors.mainColor_3,
+                        borderRadius: BorderRadius.only(topRight: Radius.circular(70))
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: size.width * 0.9,
+                            child: BottomNavigationBar(
+                              elevation: 0,
+                              items: const <BottomNavigationBarItem>[
+                                BottomNavigationBarItem(
+                                  icon: Icon(Icons.search),
+                                  label: 'Search',
+                                ),
+                                BottomNavigationBarItem(
+                                  icon: Icon(Icons.person),
+                                  label: 'Profile',
+                                ),
+                                BottomNavigationBarItem(
+                                  icon: Icon(Icons.settings),
+                                  label: 'Setting',
+                                ),
+                              ],
+                              currentIndex: _selectedIndex,
+                              selectedItemColor: Colors.black,
+                              unselectedItemColor: Colors.white,
+                              onTap: _onItemTapped,
+                              backgroundColor: Colors.transparent,
+                              type: BottomNavigationBarType.fixed,
+                              showSelectedLabels: true,
+                              showUnselectedLabels: false,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  height: size.height * 0.1,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(70),
+                    ),
+                    color: CustomColors.mainColor_1,
+                  ),
+                ),
+              ])
             ],
           ),
-          drawer: Drawer(
-            child: ListView(
-              children: [
-                DrawerHeader(
-                  child: Image.asset(
-                      "assets/images/Algofet secondary subtext.png"),
-                  padding: EdgeInsets.all(size.width * 0.075),
-                ),
-                const ListTile(
-                  leading: Icon(Icons.home),
-                  title: Text("Home"),
-                ),
-                const Divider(),
-                const ExpansionTile(
-                  leading: Icon(Icons.shopping_bag_rounded),
-                  title: Text("Products"),
-                  children: [
-                    ListTile(
-                      // leading: Icon(Icons.home),
-                      title: Text("AlgoDOCK"),
-                    ),
-                    ListTile(
-                      // leading: Icon(Icons.home),
-                      title: Text("AlgoBMS"),
-                    ),
-                    ListTile(
-                      // leading: Icon(Icons.home),
-                      title: Text("AlgoX"),
-                    ),
-                    ListTile(
-                      // leading: Icon(Icons.home),
-                      title: Text("AlgoPACK"),
-                    ),
-                    ListTile(
-                      // leading: Icon(Icons.home),
-                      title: Text("AlgoSAFE"),
-                    ),
-                    ListTile(
-                      // leading: Icon(Icons.home),
-                      title: Text("AlgoCOM"),
-                    ),
-                  ],
-                ),
-                const Divider(),
-                const ListTile(
-                  leading: Icon(Icons.person_3),
-                  title: Text("Application"),
-                ),
-                const Divider(),
-                const ListTile(
-                  leading: Icon(Icons.call),
-                  title: Text("Contact Us"),
-                ),
-                const Divider(),
-                const ListTile(
-                  leading: Icon(Icons.work),
-                  title: Text("Company"),
-                ),
-                const Divider(),
-                const ExpansionTile(
-                  leading: Icon(Icons.more),
-                  title: Text("More"),
-                  children: [
-                    ListTile(
-                      // leading: Icon(Icons.home),
-                      title: Text("NEWS"),
-                    ),
-                    ListTile(
-                      // leading: Icon(Icons.home),
-                      title: Text("Partners"),
-                    ),
-                    ListTile(
-                      // leading: Icon(Icons.home),
-                      title: Text("FAQs"),
-                    )
-                  ],
-                ),
-                const Divider()
-              ],
-            ),
-            // child: Column(
-
-            // children: [
-            // SizedBox(height: size.height*0.05,),
-            // Container(child: Image.asset("assets/images/Algofet secondary subtext.png"),padding: EdgeInsets.all(size.width*0.075),)
-            // ],
-            // ),
-          ),
-          body: (mainScreen != 1) ? mainScreenDisplay() : scanScreenDisplay(),
-          // body: RefreshIndicator(
-          //   onRefresh: onRefresh,
-          //   child: ListView(
-          //     children: <Widget>[
-          //       ..._buildSystemDeviceTiles(context),
-          //       ..._buildScanResultTiles(context),
-          //     ],
-          //   ),
-          // ),
-          floatingActionButton: buildScanButton(context),
-          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-          bottomNavigationBar: Container(
-            height: size.height * 0.075,
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    colors: [Colors.white, Colors.grey.shade500],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter)),
-            child: Container(
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: [Colors.white, Colors.grey.shade500],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter)),
-              child: Padding(
-                padding: EdgeInsets.all(NavigationToolbar.kMiddleSpacing),
-                child: GNav(
-                    padding: EdgeInsets.all(BorderSide.strokeAlignCenter),
-                    // backgroundColor: Colors.grey,
-                    activeColor: Colors.white,
-                    tabBackgroundColor: Colors.black38,
-                    gap: 8,
-                    tabs: [
-                      GButton(
-                        icon: Icons.search,
-                        text: "Scan",
-                        // onPressed: (){}
-                      ),
-                      GButton(
-                        icon: Icons.settings,
-                        text: "Setting",
-                      ),
-                      GButton(
-                        icon: Icons.light,
-                        text: "Light",
-                      ),
-                      GButton(
-                        icon: Icons.book,
-                        text: "Book",
-                      )
-                    ]),
-              ),
-            ),
-          )),
+        ),
+      ),
     );
   }
 }

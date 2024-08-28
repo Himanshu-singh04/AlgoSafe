@@ -1,41 +1,45 @@
 import 'dart:async';
-import 'package:algo_safe/screens/scan_screen.dart';
+
+import 'package:algo_safe/screens/login_screen.dart';
+import 'package:algo_safe/screens/permission_screen.dart';
+import 'package:algo_safe/screens/scan_drawer_screen.dart';
 import 'package:algo_safe/screens/splash_screen.dart';
-import 'package:algo_safe/utils/theme_service.dart';
+import 'package:algo_safe/screens/wrapper.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
 
 void main() async {
   FlutterBluePlus.setLogLevel(LogLevel.verbose, color: true);
   WidgetsFlutterBinding.ensureInitialized();
-  final themeService = await ThemeService.instance;
-  var initTheme = themeService.initial;
-  runApp(MaterialApp(
+  await Firebase.initializeApp();
+  runApp(GetMaterialApp(
     debugShowCheckedModeBanner: false,
-    theme: initTheme,
-    home: splash_screen(),
+    // home: splash_screen(),
+    home: wrapper(),
+    routes: {
+      '/permissions': (context) => BluetoothOffScreen(),
+      '/login': (context) => LoginScreen(),
+      '/home': (context) => HomePage(),
+    },
   ));
 }
 
-// ignore: camel_case_types
-class home_page extends StatefulWidget {
-  const home_page({super.key});
-
+class HomePage extends StatefulWidget {
   @override
-  State<home_page> createState() => _home_pageState();
+  _HomePageState createState() => _HomePageState();
 }
 
-// ignore: camel_case_types
-class _home_pageState extends State<home_page> {
+class _HomePageState extends State<HomePage> {
   BluetoothAdapterState adapterState = BluetoothAdapterState.unknown;
-
-  late StreamSubscription<BluetoothAdapterState> _adapterStateStateSubscription;
+  late StreamSubscription<BluetoothAdapterState> adapterStateSubscription;
 
   @override
   void initState() {
     super.initState();
-    _adapterStateStateSubscription = FlutterBluePlus.adapterState.listen((state) {
+    adapterStateSubscription = FlutterBluePlus.adapterState.listen((state) {
       adapterState = state;
       if (mounted) {
         setState(() {});
@@ -45,16 +49,17 @@ class _home_pageState extends State<home_page> {
 
   @override
   void dispose() {
-    _adapterStateStateSubscription.cancel();
+    adapterStateSubscription.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget screen = const ScanScreen();
+    Widget screen = adapterState == BluetoothAdapterState.on
+        ? scan_drawer()
+        : BluetoothOffScreen(adapter_state: adapterState);
 
     return MaterialApp(
-      color: Colors.lightBlue,
       home: screen,
       navigatorObservers: [BluetoothAdapterStateObserver()],
     );
@@ -82,26 +87,4 @@ class BluetoothAdapterStateObserver extends NavigatorObserver {
     _adapterStateSubscription?.cancel();
     _adapterStateSubscription = null;
   }
-
-    @override
-  void didRemove(Route route, Route? previousRoute) {
-    super.didRemove(route, previousRoute);
-    if (route.settings.name == '/DeviceScreen') {
-      _adapterStateSubscription?.cancel();
-      _adapterStateSubscription = null;
-    }
-  }
-
-  @override
-  void didReplace({Route? newRoute, Route? oldRoute}) {
-    super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
-    if (oldRoute?.settings.name == '/DeviceScreen') {
-      _adapterStateSubscription?.cancel();
-      _adapterStateSubscription = null;
-    }
-  }
 }
-
-
-
-

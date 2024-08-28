@@ -34,7 +34,7 @@ class Snackbar {
 }
 
 
-String prettyException(String prefix, dynamic e) {
+String pretty_exception(String prefix, dynamic e) {
   if (e is FlutterBluePlusException) {
     return "$prefix ${e.description}";
   } else if (e is PlatformException) {

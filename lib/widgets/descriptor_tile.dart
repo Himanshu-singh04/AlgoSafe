@@ -47,7 +47,7 @@ class _DescriptorTileState extends State<DescriptorTile> {
       await d.read();
       Snackbar.show(ABC.c, "Descriptor Read : Success", success: true);
     } catch (e) {
-      Snackbar.show(ABC.c, prettyException("Descriptor Read Error:", e), success: false);
+      Snackbar.show(ABC.c, pretty_exception("Descriptor Read Error:", e), success: false);
     }
   }
 
@@ -56,7 +56,7 @@ class _DescriptorTileState extends State<DescriptorTile> {
       await d.write(_getRandomBytes());
       Snackbar.show(ABC.c, "Descriptor Write : Success", success: true);
     } catch (e) {
-      Snackbar.show(ABC.c, prettyException("Descriptor Write Error:", e), success: false);
+      Snackbar.show(ABC.c, pretty_exception("Descriptor Write Error:", e), success: false);
     }
   }
 

@@ -49,7 +49,7 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
       await c.read();
       Snackbar.show(ABC.c, "Read: Success", success: true);
     } catch (e) {
-      Snackbar.show(ABC.c, prettyException("Read Error:", e), success: false);
+      Snackbar.show(ABC.c, pretty_exception("Read Error:", e), success: false);
     }
   }
 
@@ -61,7 +61,7 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
         await c.read();
       }
     } catch (e) {
-      Snackbar.show(ABC.c, prettyException("Write Error:", e), success: false);
+      Snackbar.show(ABC.c, pretty_exception("Write Error:", e), success: false);
     }
   }
 
@@ -77,7 +77,7 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
         setState(() {});
       }
     } catch (e) {
-      Snackbar.show(ABC.c, prettyException("Subscribe Error:", e), success: false);
+      Snackbar.show(ABC.c, pretty_exception("Subscribe Error:", e), success: false);
     }
   }
 
