@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class homepage extends StatefulWidget {
   const homepage({super.key});
@@ -12,6 +13,7 @@ class _homepageState extends State<homepage> {
   final user = FirebaseAuth.instance.currentUser;
 
   signout() async {
+    // await GoogleSignIn().signOut();
     await FirebaseAuth.instance.signOut();
   }
   
