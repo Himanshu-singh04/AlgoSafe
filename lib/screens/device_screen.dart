@@ -1938,11 +1938,18 @@ class _DeviceScreenState extends State<DeviceScreen> {
         ? double.parse(data_fetched["BMS_fault"]!)
         : 0.0;
 
-    int stateOfCharge = (batteryHealthStatus / 100).floor();
-    int stateOfHealth = (batteryHealthStatus % 100).round();
+    String hexValue = batteryHealthStatus.round().toRadixString(16).padLeft(4, '0');
+    int stateOfHealth = int.parse(hexValue.substring(0, 2), radix: 16);
+    int stateOfCharge = int.parse(hexValue.substring(2, 4), radix: 16);
 
-    double _stateOfCharge = stateOfCharge / 100;
-    double _stateOfHealth = stateOfHealth / 100;
+    // double _stateOfCharge = stateOfCharge / 100;
+    // double _stateOfHealth = stateOfHealth / 100;
+
+    // int stateOfCharge = (batteryHealthStatus / 100).floor();
+    // int stateOfHealth = (batteryHealthStatus % 100).round();
+
+    // double _stateOfCharge = stateOfCharge / 100;
+    // double _stateOfHealth = stateOfHealth / 100;
 
     Future<void> refresh_data() async {
       setState(() {
@@ -2021,38 +2028,38 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_2,
-                            CustomColors.mainColor_2
-                          ]),
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Battery Health Status',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    trailing: Text(
-                        (batteryHealthStatus * 0.001).toStringAsFixed(3) + ' %',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
-                  ),
-                ),
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: Container(
+              //     decoration: BoxDecoration(
+              //         gradient: LinearGradient(
+              //             begin: Alignment.centerLeft,
+              //             end: Alignment.centerRight,
+              //             colors: [
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_2,
+              //               CustomColors.mainColor_2
+              //             ]),
+              //         borderRadius: BorderRadius.circular(size.height * 0.01),
+              //         color: CustomColors.mainColor_3),
+              //     child: ListTile(
+              //       title: const Text(
+              //         'Battery Health Status',
+              //         style: TextStyle(
+              //             fontWeight: FontWeight.bold, color: Colors.white),
+              //       ),
+              //       trailing: Text(
+              //           hexValue,
+              //           style: TextStyle(
+              //               fontWeight: FontWeight.bold,
+              //               color: Colors.white,
+              //               fontSize: size.height * 0.018)),
+              //     ),
+              //   ),
+              // ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
@@ -2178,7 +2185,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                                   Spacer(),
                                   TweenAnimationBuilder<double>(
                                     tween: Tween<double>(
-                                        begin: 0, end: _stateOfCharge),
+                                        begin: 0, end: (stateOfCharge*0.01)),
                                     duration: Duration(seconds: 2),
                                     builder: (context, value, child) {
                                       Color color;
@@ -2227,7 +2234,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                                   Spacer(),
                                   TweenAnimationBuilder<double>(
                                     tween: Tween<double>(
-                                        begin: 0, end: _stateOfHealth),
+                                        begin: 0, end: (stateOfHealth*0.01)),
                                     duration: Duration(seconds: 2),
                                     builder: (context, value, child) {
                                       Color color;
@@ -3151,6 +3158,10 @@ class _DeviceScreenState extends State<DeviceScreen> {
         ? double.parse(data_fetched["cell16_voltage"]!)
         : 0.0;
 
+    String hexValue = batteryHealthStatus.round().toRadixString(16).padLeft(4, '0');
+    int stateOfHealth = int.parse(hexValue.substring(0, 2), radix: 16);
+    int stateOfCharge = int.parse(hexValue.substring(2, 4), radix: 16);
+
     Future<void> refresh_data() async {
       setState(() {
         on_refresh_pressed();
@@ -3228,38 +3239,38 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_2,
-                            CustomColors.mainColor_2
-                          ]),
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Battery Health Status',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    trailing: Text(
-                        (batteryHealthStatus * 0.001).toStringAsFixed(2) + ' %',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
-                  ),
-                ),
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: Container(
+              //     decoration: BoxDecoration(
+              //         gradient: LinearGradient(
+              //             begin: Alignment.centerLeft,
+              //             end: Alignment.centerRight,
+              //             colors: [
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_3,
+              //               CustomColors.mainColor_2,
+              //               CustomColors.mainColor_2
+              //             ]),
+              //         borderRadius: BorderRadius.circular(size.height * 0.01),
+              //         color: CustomColors.mainColor_3),
+              //     child: ListTile(
+              //       title: const Text(
+              //         'Battery Health Status',
+              //         style: TextStyle(
+              //             fontWeight: FontWeight.bold, color: Colors.white),
+              //       ),
+              //       trailing: Text(
+              //           (batteryHealthStatus * 0.001).toStringAsFixed(2) + ' %',
+              //           style: TextStyle(
+              //               fontWeight: FontWeight.bold,
+              //               color: Colors.white,
+              //               fontSize: size.height * 0.018)),
+              //     ),
+              //   ),
+              // ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
@@ -3920,11 +3931,15 @@ class _DeviceScreenState extends State<DeviceScreen> {
         ? double.parse(data_fetched["BMS_fault"]!)
         : 0.0;
 
-    int stateOfCharge = (batteryHealthStatus / 100).floor();
-    int stateOfHealth = (batteryHealthStatus % 100).round();
+    String hexValue = batteryHealthStatus.round().toRadixString(16).padLeft(4, '0');
+    int stateOfHealth = int.parse(hexValue.substring(0, 2), radix: 16);
+    int stateOfCharge = int.parse(hexValue.substring(2, 4), radix: 16);
 
-    double _stateOfCharge = stateOfCharge / 100;
-    double _stateOfHealth = stateOfHealth / 100;
+    // int stateOfCharge = (batteryHealthStatus / 100).floor();
+    // int stateOfHealth = (batteryHealthStatus % 100).round();
+
+    // double _stateOfCharge = stateOfCharge / 100;
+    // double _stateOfHealth = stateOfHealth / 100;
 
     Future<void> refresh_data() async {
       setState(() {
@@ -4064,7 +4079,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                                   Spacer(),
                                   TweenAnimationBuilder<double>(
                                     tween: Tween<double>(
-                                        begin: 0, end: _stateOfCharge),
+                                        begin: 0, end: (stateOfCharge*0.01)),
                                     duration: Duration(seconds: 2),
                                     builder: (context, value, child) {
                                       Color color;
@@ -4113,7 +4128,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                                   Spacer(),
                                   TweenAnimationBuilder<double>(
                                     tween: Tween<double>(
-                                        begin: 0, end: _stateOfHealth),
+                                        begin: 0, end: (stateOfHealth*0.01)),
                                     duration: Duration(seconds: 2),
                                     builder: (context, value, child) {
                                       Color color;
@@ -4910,11 +4925,15 @@ class _DeviceScreenState extends State<DeviceScreen> {
         ? double.parse(data_fetched["BMS_fault"]!)
         : 0.0;
 
-    int stateOfCharge = (batteryHealthStatus / 100).floor();
-    int stateOfHealth = (batteryHealthStatus % 100).round();
+    String hexValue = batteryHealthStatus.round().toRadixString(16).padLeft(4, '0');
+    int stateOfHealth = int.parse(hexValue.substring(0, 2), radix: 16);
+    int stateOfCharge = int.parse(hexValue.substring(2, 4), radix: 16);
 
-    double _stateOfCharge = stateOfCharge / 100;
-    double _stateOfHealth = stateOfHealth / 100;
+    // int stateOfCharge = (batteryHealthStatus / 100).floor();
+    // int stateOfHealth = (batteryHealthStatus % 100).round();
+
+    // double _stateOfCharge = stateOfCharge / 100;
+    // double _stateOfHealth = stateOfHealth / 100;
 
     Future<void> refresh_data() async {
       setState(() {
@@ -5058,7 +5077,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                                   Spacer(),
                                   TweenAnimationBuilder<double>(
                                     tween: Tween<double>(
-                                        begin: 0, end: _stateOfCharge),
+                                        begin: 0, end: (stateOfCharge*0.01)),
                                     duration: Duration(seconds: 2),
                                     builder: (context, value, child) {
                                       Color color;
@@ -5107,7 +5126,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                                   Spacer(),
                                   TweenAnimationBuilder<double>(
                                     tween: Tween<double>(
-                                        begin: 0, end: _stateOfHealth),
+                                        begin: 0, end: (stateOfHealth*0.01)),
                                     duration: Duration(seconds: 2),
                                     builder: (context, value, child) {
                                       Color color;
