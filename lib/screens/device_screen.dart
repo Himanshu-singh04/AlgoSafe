@@ -3085,9 +3085,9 @@ class _DeviceScreenState extends State<DeviceScreen> {
         ? double.parse(data_fetched["Battery_current"]!)
         : 0.0;
 
-    double batteryHealthStatus = data_fetched["Battery_health_status"] != null
-        ? double.parse(data_fetched["Battery_health_status"]!)
-        : 0.0;
+    // double batteryHealthStatus = data_fetched["Battery_health_status"] != null
+    //     ? double.parse(data_fetched["Battery_health_status"]!)
+    //     : 0.0;
 
     double packageRemainingCapacity =
         data_fetched["Package_remaining_capacity"] != null
@@ -3158,9 +3158,9 @@ class _DeviceScreenState extends State<DeviceScreen> {
         ? double.parse(data_fetched["cell16_voltage"]!)
         : 0.0;
 
-    String hexValue = batteryHealthStatus.round().toRadixString(16).padLeft(4, '0');
-    int stateOfHealth = int.parse(hexValue.substring(0, 2), radix: 16);
-    int stateOfCharge = int.parse(hexValue.substring(2, 4), radix: 16);
+    // String hexValue = batteryHealthStatus.round().toRadixString(16).padLeft(4, '0');
+    // int stateOfHealth = int.parse(hexValue.substring(0, 2), radix: 16);
+    // int stateOfCharge = int.parse(hexValue.substring(2, 4), radix: 16);
 
     Future<void> refresh_data() async {
       setState(() {

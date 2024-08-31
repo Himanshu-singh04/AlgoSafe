@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:algo_safe/screens/firmware_update_screen.dart';
 import 'package:algo_safe/screens/permission_screen.dart';
 import 'package:algo_safe/screens/scan_drawer_screen.dart';
 import 'package:algo_safe/screens/splash_screen.dart';
@@ -54,7 +55,7 @@ class _home_pageState extends State<home_page> {
   @override
   Widget build(BuildContext context) {
     Widget screen = adapter_state == BluetoothAdapterState.on
-        ? scan_drawer()
+        ? firmware_Update()
         : BluetoothOffScreen(adapter_state: adapter_state);
 
     return MaterialApp(
