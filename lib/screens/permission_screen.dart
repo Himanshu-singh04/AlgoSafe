@@ -65,7 +65,7 @@ class BluetoothOffScreen extends StatelessWidget {
                 success: false);
           }
           // new line added
-          Navigator.pushReplacementNamed(context, '/login');
+          Navigator.pushReplacementNamed(context, '/wrapper');
         },
       ),
     );

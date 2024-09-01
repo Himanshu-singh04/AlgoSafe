@@ -1,5 +1,7 @@
 import 'package:algo_safe/utils/colors.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class drawer_screen extends StatefulWidget {
   const drawer_screen({super.key});
@@ -9,6 +11,14 @@ class drawer_screen extends StatefulWidget {
 }
 
 class _drawer_screenState extends State<drawer_screen> {
+
+  final user = FirebaseAuth.instance.currentUser;
+
+  sign_out () async {
+    await GoogleSignIn().signOut();
+    await FirebaseAuth.instance.signOut();
+  }
+
   // drawer screen activities
   @override
   Widget build(BuildContext context) {
@@ -191,6 +201,20 @@ class _drawer_screenState extends State<drawer_screen> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(30),
                       color: CustomColors.mainColor_1,
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          child: Text("${user!.email}"),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(30))
+                          ),),
+                        Spacer(),
+                        ElevatedButton(onPressed: (() => sign_out()), child: Text("Sign Out")),
+                        SizedBox(
+                          width: size.width * 0.05,
+                        )
+                      ],
                     ),
                   ),
                 ),
