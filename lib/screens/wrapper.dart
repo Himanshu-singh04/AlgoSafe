@@ -1,6 +1,5 @@
-import 'package:algo_safe/main.dart';
-import 'package:algo_safe/screens/homepage.dart';
 import 'package:algo_safe/screens/loginpage.dart';
+import 'package:algo_safe/screens/scan_screen.dart';
 import 'package:algo_safe/screens/verify.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +18,7 @@ class _wrapperState extends State<wrapper> {
       body: StreamBuilder(stream: FirebaseAuth.instance.authStateChanges(), builder: (context, snapshot){
         if (snapshot.hasData){
           if(snapshot.data!.emailVerified){
-            return HomePage();
+            return ScanScreen();
           }
           else{
             return verify();

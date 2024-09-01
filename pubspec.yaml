@@ -59,6 +59,8 @@ dependencies:
   firebase_core: ^3.3.0
   firebase_auth: ^5.1.4
   google_sign_in: ^6.2.1
+  draggable_fab: ^0.1.4
+  badges: ^3.1.2
 
 dev_dependencies:
   flutter_test:

@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:algo_safe/screens/login_screen.dart';
 import 'package:algo_safe/screens/permission_screen.dart';
-import 'package:algo_safe/screens/scan_drawer_screen.dart';
+// import 'package:algo_safe/screens/scan_drawer_screen.dart';
 import 'package:algo_safe/screens/splash_screen.dart';
 import 'package:algo_safe/screens/wrapper.dart';
+// import 'package:algo_safe/screens/wrapper.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -17,12 +18,13 @@ void main() async {
   await Firebase.initializeApp();
   runApp(GetMaterialApp(
     debugShowCheckedModeBanner: false,
-    // home: splash_screen(),
-    home: wrapper(),
+    home: splash_screen(),
+    // home: wrapper(),
     routes: {
       '/permissions': (context) => BluetoothOffScreen(),
       '/login': (context) => LoginScreen(),
       '/home': (context) => HomePage(),
+      '/wrapper': (context) => wrapper() 
     },
   ));
 }
@@ -56,7 +58,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     Widget screen = adapterState == BluetoothAdapterState.on
-        ? scan_drawer()
+        ? wrapper()
         : BluetoothOffScreen(adapter_state: adapterState);
 
     return MaterialApp(

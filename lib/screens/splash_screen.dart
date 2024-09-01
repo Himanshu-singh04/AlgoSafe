@@ -25,8 +25,8 @@ class _splash_screenState extends State<splash_screen> {
     // delayed function with 4 sec delay
     await Future.delayed(const Duration(milliseconds: 4000), () {});
     // ignore: use_build_context_synchronously
-    // Navigator.of(context).pushReplacement(create_route());
-    Navigator.pushReplacementNamed(context, '/permissions');
+    Navigator.of(context).pushReplacement(create_route());
+    // Navigator.pushReplacementNamed(context, '/permissions');
   }
 
   // actual splash screen page activities
