@@ -1,4 +1,4 @@
-import 'package:algo_safe/screens/wrapper.dart';
+import 'package:algo_safe/screens/login_checker_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
