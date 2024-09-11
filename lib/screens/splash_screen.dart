@@ -67,10 +67,12 @@ class _splash_screenState extends State<splash_screen> {
                           ),
                         ),
                       ),
-                      Text(
-                        "Experience the Fully Automated Drone operations",
-                        style: TextStyle(
-                            color: Colors.black, fontWeight: FontWeight.w400),
+                      Center(
+                        child: Text(
+                          "Experience the Fully Automated Drone operations",
+                          style: TextStyle(
+                              color: Colors.black, fontWeight: FontWeight.w400),
+                        ),
                       ),
                       Spacer(),
                       SizedBox(
