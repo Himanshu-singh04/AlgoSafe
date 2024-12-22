@@ -204,8 +204,11 @@ class _drawer_screenState extends State<drawer_screen> {
                     ),
                     child: Row(
                       children: [
+                        SizedBox(
+                          width: size.width * 0.05,
+                        ),
                         Container(
-                          child: Text("${user!.email}"),
+                          child: Text("${user!.email}",style: TextStyle(color: Colors.white),),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(30))
                           ),),

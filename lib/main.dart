@@ -1,10 +1,9 @@
 import 'dart:async';
 
-import 'package:algo_safe/screens/login_screen.dart';
 import 'package:algo_safe/screens/permission_screen.dart';
 // import 'package:algo_safe/screens/scan_drawer_screen.dart';
 import 'package:algo_safe/screens/splash_screen.dart';
-import 'package:algo_safe/screens/wrapper.dart';
+import 'package:algo_safe/screens/login_checker_screen.dart';
 // import 'package:algo_safe/screens/wrapper.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +21,6 @@ void main() async {
     // home: wrapper(),
     routes: {
       '/permissions': (context) => BluetoothOffScreen(),
-      '/login': (context) => LoginScreen(),
       '/home': (context) => HomePage(),
       '/wrapper': (context) => wrapper() 
     },
