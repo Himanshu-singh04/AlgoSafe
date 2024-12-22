@@ -1,14 +1,13 @@
 <h1 align="center">
-  <a href="https://github.com/Arsh-Khan/Xplore-VJTI">
-    <img src="https://github.com/Arsh-Khan/Xplore-VJTI/blob/develop/xplorevjtiofficialapp/assets/Logo_Black.png" alt="CoC Inheritance 2022" width="600" height="400">
+  <a href="https://github.com/Himanshu-singh04/AlgoSafe">
+    <img src="https://github.com/Himanshu-singh04/AlgoSafe/blob/main/assets/images/AlgoFET%20logo%20white%20text%20coloured.png" alt="AlgoFET" width="600" height="400">
   </a>
   <br>
-  XPLORE VJTI 
+  AlgoSAFE 
 </h1>
 
 <div align="center">
-   <strong>Xplore VJTI</strong> - An App-based interface which contains everything ranging from Curricular to Extra-Curricualar activities in VJTI<br>
-  CoC Inheritance 2022 ||  Algo_Unlocked <br> <br>
+   <strong>AlgoSAFE</strong> -  A cross-platform Flutter-based mobile application to monitor and control AlgoFET devices via an ESP32 using Bluetooth Low Energy (BLE). The app supports real-time data monitoring across Android and iOS, featuring a robust communication framework with custom UUIDs and advanced message decoding. <br> <br>
 <!--   Add any <a href="https://shields.io/">Shields</a> here -->
 </div>
 <hr>
@@ -31,45 +30,24 @@
 
 # 📝Description
 
-**Xplore VJTI** is the dream project of its developers as it was the first dev project for them. It is the application based interface which hosts all the shattered aspects of one of the finest technological institutes - **Veermata Jijabai Technological Institute (VJTI)**. The app is the collective outcome of our experience and the knowledge inherited from our seniors.
-The primary motive of this app is to build an interactive community of VJTIans and provide them a platform to discuss their doubts and queries and to share their knowledge to uplift the society. Also this interface would exponentially benefit the prospective students of VJTI as they would have a clear insight of their dream college.
-Thus, we would like to invite all the concerned peoples to our app and engrace it by their esteemed presence.
+**AlgoSAFE** The product's primary focus was to develop a sophisticated mobile application for AlgoFET, aimed at monitoring and controlling its product ecosystem through an advanced communication framework. The application's core objective: is to create a cross-platform solution that could interface seamlessly with an ESP32-based device, AlgoCOM, utilizing Bluetooth Low Energy (BLE) communication protocols. This user-friendly solution empowers users to interact seamlessly with multiple AlgoFET devices. 
 
 Any queries or suggestion regarding this app can be sent us to :
-**help.xplorevjti@gmail.com**
+**himanshu.singh.ws@gmail.com**
 
 <!-- Add your **project description** here. Your project description should cover how your website/app works. That way you can convey what your project is without the need for anyone to view the code. A more *detailed README* in your project repository is encouraged, which can include build and use instructions etc. -->
 
 
 # Features
-## 1. LOGIN & SIGN-UP
+## 1. Landing and Loading Screen
 
-   For all the new users to our app, we have a login/sign-up options for both - VJTI as well as non-VJTI users - where we collect few basic information of the user - Name, DOB, Email id, Registeration Number, Branch and Password - and store them to the firebase along with their encrypted credentials. The email authentication is also done using the features of firebase.
+When you open the app, a loading screen appears, ensuring everything is set up correctly before you start. During this time, the app secures the necessary permissions to access Bluetooth, allowing it to connect with your devices and retrieve the data you need. Once the setup is complete, you'll be seamlessly directed into the app, ready to connect and manage your devices easily.
 
-## 2. DASHBOARD
+## 2. Home Screen
 
-   After successful registeration and login, the user is carried to the dashboard which is the main soul of the project. All the features of the app can be accessed through the dashboard. We have a pallete view having seven thumbnails which are as follows:
+The scan screen is designed to help users easily connect to nearby AlgoFET devices via Bluetooth Low Energy (BLE). When Scan for Devices is pressed, it starts scanning for available AlgoFET devices in the vicinity.
    
-   - **Senior's Advice:**
-     It is a common chatbox where everyone can post their doubts and queries as well as it also provides an interface for seniors to resolve those queries. Additionally, the developers are given an admin tag who can control the chats and maintain its decorum.
-   
-   - **Extra-Curriculars:**
-     It is the most attractive site of our app especially for the aspiring students. Here one can find a list of all clubs & committees of VJTI and on clicking them one can land to the official website of that particular club/committee. So it basically reflects the beauty of the extra-curriculars in VJTI which covers the taste of all its students ranging from various technical and cultural interests.
-   
-   - **Notes & PYQs:**
-     It is the flagship feature of this app which enables user to contribute our college community with some helpful notes & pyqs from the subject toppers which prove to be a key factor for any student to succeed in exams. Additionally, it would also help in building the spirit of contribution which eventually hepls lifetime.  
-   
-   - **About VJTI:**
-     As the title suggests, this feature contains all the general information about VJTI which is simply copy pasted from the official website and very well arranged here especially for the prospeactive students.  
-   
-   - **Location within the campus:**
-     It's the most fancy, difficult to impliment and extremely needful feature of this app. The hardships that we faced in the initial days of our college, in search of various landmarks inside this widely spread college was very painful and thus we came across this idea to make such a feature which would help coming generations as well as the existing students to find the best suitable path from A to B. As said earlier, its the most difficult part to impliment, so for now we have directly merged an app created by our seniors from 2023 batch - Mr Ravi Maurya & Ms Sarah Tisekar - with the name "VJTI Maps".
-   
-   - **How to get VJTI:**
-     As per the name of this title, it is all about the various eligibilty criterias and the previous year cut-offs for every branch along with few free advices from the topper. In short, it is the most statistical page of this app and extremely helpful for anyone to gain a very clear idea regarding the various eligibility criterias of VJTI.
-   
-   - **Map of VJTI:**
-     It is a simpler alternative for locations within the campus wherein we have a schematic map of VJTI along with few markings of famous lankdmarks, which may help user to locate it and reach there according to his preferable way.
+Detected devices are displayed in a list format, with each device name (AlgoTEST) shown alongside a corresponding image of the device. Each device entry includes a Connect button that, when pressed, initiates the connection process to that specific device. Additionally, a Stop Scanning button at the bottom allows the user to halt the scanning process at any time, which is useful when they have found the device they wish to connect to or if no devices are available.
 
 ## 3. SIDE BAR
 Side bar is the most appropriate place for user to access its profile and to customize the app as per his/her need. Additionally, it is also the place where, a user can contact the developers in case of any feedback or suggestion. So in this app too, we tried to implement these features and the following is a breif description of each one of them:
