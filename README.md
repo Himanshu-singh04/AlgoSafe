@@ -116,41 +116,18 @@ AlgoDOCK, the revolutionary Contact-Based Charging System for drones. By utilizi
 
 ## 📱Screenshots
 
-**Sign Up and Login of VJTI Students**
+<img src = "https://github.com/Himanshu-singh04/AlgoSafe/blob/main/assets/app_images/splash_screen.jpg" height=700 width=370>
 
-<img src = "https://github.com/Arsh-Khan/Xplore-VJTI/blob/develop/assets/Screenshot_20230202_231313.jpg" height=700 width=370>
+<img src = "https://github.com/Himanshu-singh04/AlgoSafe/blob/main/assets/app_images/ble_permission.jpg" height=700 width=370>
 
-<img src = "https://github.com/Arsh-Khan/Xplore-VJTI/blob/develop/assets/Screenshot_20230202_231424.jpg" height=1000 width=370>
+<img src = "https://github.com/Himanshu-singh04/AlgoSafe/blob/main/assets/app_images/scan_screen.jpg" height=700 width=370>
 
-**Dashboard View and Side Bar**
+<img src = "https://github.com/Himanshu-singh04/AlgoSafe/blob/main/assets/app_images/algobms_read(3).jpg" height=700 width=370>
 
-<img src = "https://github.com/Arsh-Khan/Xplore-VJTI/blob/develop/assets/Screenshot_20230202_231733.jpg" height=800 width=370>
+<img src = "https://github.com/Himanshu-singh04/AlgoSafe/blob/main/assets/app_images/algobms_write%20(2).jpg" height=700 width=370>
 
-<img src = "https://github.com/Arsh-Khan/Xplore-VJTI/blob/develop/assets/Screenshot_20230202_231746.jpg" height=700 width=370>
+<img src = "https://github.com/Himanshu-singh04/AlgoSafe/blob/main/assets/app_images/algox_read.jpg" height=700 width=370>
 
-**Profile View and Update Profile**
+<img src = "https://github.com/Himanshu-singh04/AlgoSafe/blob/main/assets/app_images/algox_final.jpg" height=700 width=370>
 
-<img src = "https://github.com/Arsh-Khan/Xplore-VJTI/blob/develop/assets/Screenshot_20230202_231755.jpg" height=800 width=370>
-
-<img src = "https://github.com/Arsh-Khan/Xplore-VJTI/blob/develop/assets/Screenshot_20230202_232029.jpg" height=800 width=370>
-
-**Extra Curricular Page**
-
-<img src = "https://github.com/Arsh-Khan/Xplore-VJTI/blob/develop/assets/Screenshot_20230202_231939.jpg" height=700 width=370>
-
-**Notes And PYQS**
-
-<img src = "https://github.com/Arsh-Khan/Xplore-VJTI/blob/develop/assets/Screenshot_20230202_231959.jpg" height=700 width=370>
-
-<img src = "https://github.com/Arsh-Khan/Xplore-VJTI/blob/develop/assets/Screenshot_20230202_232002.jpg" height=700 width=370>
-
-<img src = "https://github.com/Arsh-Khan/Xplore-VJTI/blob/develop/assets/Screenshot_20230202_232006.jpg" height=700 width=370>
-
-<img src = "https://github.com/Arsh-Khan/Xplore-VJTI/blob/develop/assets/Screenshot_20230202_232011.jpg" height=700 width=370>
-
-
-**Seniors Advice**
-
-<img src = "https://github.com/Arsh-Khan/Xplore-VJTI/blob/develop/assets/Screenshot_20230202_232357.jpg" height=800 width=370>
-
-<img src = "https://github.com/Arsh-Khan/Xplore-VJTI/blob/develop/assets/Screenshot_20230202_232411.jpg" height=700 width=370>
+<img src = "https://github.com/Himanshu-singh04/AlgoSafe/blob/main/assets/app_images/algo_pad1.jpg" height=700 width=370>
