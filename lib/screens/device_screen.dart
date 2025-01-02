@@ -1938,7 +1938,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
         ? double.parse(data_fetched["BMS_fault"]!)
         : 0.0;
 
-    String hexValue = batteryHealthStatus.round().toRadixString(16).padLeft(4, '0');
+    String hexValue =
+        batteryHealthStatus.round().toRadixString(16).padLeft(4, '0');
     int stateOfHealth = int.parse(hexValue.substring(0, 2), radix: 16);
     int stateOfCharge = int.parse(hexValue.substring(2, 4), radix: 16);
 
@@ -2020,7 +2021,13 @@ class _DeviceScreenState extends State<DeviceScreen> {
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                     trailing: Text(
-                        (batteryTemperature * 0.01).toStringAsFixed(2) + ' °C',
+                        // Calculate temperature based on the condition
+                        batteryTemperature > 12000
+                            ? ((65535 - batteryTemperature) * -0.01)
+                                    .toStringAsFixed(2) +
+                                ' °C'
+                            : (batteryTemperature * 0.01).toStringAsFixed(2) +
+                                ' °C',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -2185,7 +2192,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                                   Spacer(),
                                   TweenAnimationBuilder<double>(
                                     tween: Tween<double>(
-                                        begin: 0, end: (stateOfCharge*0.01)),
+                                        begin: 0, end: (stateOfCharge * 0.01)),
                                     duration: Duration(seconds: 2),
                                     builder: (context, value, child) {
                                       Color color;
@@ -2234,7 +2241,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                                   Spacer(),
                                   TweenAnimationBuilder<double>(
                                     tween: Tween<double>(
-                                        begin: 0, end: (stateOfHealth*0.01)),
+                                        begin: 0, end: (stateOfHealth * 0.01)),
                                     duration: Duration(seconds: 2),
                                     builder: (context, value, child) {
                                       Color color;
@@ -3085,9 +3092,9 @@ class _DeviceScreenState extends State<DeviceScreen> {
         ? double.parse(data_fetched["Battery_current"]!)
         : 0.0;
 
-    double batteryHealthStatus = data_fetched["Battery_health_status"] != null
-        ? double.parse(data_fetched["Battery_health_status"]!)
-        : 0.0;
+    // double batteryHealthStatus = data_fetched["Battery_health_status"] != null
+    //     ? double.parse(data_fetched["Battery_health_status"]!)
+    //     : 0.0;
 
     double packageRemainingCapacity =
         data_fetched["Package_remaining_capacity"] != null
@@ -3158,9 +3165,10 @@ class _DeviceScreenState extends State<DeviceScreen> {
         ? double.parse(data_fetched["cell16_voltage"]!)
         : 0.0;
 
-    String hexValue = batteryHealthStatus.round().toRadixString(16).padLeft(4, '0');
-    int stateOfHealth = int.parse(hexValue.substring(0, 2), radix: 16);
-    int stateOfCharge = int.parse(hexValue.substring(2, 4), radix: 16);
+    // String hexValue =
+    //     batteryHealthStatus.round().toRadixString(16).padLeft(4, '0');
+    // int stateOfHealth = int.parse(hexValue.substring(0, 2), radix: 16);
+    // int stateOfCharge = int.parse(hexValue.substring(2, 4), radix: 16);
 
     Future<void> refresh_data() async {
       setState(() {
@@ -3931,7 +3939,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
         ? double.parse(data_fetched["BMS_fault"]!)
         : 0.0;
 
-    String hexValue = batteryHealthStatus.round().toRadixString(16).padLeft(4, '0');
+    String hexValue =
+        batteryHealthStatus.round().toRadixString(16).padLeft(4, '0');
     int stateOfHealth = int.parse(hexValue.substring(0, 2), radix: 16);
     int stateOfCharge = int.parse(hexValue.substring(2, 4), radix: 16);
 
@@ -4079,7 +4088,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                                   Spacer(),
                                   TweenAnimationBuilder<double>(
                                     tween: Tween<double>(
-                                        begin: 0, end: (stateOfCharge*0.01)),
+                                        begin: 0, end: (stateOfCharge * 0.01)),
                                     duration: Duration(seconds: 2),
                                     builder: (context, value, child) {
                                       Color color;
@@ -4128,7 +4137,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                                   Spacer(),
                                   TweenAnimationBuilder<double>(
                                     tween: Tween<double>(
-                                        begin: 0, end: (stateOfHealth*0.01)),
+                                        begin: 0, end: (stateOfHealth * 0.01)),
                                     duration: Duration(seconds: 2),
                                     builder: (context, value, child) {
                                       Color color;
@@ -4454,402 +4463,402 @@ class _DeviceScreenState extends State<DeviceScreen> {
                     ),
                   ),
                 ),
-                if (cell5Voltage != 0)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_2,
-                            CustomColors.mainColor_2
-                          ]),
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Cell5 Voltage',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    trailing: Text(
-                        (cell5Voltage * 0.001).toStringAsFixed(3) + ' V',
+              if (cell5Voltage != 0)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_2,
+                              CustomColors.mainColor_2
+                            ]),
+                        borderRadius: BorderRadius.circular(size.height * 0.01),
+                        color: CustomColors.mainColor_3),
+                    child: ListTile(
+                      title: const Text(
+                        'Cell5 Voltage',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
+                            fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                      trailing: Text(
+                          (cell5Voltage * 0.001).toStringAsFixed(3) + ' V',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: size.height * 0.018)),
+                    ),
                   ),
                 ),
-              ),
               if (cell6Voltage != 0)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_2,
-                            CustomColors.mainColor_2
-                          ]),
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Cell6 Voltage',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    trailing: Text(
-                        (cell6Voltage * 0.001).toStringAsFixed(3) + ' V',
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_2,
+                              CustomColors.mainColor_2
+                            ]),
+                        borderRadius: BorderRadius.circular(size.height * 0.01),
+                        color: CustomColors.mainColor_3),
+                    child: ListTile(
+                      title: const Text(
+                        'Cell6 Voltage',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
+                            fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                      trailing: Text(
+                          (cell6Voltage * 0.001).toStringAsFixed(3) + ' V',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: size.height * 0.018)),
+                    ),
                   ),
                 ),
-              ),
               if (cell7Voltage != 0)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_2,
-                            CustomColors.mainColor_2
-                          ]),
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Cell7 Voltage',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    trailing: Text(
-                        (cell7Voltage * 0.001).toStringAsFixed(3) + ' V',
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_2,
+                              CustomColors.mainColor_2
+                            ]),
+                        borderRadius: BorderRadius.circular(size.height * 0.01),
+                        color: CustomColors.mainColor_3),
+                    child: ListTile(
+                      title: const Text(
+                        'Cell7 Voltage',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
+                            fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                      trailing: Text(
+                          (cell7Voltage * 0.001).toStringAsFixed(3) + ' V',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: size.height * 0.018)),
+                    ),
                   ),
                 ),
-              ),
               if (cell8Voltage != 0)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_2,
-                            CustomColors.mainColor_2
-                          ]),
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Cell8 Voltage',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    trailing: Text(
-                        (cell8Voltage * 0.001).toStringAsFixed(3) + ' V',
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_2,
+                              CustomColors.mainColor_2
+                            ]),
+                        borderRadius: BorderRadius.circular(size.height * 0.01),
+                        color: CustomColors.mainColor_3),
+                    child: ListTile(
+                      title: const Text(
+                        'Cell8 Voltage',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
+                            fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                      trailing: Text(
+                          (cell8Voltage * 0.001).toStringAsFixed(3) + ' V',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: size.height * 0.018)),
+                    ),
                   ),
                 ),
-              ),
               if (cell9Voltage != 0)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_2,
-                            CustomColors.mainColor_2
-                          ]),
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Cell9 Voltage',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    trailing: Text(
-                        (cell9Voltage * 0.001).toStringAsFixed(3) + ' V',
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_2,
+                              CustomColors.mainColor_2
+                            ]),
+                        borderRadius: BorderRadius.circular(size.height * 0.01),
+                        color: CustomColors.mainColor_3),
+                    child: ListTile(
+                      title: const Text(
+                        'Cell9 Voltage',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
+                            fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                      trailing: Text(
+                          (cell9Voltage * 0.001).toStringAsFixed(3) + ' V',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: size.height * 0.018)),
+                    ),
                   ),
                 ),
-              ),
               if (cell10Voltage != 0)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_2,
-                            CustomColors.mainColor_2
-                          ]),
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Cell10 Voltage',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    trailing: Text(
-                        (cell10Voltage * 0.001).toStringAsFixed(3) + ' V',
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_2,
+                              CustomColors.mainColor_2
+                            ]),
+                        borderRadius: BorderRadius.circular(size.height * 0.01),
+                        color: CustomColors.mainColor_3),
+                    child: ListTile(
+                      title: const Text(
+                        'Cell10 Voltage',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
+                            fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                      trailing: Text(
+                          (cell10Voltage * 0.001).toStringAsFixed(3) + ' V',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: size.height * 0.018)),
+                    ),
                   ),
                 ),
-              ),
               if (cell11Voltage != 0)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_2,
-                            CustomColors.mainColor_2
-                          ]),
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Cell11 Voltage',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    trailing: Text(
-                        (cell11Voltage * 0.001).toStringAsFixed(3) + ' V',
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_2,
+                              CustomColors.mainColor_2
+                            ]),
+                        borderRadius: BorderRadius.circular(size.height * 0.01),
+                        color: CustomColors.mainColor_3),
+                    child: ListTile(
+                      title: const Text(
+                        'Cell11 Voltage',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
+                            fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                      trailing: Text(
+                          (cell11Voltage * 0.001).toStringAsFixed(3) + ' V',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: size.height * 0.018)),
+                    ),
                   ),
                 ),
-              ),
               if (cell12Voltage != 0)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_2,
-                            CustomColors.mainColor_2
-                          ]),
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Cell12 Voltage',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    trailing: Text(
-                        (cell12Voltage * 0.001).toStringAsFixed(3) + ' V',
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_2,
+                              CustomColors.mainColor_2
+                            ]),
+                        borderRadius: BorderRadius.circular(size.height * 0.01),
+                        color: CustomColors.mainColor_3),
+                    child: ListTile(
+                      title: const Text(
+                        'Cell12 Voltage',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
+                            fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                      trailing: Text(
+                          (cell12Voltage * 0.001).toStringAsFixed(3) + ' V',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: size.height * 0.018)),
+                    ),
                   ),
                 ),
-              ),
               if (cell13Voltage != 0)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_2,
-                            CustomColors.mainColor_2
-                          ]),
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Cell13 Voltage',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    trailing: Text(
-                        (cell13Voltage * 0.001).toStringAsFixed(3) + ' V',
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_2,
+                              CustomColors.mainColor_2
+                            ]),
+                        borderRadius: BorderRadius.circular(size.height * 0.01),
+                        color: CustomColors.mainColor_3),
+                    child: ListTile(
+                      title: const Text(
+                        'Cell13 Voltage',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
+                            fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                      trailing: Text(
+                          (cell13Voltage * 0.001).toStringAsFixed(3) + ' V',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: size.height * 0.018)),
+                    ),
                   ),
                 ),
-              ),
               if (cell14Voltage != 0)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_2,
-                            CustomColors.mainColor_2
-                          ]),
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Cell14 Voltage',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    trailing: Text(
-                        (cell14Voltage * 0.001).toStringAsFixed(3) + ' V',
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_2,
+                              CustomColors.mainColor_2
+                            ]),
+                        borderRadius: BorderRadius.circular(size.height * 0.01),
+                        color: CustomColors.mainColor_3),
+                    child: ListTile(
+                      title: const Text(
+                        'Cell14 Voltage',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
+                            fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                      trailing: Text(
+                          (cell14Voltage * 0.001).toStringAsFixed(3) + ' V',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: size.height * 0.018)),
+                    ),
                   ),
                 ),
-              ),
               if (cell15Voltage != 0)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_2,
-                            CustomColors.mainColor_2
-                          ]),
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Cell15 Voltage',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    trailing: Text(
-                        (cell15Voltage * 0.001).toStringAsFixed(3) + ' V',
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_2,
+                              CustomColors.mainColor_2
+                            ]),
+                        borderRadius: BorderRadius.circular(size.height * 0.01),
+                        color: CustomColors.mainColor_3),
+                    child: ListTile(
+                      title: const Text(
+                        'Cell15 Voltage',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
+                            fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                      trailing: Text(
+                          (cell15Voltage * 0.001).toStringAsFixed(3) + ' V',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: size.height * 0.018)),
+                    ),
                   ),
                 ),
-              ),
               if (cell16Voltage != 0)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_3,
-                            CustomColors.mainColor_2,
-                            CustomColors.mainColor_2
-                          ]),
-                      borderRadius: BorderRadius.circular(size.height * 0.01),
-                      color: CustomColors.mainColor_3),
-                  child: ListTile(
-                    title: const Text(
-                      'Cell16 Voltage',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    trailing: Text(
-                        (cell16Voltage * 0.001).toStringAsFixed(3) + ' V',
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_3,
+                              CustomColors.mainColor_2,
+                              CustomColors.mainColor_2
+                            ]),
+                        borderRadius: BorderRadius.circular(size.height * 0.01),
+                        color: CustomColors.mainColor_3),
+                    child: ListTile(
+                      title: const Text(
+                        'Cell16 Voltage',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: size.height * 0.018)),
+                            fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                      trailing: Text(
+                          (cell16Voltage * 0.001).toStringAsFixed(3) + ' V',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: size.height * 0.018)),
+                    ),
                   ),
                 ),
-              ),
               if (bmsFault != 0)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -4925,7 +4934,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
         ? double.parse(data_fetched["BMS_fault"]!)
         : 0.0;
 
-    String hexValue = batteryHealthStatus.round().toRadixString(16).padLeft(4, '0');
+    String hexValue =
+        batteryHealthStatus.round().toRadixString(16).padLeft(4, '0');
     int stateOfHealth = int.parse(hexValue.substring(0, 2), radix: 16);
     int stateOfCharge = int.parse(hexValue.substring(2, 4), radix: 16);
 
@@ -5077,7 +5087,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                                   Spacer(),
                                   TweenAnimationBuilder<double>(
                                     tween: Tween<double>(
-                                        begin: 0, end: (stateOfCharge*0.01)),
+                                        begin: 0, end: (stateOfCharge * 0.01)),
                                     duration: Duration(seconds: 2),
                                     builder: (context, value, child) {
                                       Color color;
@@ -5126,7 +5136,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                                   Spacer(),
                                   TweenAnimationBuilder<double>(
                                     tween: Tween<double>(
-                                        begin: 0, end: (stateOfHealth*0.01)),
+                                        begin: 0, end: (stateOfHealth * 0.01)),
                                     duration: Duration(seconds: 2),
                                     builder: (context, value, child) {
                                       Color color;
