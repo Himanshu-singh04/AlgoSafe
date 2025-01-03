@@ -131,7 +131,6 @@ class _ScanResultTileState extends State<ScanResultTile> {
     final Size size = MediaQuery.of(context).size;
     // var adv = widget.result.advertisementData;
     return Card(
-      color: Colors.blueAccent,
       margin: EdgeInsets.all(size.height * 0.01),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),
@@ -161,7 +160,7 @@ class _ScanResultTileState extends State<ScanResultTile> {
               // color: Colors.pink,
               height: size.height * 0.1,
               width: size.width * 0.3,
-              child: Image.asset("C:/Users/I-HUB/Documents/GitHub/AlgoSafe/assets/images/esp32.png"),
+              child: Image.asset("assets/images/esp32.png"),
             ),
             Container(
               // color: Colors.pink,
