@@ -2554,7 +2554,13 @@ class _DeviceScreenState extends State<DeviceScreen> {
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                     trailing: Text(
-                        (batteryTemperature * 0.01).toStringAsFixed(2) + ' °C',
+                        // Calculate temperature based on the condition
+                        batteryTemperature > 12000
+                            ? ((65535 - batteryTemperature) * -0.01)
+                                    .toStringAsFixed(2) +
+                                ' °C'
+                            : (batteryTemperature * 0.01).toStringAsFixed(2) +
+                                ' °C',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -4051,7 +4057,13 @@ class _DeviceScreenState extends State<DeviceScreen> {
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                     trailing: Text(
-                        (batteryTemperature * 0.01).toStringAsFixed(2) + ' °C',
+                        // Calculate temperature based on the condition
+                        batteryTemperature > 12000
+                            ? ((65535 - batteryTemperature) * -0.01)
+                                    .toStringAsFixed(2) +
+                                ' °C'
+                            : (batteryTemperature * 0.01).toStringAsFixed(2) +
+                                ' °C',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -5050,7 +5062,13 @@ class _DeviceScreenState extends State<DeviceScreen> {
                           fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                     trailing: Text(
-                        (batteryTemperature * 0.01).toStringAsFixed(2) + ' °C',
+                        // Calculate temperature based on the condition
+                        batteryTemperature > 12000
+                            ? ((65535 - batteryTemperature) * -0.01)
+                                    .toStringAsFixed(2) +
+                                ' °C'
+                            : (batteryTemperature * 0.01).toStringAsFixed(2) +
+                                ' °C',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
